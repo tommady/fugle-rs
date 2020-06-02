@@ -1,12 +1,11 @@
-use crate::schema::{ChartResponse, DealtsResponse, ErrorResponse, MetaResponse, QuoteResponse};
-use std::error;
+use crate::schema::{
+    ChartResponse, DealtsResponse, ErrorResponse, MetaResponse, QuoteResponse, Result,
+};
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0/intraday/chart";
 const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0/intraday/quote";
 const INTRADAY_META: &str = "https://api.fugle.tw/realtime/v0/intraday/meta";
 const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0/intraday/dealts";
-
-type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 /// [Endpoint]: https://developer.fugle.tw/document/intraday/chart
 ///

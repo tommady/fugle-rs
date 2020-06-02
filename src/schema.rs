@@ -4,6 +4,18 @@ use std::collections::HashMap;
 use std::error;
 use std::fmt;
 
+pub type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
+
+// for listener usage, but fugle websocket not provide DealtsResponse currently.
+#[derive(Debug)]
+pub enum Response {
+    ChartResponse(ChartResponse),
+    MetaResponse(MetaResponse),
+    QuoteResponse(QuoteResponse),
+    // DealtsResponse,
+    ErrorResponse(ErrorResponse),
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Info {
