@@ -118,7 +118,7 @@ impl Worker {
 
         let thread = thread::spawn(move || {
             while !done.load(Ordering::SeqCst) {
-                let mut socket_receiver = || -> tungstenite::Result<String> {
+                let mut socket_receiver = || -> Result<String> {
                     let msg = socket.read_message()?;
                     let txt = msg.to_text()?;
                     Ok(txt.to_owned())
