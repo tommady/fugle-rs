@@ -7,7 +7,7 @@ use std::sync::{
     Arc,
 };
 use std::thread;
-use tungstenite::{connect, Error};
+use tungstenite::connect;
 
 const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0/intraday/chart";
 const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0/intraday/quote";
@@ -114,10 +114,45 @@ impl Worker {
         sender: Sender<Response>,
         done: Arc<AtomicBool>,
     ) -> Result<Worker> {
+        let (mut socket, _) = connect(uri)?;
+
         let thread = thread::spawn(move || {
             while !done.load(Ordering::SeqCst) {
-                if let Err(e) = handle(mode, &uri, sender.clone()) {
-                    error!("error:{}", e);
+                let mut socket_receiver = || -> tungstenite::Result<String> {
+                    let msg = socket.read_message()?;
+                    let txt = msg.to_text()?;
+                    Ok(txt.to_owned())
+                };
+
+                let txt = match socket_receiver() {
+                    Ok(v) => v,
+                    Err(e) => {
+                        error!("socket_receiver error:{}", e);
+                        continue;
+                    }
+                };
+
+                let m = txt.as_str();
+                let sending = || -> Result<()> {
+                    match mode {
+                        Mode::Chart => {
+                            let c: ChartResponse = serde_json::from_str(m)?;
+                            sender.send(Response::ChartResponse(c))?;
+                        }
+                        Mode::Quote => {
+                            let q: QuoteResponse = serde_json::from_str(m)?;
+                            sender.send(Response::QuoteResponse(q))?;
+                        }
+                        Mode::Meta => {
+                            let m: MetaResponse = serde_json::from_str(m)?;
+                            sender.send(Response::MetaResponse(m))?;
+                        }
+                    }
+                    Ok(())
+                };
+
+                if let Err(e) = sending() {
+                    error!("sending error:{}", e);
                 }
             }
         });
@@ -126,26 +161,4 @@ impl Worker {
             thread: Some(thread),
         })
     }
-}
-
-fn handle(mode: Mode, uri: &str, sender: Sender<Response>) -> Result<()> {
-    let (mut socket, _) = connect(uri)?;
-    let msg = socket.read_message()?;
-    let txt = msg.to_text()?;
-
-    match mode {
-        Mode::Chart => {
-            let c: ChartResponse = serde_json::from_str(txt)?;
-            sender.send(Response::ChartResponse(c))?;
-        }
-        Mode::Quote => {
-            let q: QuoteResponse = serde_json::from_str(txt)?;
-            sender.send(Response::QuoteResponse(q))?;
-        }
-        Mode::Meta => {
-            let m: MetaResponse = serde_json::from_str(txt)?;
-            sender.send(Response::MetaResponse(m))?;
-        }
-    }
-    Ok(())
 }
