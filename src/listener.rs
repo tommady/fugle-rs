@@ -132,6 +132,10 @@ impl Worker {
                     }
                 };
 
+                if txt.is_empty() {
+                    continue;
+                }
+
                 let m = txt.as_str();
                 let sending = || -> Result<()> {
                     match mode {
@@ -155,6 +159,7 @@ impl Worker {
                     error!("sending error:{}", e);
                 }
             }
+            let _ = socket.close(None);
         });
 
         Ok(Worker {
