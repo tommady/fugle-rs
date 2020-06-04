@@ -13,7 +13,6 @@ pub enum Response {
     MetaResponse(MetaResponse),
     QuoteResponse(QuoteResponse),
     // DealtsResponse,
-    ErrorResponse(ErrorResponse),
 }
 
 #[derive(Debug, Deserialize)]
