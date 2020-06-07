@@ -2,6 +2,13 @@
 name = "fugle"
 version = "0.1.0"
 authors = ["tommady <tommady@users.noreply.github.com>"]
+description = "a rust library of https://developer.fugle.tw"
+license-file = "LICENSE"
+readme = "README.md"
+homepage = "https://github.com/tommady/fugle-rs"
+repository = "https://github.com/tommady/fugle-rs"
+keywords = ["fugle", "stock"]
+categories = ["web-programming::http-client", "web-programming::websocket"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
