@@ -47,7 +47,7 @@ fn test_intraday_meta_failed() {
 
 #[test]
 fn test_intraday_deals_pass() {
-    let res = crawler::intraday_dealts("2884", "demo");
+    let res = crawler::intraday_dealts("2884", "demo", 0, 0);
     match res {
         Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
         Err(e) => assert!(false, e.to_string()),
@@ -56,6 +56,6 @@ fn test_intraday_deals_pass() {
 
 #[test]
 fn test_intraday_dealts_failed() {
-    let res = crawler::intraday_dealts("", "");
+    let res = crawler::intraday_dealts("", "", 0, 0);
     assert!(res.is_err());
 }

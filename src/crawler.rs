@@ -58,9 +58,18 @@ pub fn intraday_meta(id: &str, token: &str) -> Result<MetaResponse> {
 /// [Endpoint]: https://developer.fugle.tw/document/intraday/dealts
 ///
 /// Fetching today's advantage information.
-pub fn intraday_dealts(id: &str, token: &str) -> Result<DealtsResponse> {
+pub fn intraday_dealts(
+    id: &str,
+    token: &str,
+    limit: usize,
+    offset: usize,
+) -> Result<DealtsResponse> {
     let resp = reqwest::blocking::get(
-        format!("{}?symbolId={}&apiToken={}", INTRADAY_DEALTS, id, token).as_str(),
+        format!(
+            "{}?symbolId={}&apiToken={}&limit={}&offset={}",
+            INTRADAY_DEALTS, id, token, limit, offset
+        )
+        .as_str(),
     )?;
 
     if resp.status().is_success() {
