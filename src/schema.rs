@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error;
 use std::fmt;
@@ -15,7 +15,7 @@ pub enum Response {
     // DealtsResponse,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Info {
     pub last_updated_at: Option<DateTime<Utc>>,
@@ -26,7 +26,7 @@ pub struct Info {
     pub time_zone: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Chart {
     pub close: f64,
@@ -37,21 +37,21 @@ pub struct Chart {
     pub volume: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChartData {
     pub info: Info,
     pub chart: HashMap<DateTime<Utc>, Chart>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChartResponse {
     pub api_version: String,
     pub data: ChartData,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Meta {
     pub is_index: bool,
@@ -72,21 +72,21 @@ pub struct Meta {
     pub type_zh_tw: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MetaData {
     pub info: Info,
     pub meta: Meta,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MetaResponse {
     pub api_version: String,
     pub data: MetaData,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteTotal {
     pub at: DateTime<Utc>,
@@ -94,7 +94,7 @@ pub struct QuoteTotal {
     pub volume: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteTrial {
     pub at: DateTime<Utc>,
@@ -103,7 +103,7 @@ pub struct QuoteTrial {
     pub volume: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteTrade {
     pub at: DateTime<Utc>,
@@ -113,7 +113,7 @@ pub struct QuoteTrade {
     pub serial: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteBest {
     pub price: f64,
@@ -121,7 +121,7 @@ pub struct QuoteBest {
     pub volume: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteOrder {
     pub at: DateTime<Utc>,
@@ -129,28 +129,28 @@ pub struct QuoteOrder {
     pub best_asks: Vec<QuoteBest>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuotePriceHigh {
     pub price: f64,
     pub at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuotePriceLow {
     pub price: f64,
     pub at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuotePriceOpen {
     pub price: f64,
     pub at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Quote {
     pub is_curbing: bool,
@@ -168,21 +168,21 @@ pub struct Quote {
     pub price_open: QuotePriceOpen,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteData {
     pub info: Info,
     pub quote: Quote,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteResponse {
     pub api_version: String,
     pub data: QuoteData,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Dealt {
     pub at: DateTime<Utc>,
@@ -191,28 +191,28 @@ pub struct Dealt {
     pub serial: u64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DealtsData {
     pub info: Info,
     pub dealts: Vec<Dealt>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DealtsResponse {
     pub api_version: String,
     pub data: DealtsData,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Error {
     pub code: i32,
     pub message: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorResponse {
     pub api_version: String,
