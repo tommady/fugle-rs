@@ -1,6 +1,6 @@
 [package]
 name = "fugle"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["tommady <tommady@users.noreply.github.com>"]
 description = "a rust library of https://developer.fugle.tw"
 license-file = "LICENSE"

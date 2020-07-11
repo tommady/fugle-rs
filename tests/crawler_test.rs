@@ -1,4 +1,5 @@
 use fugle::crawler;
+use fugle::schema::FugleError;
 
 #[test]
 fn test_intraday_chart_pass() {
@@ -58,4 +59,18 @@ fn test_intraday_deals_pass() {
 fn test_intraday_dealts_failed() {
     let res = crawler::intraday_dealts("", "", 0, 0);
     assert!(res.is_err());
+}
+
+// the fugle api returns 403 with message Forbidden in every errors now...
+// this case was testing 401 unauthorized.
+#[test]
+fn test_error_rate_limit_exceeded() {
+    let res = crawler::intraday_dealts("0050", "demo", 0, 0);
+    match res {
+        Ok(v) => assert!(false, v),
+        Err(e) => match e {
+            FugleError::RateLimitExceeded => assert!(true),
+            _ => assert!(false, e),
+        },
+    }
 }

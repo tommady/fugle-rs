@@ -1,4 +1,4 @@
-use crate::schema::{ChartResponse, MetaResponse, QuoteResponse, Response, Result};
+use crate::schema::{ChartResponse, FugleError, MetaResponse, QuoteResponse, Response, Result};
 use log::error;
 use serde_json;
 use std::sync::{
@@ -141,15 +141,21 @@ impl Worker {
                     match mode {
                         Mode::Chart => {
                             let c: ChartResponse = serde_json::from_str(m)?;
-                            sender.send(Response::ChartResponse(c))?;
+                            sender
+                                .send(Response::ChartResponse(c))
+                                .map_err(|_| FugleError::MpscSendError)?;
                         }
                         Mode::Quote => {
                             let q: QuoteResponse = serde_json::from_str(m)?;
-                            sender.send(Response::QuoteResponse(q))?;
+                            sender
+                                .send(Response::QuoteResponse(q))
+                                .map_err(|_| FugleError::MpscSendError)?;
                         }
                         Mode::Meta => {
                             let m: MetaResponse = serde_json::from_str(m)?;
-                            sender.send(Response::MetaResponse(m))?;
+                            sender
+                                .send(Response::MetaResponse(m))
+                                .map_err(|_| FugleError::MpscSendError)?;
                         }
                     }
                     Ok(())

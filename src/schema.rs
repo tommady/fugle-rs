@@ -1,10 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::error;
-use std::fmt;
 
-pub type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
+pub type Result<T> = std::result::Result<T, FugleError>;
 
 // for listener usage, but fugle websocket not provide DealtsResponse currently.
 #[derive(Debug)]
@@ -219,21 +217,103 @@ pub struct ErrorResponse {
     pub error: Error,
 }
 
-impl fmt::Display for ErrorResponse {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for ErrorResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
-            "FugleError: {{ api_version:{}, code:{}, msg:{} }}",
+            "FugleAPI: {{ api_version:{}, code:{}, msg:{} }}",
             self.api_version, self.error.code, self.error.message,
         )
     }
 }
 
-impl error::Error for ErrorResponse {
-    fn description(&self) -> &str {
-        "API response an error"
-    }
-    fn cause(&self) -> Option<&dyn error::Error> {
+impl std::error::Error for ErrorResponse {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         None
+    }
+}
+
+#[derive(Debug)]
+pub enum FugleError {
+    MpscSendError,
+    // error from serde_json lib
+    SerdeJson(serde_json::Error),
+    // error from tungstenite lib
+    Tungstenite(tungstenite::Error),
+    // error from reqwest lib
+    Reqwest(reqwest::Error),
+    // from fugle API response code, to specific errors
+    // https://developer.fugle.tw/document/intraday/introduction
+    // 400
+    General(ErrorResponse),
+    // 401
+    Unauthorized,
+    // 403
+    RateLimitExceeded,
+    // 404
+    ResourceNotFound,
+    // status codes not in the list
+    Unknown(ErrorResponse),
+}
+
+impl std::fmt::Display for FugleError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            FugleError::SerdeJson(ref e) => write!(f, "Serde_json Lib error: {}", e),
+            FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
+            FugleError::Reqwest(ref e) => write!(f, "Reqwest Lib error: {}", e),
+            FugleError::General(ref e) => write!(f, "General purpose error: {}", e),
+            FugleError::Unknown(ref e) => write!(f, "Unknown error: {}", e),
+            FugleError::Unauthorized => write!(f, "Unauthorized"),
+            FugleError::RateLimitExceeded => write!(f, "Rate limit or quota exceeded"),
+            FugleError::ResourceNotFound => write!(f, "Resource Not Found"),
+            FugleError::MpscSendError => write!(f, "MPSC Send Error"),
+        }
+    }
+}
+
+impl std::error::Error for FugleError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            FugleError::SerdeJson(ref e) => Some(e),
+            FugleError::Tungstenite(ref e) => Some(e),
+            FugleError::Reqwest(ref e) => Some(e),
+            FugleError::General(ref _e) => None,
+            FugleError::Unknown(ref _e) => None,
+            FugleError::Unauthorized => None,
+            FugleError::RateLimitExceeded => None,
+            FugleError::ResourceNotFound => None,
+            FugleError::MpscSendError => None,
+        }
+    }
+}
+
+impl From<reqwest::Error> for FugleError {
+    fn from(err: reqwest::Error) -> FugleError {
+        FugleError::Reqwest(err)
+    }
+}
+
+impl From<tungstenite::Error> for FugleError {
+    fn from(err: tungstenite::Error) -> FugleError {
+        FugleError::Tungstenite(err)
+    }
+}
+
+impl From<serde_json::Error> for FugleError {
+    fn from(err: serde_json::Error) -> FugleError {
+        FugleError::SerdeJson(err)
+    }
+}
+
+impl From<ErrorResponse> for FugleError {
+    fn from(err: ErrorResponse) -> FugleError {
+        match err.error.code {
+            400 => FugleError::General(err),
+            401 => FugleError::Unauthorized,
+            403 => FugleError::RateLimitExceeded,
+            404 => FugleError::ResourceNotFound,
+            _ => FugleError::Unknown(err),
+        }
     }
 }
