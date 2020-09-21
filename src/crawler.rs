@@ -11,9 +11,9 @@ const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0/intraday/dealts"
 ///
 /// Fetching the current drawing data.
 pub fn intraday_chart(id: &str, token: &str) -> Result<ChartResponse> {
-    let resp = reqwest::blocking::get(
-        format!("{}?symbolId={}&apiToken={}", INTRADAY_CHART, id, token).as_str(),
-    )?;
+    let url =
+        reqwest::Url::parse_with_params(INTRADAY_CHART, &[("symbolId", id), ("apiToken", token)])?;
+    let resp = reqwest::blocking::get(url)?;
 
     if resp.status().is_success() {
         Ok(resp.json()?)
@@ -27,9 +27,9 @@ pub fn intraday_chart(id: &str, token: &str) -> Result<ChartResponse> {
 ///
 /// Fetching the current status and statistics.
 pub fn intraday_quote(id: &str, token: &str) -> Result<QuoteResponse> {
-    let resp = reqwest::blocking::get(
-        format!("{}?symbolId={}&apiToken={}", INTRADAY_QUOTE, id, token).as_str(),
-    )?;
+    let url =
+        reqwest::Url::parse_with_params(INTRADAY_QUOTE, &[("symbolId", id), ("apiToken", token)])?;
+    let resp = reqwest::blocking::get(url)?;
 
     if resp.status().is_success() {
         Ok(resp.json()?)
@@ -43,9 +43,9 @@ pub fn intraday_quote(id: &str, token: &str) -> Result<QuoteResponse> {
 ///
 /// Fetching today's basic informations.
 pub fn intraday_meta(id: &str, token: &str) -> Result<MetaResponse> {
-    let resp = reqwest::blocking::get(
-        format!("{}?symbolId={}&apiToken={}", INTRADAY_META, id, token).as_str(),
-    )?;
+    let url =
+        reqwest::Url::parse_with_params(INTRADAY_META, &[("symbolId", id), ("apiToken", token)])?;
+    let resp = reqwest::blocking::get(url)?;
 
     if resp.status().is_success() {
         Ok(resp.json()?)
@@ -64,13 +64,16 @@ pub fn intraday_dealts(
     limit: usize,
     offset: usize,
 ) -> Result<DealtsResponse> {
-    let resp = reqwest::blocking::get(
-        format!(
-            "{}?symbolId={}&apiToken={}&limit={}&offset={}",
-            INTRADAY_DEALTS, id, token, limit, offset
-        )
-        .as_str(),
+    let url = reqwest::Url::parse_with_params(
+        INTRADAY_DEALTS,
+        &[
+            ("symbolId", id),
+            ("apiToken", token),
+            ("limit", &limit.to_string()),
+            ("offset", &offset.to_string()),
+        ],
     )?;
+    let resp = reqwest::blocking::get(url)?;
 
     if resp.status().is_success() {
         Ok(resp.json()?)

@@ -242,6 +242,8 @@ pub enum FugleError {
     Tungstenite(tungstenite::Error),
     // error from reqwest lib
     Reqwest(reqwest::Error),
+    // Url Parsing error
+    Url(url::ParseError),
     // from fugle API response code, to specific errors
     // https://developer.fugle.tw/document/intraday/introduction
     // 400
@@ -262,6 +264,7 @@ impl std::fmt::Display for FugleError {
             FugleError::SerdeJson(ref e) => write!(f, "Serde_json Lib error: {}", e),
             FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
             FugleError::Reqwest(ref e) => write!(f, "Reqwest Lib error: {}", e),
+            FugleError::Url(ref e) => write!(f, "Url Parse error: {}", e),
             FugleError::General(ref e) => write!(f, "General purpose error: {}", e),
             FugleError::Unknown(ref e) => write!(f, "Unknown error: {}", e),
             FugleError::Unauthorized => write!(f, "Unauthorized"),
@@ -278,6 +281,7 @@ impl std::error::Error for FugleError {
             FugleError::SerdeJson(ref e) => Some(e),
             FugleError::Tungstenite(ref e) => Some(e),
             FugleError::Reqwest(ref e) => Some(e),
+            FugleError::Url(ref e) => Some(e),
             FugleError::General(ref _e) => None,
             FugleError::Unknown(ref _e) => None,
             FugleError::Unauthorized => None,
@@ -285,6 +289,12 @@ impl std::error::Error for FugleError {
             FugleError::ResourceNotFound => None,
             FugleError::MpscSendError => None,
         }
+    }
+}
+
+impl From<url::ParseError> for FugleError {
+    fn from(err: url::ParseError) -> FugleError {
+        FugleError::Url(err)
     }
 }
 
