@@ -6,7 +6,7 @@ fn test_intraday_chart_pass() {
     let res = crawler::intraday_chart("2884", "demo");
     match res {
         Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
-        Err(e) => assert!(false, e.to_string()),
+        Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
@@ -21,7 +21,7 @@ fn test_intraday_quote_pass() {
     let res = crawler::intraday_quote("2884", "demo");
     match res {
         Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
-        Err(e) => assert!(false, e.to_string()),
+        Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
@@ -36,7 +36,7 @@ fn test_intraday_meta_pass() {
     let res = crawler::intraday_meta("2884", "demo");
     match res {
         Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
-        Err(e) => assert!(false, e.to_string()),
+        Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
@@ -51,7 +51,7 @@ fn test_intraday_deals_pass() {
     let res = crawler::intraday_dealts("2884", "demo", 0, 0);
     match res {
         Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
-        Err(e) => assert!(false, e.to_string()),
+        Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
@@ -67,10 +67,10 @@ fn test_intraday_dealts_failed() {
 fn test_error_rate_limit_exceeded() {
     let res = crawler::intraday_dealts("0050", "demo", 0, 0);
     match res {
-        Ok(v) => assert!(false, v),
+        Ok(v) => assert!(false, "ok: {:?}", v),
         Err(e) => match e {
             FugleError::RateLimitExceeded => assert!(true),
-            _ => assert!(false, e),
+            _ => assert!(false, "error: {}", e),
         },
     }
 }
