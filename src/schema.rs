@@ -1,27 +1,53 @@
-use chrono::{DateTime, Utc};
+use chrono::{naive::MIN_DATE, NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
-// for listener usage, but fugle websocket not provide DealtsResponse currently.
-#[derive(Debug)]
-pub enum Response {
-    ChartResponse(ChartResponse),
-    MetaResponse(MetaResponse),
-    QuoteResponse(QuoteResponse),
-    // DealtsResponse,
+// // for listener usage, but fugle websocket not provide DealtsResponse currently.
+// // for more detail please check at
+// // https://developer.fugle.tw/document/status
+// #[derive(Debug)]
+// pub enum WssResponse {
+//     ChartResponse(ChartResponse),
+//     MetaResponse(MetaResponse),
+//     QuoteResponse(QuoteResponse),
+//     // DealtsResponse,
+// }
+
+fn default_naive_date() -> NaiveDate {
+    MIN_DATE
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+fn default_naive_date_time() -> NaiveDateTime {
+    MIN_DATE.and_hms(0, 0, 0)
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Info {
-    pub last_updated_at: Option<DateTime<Utc>>,
-    pub date: String,
+    #[serde(default = "default_naive_date_time")]
+    pub last_updated_at: NaiveDateTime,
+    #[serde(default = "default_naive_date")]
+    pub date: NaiveDate,
+    #[serde(default)]
     pub mode: String,
+    #[serde(default)]
     pub symbol_id: String,
+    #[serde(default)]
     pub country_code: String,
+    #[serde(default)]
     pub time_zone: String,
+}
+
+impl Default for Info {
+    fn default() -> Info {
+        Info {
+            last_updated_at: MIN_DATE.and_hms(0, 0, 0),
+            date: MIN_DATE,
+            ..std::default::Default::default()
+        }
+    }
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -39,15 +65,15 @@ pub struct Chart {
 #[serde(default, rename_all = "camelCase")]
 pub struct ChartData {
     pub info: Info,
-    pub chart: HashMap<Option<DateTime<Utc>>, Chart>,
+    pub chart: HashMap<NaiveDateTime, Chart>,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct ChartResponse {
-    pub api_version: String,
-    pub data: ChartData,
-}
+// #[derive(Default, Debug, Deserialize, Serialize)]
+// #[serde(default, rename_all = "camelCase")]
+// pub struct ChartResponse {
+//     pub api_version: String,
+//     pub data: ChartData,
+// }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -77,38 +103,77 @@ pub struct MetaData {
     pub meta: Meta,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct MetaResponse {
-    pub api_version: String,
-    pub data: MetaData,
-}
+// #[derive(Default, Debug, Deserialize, Serialize)]
+// #[serde(default, rename_all = "camelCase")]
+// pub struct MetaResponse {
+//     pub api_version: String,
+//     pub data: MetaData,
+// }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuoteTotal {
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
+    #[serde(default)]
     pub unit: u64,
+    #[serde(default)]
     pub volume: u64,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+impl Default for QuoteTotal {
+    fn default() -> QuoteTotal {
+        QuoteTotal {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuoteTrial {
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
+    #[serde(default)]
     pub price: f64,
+    #[serde(default)]
     pub unit: u64,
+    #[serde(default)]
     pub volume: u64,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+impl Default for QuoteTrial {
+    fn default() -> QuoteTrial {
+        QuoteTrial {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuoteTrade {
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
+    #[serde(default)]
     pub price: f64,
+    #[serde(default)]
     pub unit: u64,
+    #[serde(default)]
     pub volume: u64,
+    #[serde(default)]
     pub serial: u64,
+}
+
+impl Default for QuoteTrade {
+    fn default() -> QuoteTrade {
+        QuoteTrade {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -119,33 +184,78 @@ pub struct QuoteBest {
     pub volume: u64,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuoteOrder {
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
+    #[serde(default)]
     pub best_bids: Vec<QuoteBest>,
+    #[serde(default)]
     pub best_asks: Vec<QuoteBest>,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+impl Default for QuoteOrder {
+    fn default() -> QuoteOrder {
+        QuoteOrder {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuotePriceHigh {
+    #[serde(default)]
     pub price: f64,
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+impl Default for QuotePriceHigh {
+    fn default() -> QuotePriceHigh {
+        QuotePriceHigh {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuotePriceLow {
+    #[serde(default)]
     pub price: f64,
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+impl Default for QuotePriceLow {
+    fn default() -> QuotePriceLow {
+        QuotePriceLow {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QuotePriceOpen {
+    #[serde(default)]
     pub price: f64,
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
+}
+
+impl Default for QuotePriceOpen {
+    fn default() -> QuotePriceOpen {
+        QuotePriceOpen {
+            at: MIN_DATE.and_hms(0, 0, 0),
+            ..std::default::Default::default()
+        }
+    }
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -160,7 +270,7 @@ pub struct Quote {
     pub total: QuoteTotal,
     pub trial: QuoteTrial,
     pub trade: QuoteTrade,
-    pub order: Option<QuoteOrder>,
+    pub order: QuoteOrder,
     pub price_high: QuotePriceHigh,
     pub price_low: QuotePriceLow,
     pub price_open: QuotePriceOpen,
@@ -173,19 +283,23 @@ pub struct QuoteData {
     pub quote: Quote,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct QuoteResponse {
-    pub api_version: String,
-    pub data: QuoteData,
-}
+// #[derive(Default, Debug, Deserialize, Serialize)]
+// #[serde(default, rename_all = "camelCase")]
+// pub struct QuoteResponse {
+//     pub api_version: String,
+//     pub data: QuoteData,
+// }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Dealt {
-    pub at: Option<DateTime<Utc>>,
+    #[serde(default = "default_naive_date_time")]
+    pub at: NaiveDateTime,
+    #[serde(default)]
     pub price: f64,
+    #[serde(default)]
     pub unit: u64,
+    #[serde(default)]
     pub serial: u64,
 }
 
@@ -196,11 +310,26 @@ pub struct DealtsData {
     pub dealts: Vec<Dealt>,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct DealtsResponse {
+// #[derive(Default, Debug, Deserialize, Serialize)]
+// #[serde(default, rename_all = "camelCase")]
+// pub struct DealtsResponse {
+//     pub api_version: String,
+//     pub data: DealtsData,
+// }
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", untagged)]
+enum Data {
+    DealtsData(DealtsData),
+    QuoteData(QuoteData),
+    MetaData(MetaData),
+    ChartData(ChartData),
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Response {
     pub api_version: String,
-    pub data: DealtsData,
+    pub data: Data,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -240,10 +369,10 @@ pub enum FugleError {
     SerdeJson(serde_json::Error),
     // error from tungstenite lib
     Tungstenite(tungstenite::Error),
-    // error from reqwest lib
-    Reqwest(reqwest::Error),
-    // Url Parsing error
-    Url(url::ParseError),
+    // error from ureq lib
+    Ureq(ureq::Error),
+    // error from std io
+    StdIO(std::io::Error),
     // from fugle API response code, to specific errors
     // https://developer.fugle.tw/document/intraday/introduction
     // 400
@@ -263,8 +392,8 @@ impl std::fmt::Display for FugleError {
         match *self {
             FugleError::SerdeJson(ref e) => write!(f, "Serde_json Lib error: {}", e),
             FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
-            FugleError::Reqwest(ref e) => write!(f, "Reqwest Lib error: {}", e),
-            FugleError::Url(ref e) => write!(f, "Url Parse error: {}", e),
+            FugleError::Ureq(ref e) => write!(f, "Ureq Lib error: {}", e),
+            FugleError::StdIO(ref e) => write!(f, "std io json Deserialize error: {}", e),
             FugleError::General(ref e) => write!(f, "General purpose error: {}", e),
             FugleError::Unknown(ref e) => write!(f, "Unknown error: {}", e),
             FugleError::Unauthorized => write!(f, "Unauthorized"),
@@ -280,8 +409,8 @@ impl std::error::Error for FugleError {
         match *self {
             FugleError::SerdeJson(ref e) => Some(e),
             FugleError::Tungstenite(ref e) => Some(e),
-            FugleError::Reqwest(ref e) => Some(e),
-            FugleError::Url(ref e) => Some(e),
+            FugleError::Ureq(ref e) => Some(e),
+            FugleError::StdIO(ref e) => Some(e),
             FugleError::General(ref _e) => None,
             FugleError::Unknown(ref _e) => None,
             FugleError::Unauthorized => None,
@@ -292,15 +421,15 @@ impl std::error::Error for FugleError {
     }
 }
 
-impl From<url::ParseError> for FugleError {
-    fn from(err: url::ParseError) -> FugleError {
-        FugleError::Url(err)
+impl From<std::io::Error> for FugleError {
+    fn from(err: std::io::Error) -> FugleError {
+        FugleError::StdIO(err)
     }
 }
 
-impl From<reqwest::Error> for FugleError {
-    fn from(err: reqwest::Error) -> FugleError {
-        FugleError::Reqwest(err)
+impl From<ureq::Error> for FugleError {
+    fn from(err: ureq::Error) -> FugleError {
+        FugleError::Ureq(err)
     }
 }
 

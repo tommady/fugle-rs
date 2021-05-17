@@ -1,4 +1,4 @@
-use crate::schema::{ChartResponse, FugleError, MetaResponse, QuoteResponse, Response, Result};
+use crate::schema::{FugleError, Response, Result};
 use log::error;
 use serde_json;
 use std::sync::{
@@ -9,16 +9,9 @@ use std::sync::{
 use std::thread;
 use tungstenite::connect;
 
-const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0/intraday/chart";
-const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0/intraday/quote";
-const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0/intraday/meta";
-
-#[derive(Clone, Copy)]
-enum Mode {
-    Chart,
-    Quote,
-    Meta,
-}
+const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/chart";
+const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/quote";
+const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/meta";
 
 pub struct Intraday {
     token: &'static str,
@@ -39,7 +32,6 @@ impl Intraday {
 
     pub fn chart(&mut self, symbol_id: &str) -> Result<()> {
         match Worker::new(
-            Mode::Chart,
             format!(
                 "{}?symbolId={}&apiToken={}",
                 INTRADAY_CHART, symbol_id, self.token
@@ -57,7 +49,6 @@ impl Intraday {
 
     pub fn meta(&mut self, symbol_id: &str) -> Result<()> {
         match Worker::new(
-            Mode::Meta,
             format!(
                 "{}?symbolId={}&apiToken={}",
                 INTRADAY_META, symbol_id, self.token
@@ -75,7 +66,6 @@ impl Intraday {
 
     pub fn quote(&mut self, symbol_id: &str) -> Result<()> {
         match Worker::new(
-            Mode::Quote,
             format!(
                 "{}?symbolId={}&apiToken={}",
                 INTRADAY_QUOTE, symbol_id, self.token
@@ -108,12 +98,7 @@ struct Worker {
 }
 
 impl Worker {
-    fn new(
-        mode: Mode,
-        uri: String,
-        sender: Sender<Response>,
-        done: Arc<AtomicBool>,
-    ) -> Result<Worker> {
+    fn new(uri: String, sender: Sender<Response>, done: Arc<AtomicBool>) -> Result<Worker> {
         let (mut socket, _) = connect(uri)?;
 
         let thread = thread::spawn(move || {
@@ -136,28 +121,10 @@ impl Worker {
                     continue;
                 }
 
-                let m = txt.as_str();
                 let sending = || -> Result<()> {
-                    match mode {
-                        Mode::Chart => {
-                            let c: ChartResponse = serde_json::from_str(m)?;
-                            sender
-                                .send(Response::ChartResponse(c))
-                                .map_err(|_| FugleError::MpscSendError)?;
-                        }
-                        Mode::Quote => {
-                            let q: QuoteResponse = serde_json::from_str(m)?;
-                            sender
-                                .send(Response::QuoteResponse(q))
-                                .map_err(|_| FugleError::MpscSendError)?;
-                        }
-                        Mode::Meta => {
-                            let m: MetaResponse = serde_json::from_str(m)?;
-                            sender
-                                .send(Response::MetaResponse(m))
-                                .map_err(|_| FugleError::MpscSendError)?;
-                        }
-                    }
+                    sender
+                        .send(serde_json::from_str(txt.as_str())?)
+                        .map_err(|_| FugleError::MpscSendError)?;
                     Ok(())
                 };
 
