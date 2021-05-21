@@ -1,33 +1,49 @@
-use chrono::{naive::MIN_DATE, NaiveDate, NaiveDateTime};
-use serde::{Deserialize, Serialize};
+use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime};
+use serde::{de, Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
-// // for listener usage, but fugle websocket not provide DealtsResponse currently.
-// // for more detail please check at
-// // https://developer.fugle.tw/document/status
-// #[derive(Debug)]
-// pub enum WssResponse {
-//     ChartResponse(ChartResponse),
-//     MetaResponse(MetaResponse),
-//     QuoteResponse(QuoteResponse),
-//     // DealtsResponse,
-// }
-
 fn default_naive_date() -> NaiveDate {
-    MIN_DATE
+    NaiveDate::from_num_days_from_ce(1)
 }
 
-fn default_naive_date_time() -> NaiveDateTime {
-    MIN_DATE.and_hms(0, 0, 0)
+fn default_date_time() -> DateTime<FixedOffset> {
+    DateTime::<FixedOffset>::from_utc(
+        NaiveDateTime::from_timestamp(0, 0),
+        FixedOffset::east(8 * 3600),
+    )
 }
+
+// fn de_date_time<'de, D>(deserializer: D) -> std::result::Result<DateTime<FixedOffset>, D::Error>
+// where
+//     D: Deserializer<'de>,
+// {
+//     let s: &str = Deserialize::deserialize(deserializer)?;
+//     DateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S.%3f%z").map_err(de::Error::custom)
+// }
+//
+// fn de_chart_map<'de, D>(
+//     deserializer: D,
+// ) -> std::result::Result<HashMap<DateTime<FixedOffset>, Chart>, D::Error>
+// where
+//     D: Deserializer<'de>,
+// {
+//     #[derive(Deserialize, Hash, Eq, PartialEq)]
+//     struct Wrapper(
+//         #[serde(deserialize_with = "de_date_time", default = "default_date_time")]
+//         DateTime<FixedOffset>,
+//     );
+//
+//     let v = HashMap::<Wrapper, Chart>::deserialize(deserializer)?;
+//     Ok(v.into_iter().map(|(Wrapper(k), v)| (k, v)).collect())
+// }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Info {
-    #[serde(default = "default_naive_date_time")]
-    pub last_updated_at: NaiveDateTime,
+    #[serde(default = "default_date_time")]
+    pub last_updated_at: DateTime<FixedOffset>,
     #[serde(default = "default_naive_date")]
     pub date: NaiveDate,
     #[serde(default)]
@@ -43,9 +59,9 @@ pub struct Info {
 impl Default for Info {
     fn default() -> Info {
         Info {
-            last_updated_at: MIN_DATE.and_hms(0, 0, 0),
-            date: MIN_DATE,
-            ..std::default::Default::default()
+            last_updated_at: default_date_time(),
+            date: default_naive_date(),
+            ..Default::default()
         }
     }
 }
@@ -65,15 +81,16 @@ pub struct Chart {
 #[serde(default, rename_all = "camelCase")]
 pub struct ChartData {
     pub info: Info,
-    pub chart: HashMap<NaiveDateTime, Chart>,
+    // #[serde(deserialize_with = "de_chart_map")]
+    pub chart: HashMap<DateTime<FixedOffset>, Chart>,
 }
 
-// #[derive(Default, Debug, Deserialize, Serialize)]
-// #[serde(default, rename_all = "camelCase")]
-// pub struct ChartResponse {
-//     pub api_version: String,
-//     pub data: ChartData,
-// }
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct ChartResponse {
+    pub api_version: String,
+    pub data: ChartData,
+}
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -94,6 +111,8 @@ pub struct Meta {
     pub is_suspended: bool,
     pub is_warrant: bool,
     pub type_zh_tw: String,
+    pub abnormal: String,
+    pub is_unusually_recommended: bool,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -103,18 +122,21 @@ pub struct MetaData {
     pub meta: Meta,
 }
 
-// #[derive(Default, Debug, Deserialize, Serialize)]
-// #[serde(default, rename_all = "camelCase")]
-// pub struct MetaResponse {
-//     pub api_version: String,
-//     pub data: MetaData,
-// }
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct MetaResponse {
+    pub api_version: String,
+    pub data: MetaData,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteTotal {
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
     #[serde(default)]
     pub unit: u64,
     #[serde(default)]
@@ -124,8 +146,8 @@ pub struct QuoteTotal {
 impl Default for QuoteTotal {
     fn default() -> QuoteTotal {
         QuoteTotal {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -133,8 +155,11 @@ impl Default for QuoteTotal {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteTrial {
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
     #[serde(default)]
     pub price: f64,
     #[serde(default)]
@@ -146,8 +171,8 @@ pub struct QuoteTrial {
 impl Default for QuoteTrial {
     fn default() -> QuoteTrial {
         QuoteTrial {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -155,8 +180,11 @@ impl Default for QuoteTrial {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteTrade {
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
     #[serde(default)]
     pub price: f64,
     #[serde(default)]
@@ -170,8 +198,8 @@ pub struct QuoteTrade {
 impl Default for QuoteTrade {
     fn default() -> QuoteTrade {
         QuoteTrade {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -179,16 +207,22 @@ impl Default for QuoteTrade {
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct QuoteBest {
+    #[serde(default)]
     pub price: f64,
+    #[serde(default)]
     pub unit: u64,
+    #[serde(default)]
     pub volume: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QuoteOrder {
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
     #[serde(default)]
     pub best_bids: Vec<QuoteBest>,
     #[serde(default)]
@@ -198,8 +232,8 @@ pub struct QuoteOrder {
 impl Default for QuoteOrder {
     fn default() -> QuoteOrder {
         QuoteOrder {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -209,15 +243,18 @@ impl Default for QuoteOrder {
 pub struct QuotePriceHigh {
     #[serde(default)]
     pub price: f64,
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
 }
 
 impl Default for QuotePriceHigh {
     fn default() -> QuotePriceHigh {
         QuotePriceHigh {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -227,15 +264,18 @@ impl Default for QuotePriceHigh {
 pub struct QuotePriceLow {
     #[serde(default)]
     pub price: f64,
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
 }
 
 impl Default for QuotePriceLow {
     fn default() -> QuotePriceLow {
         QuotePriceLow {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -245,15 +285,18 @@ impl Default for QuotePriceLow {
 pub struct QuotePriceOpen {
     #[serde(default)]
     pub price: f64,
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(
+        default = "default_date_time",
+        // deserialize_with = "de_naive_date_time"
+    )]
+    pub at: DateTime<FixedOffset>,
 }
 
 impl Default for QuotePriceOpen {
     fn default() -> QuotePriceOpen {
         QuotePriceOpen {
-            at: MIN_DATE.and_hms(0, 0, 0),
-            ..std::default::Default::default()
+            at: default_date_time(),
+            ..Default::default()
         }
     }
 }
@@ -262,6 +305,8 @@ impl Default for QuotePriceOpen {
 #[serde(default, rename_all = "camelCase")]
 pub struct Quote {
     pub is_curbing: bool,
+    pub is_curbing_rise: bool,
+    pub is_curbing_fall: bool,
     pub is_trial: bool,
     pub is_open_delayed: bool,
     pub is_close_delayed: bool,
@@ -274,6 +319,10 @@ pub struct Quote {
     pub price_high: QuotePriceHigh,
     pub price_low: QuotePriceLow,
     pub price_open: QuotePriceOpen,
+    pub change: f64,
+    pub change_percent: f64,
+    pub amplitude: f64,
+    pub price_limit: String,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -283,18 +332,18 @@ pub struct QuoteData {
     pub quote: Quote,
 }
 
-// #[derive(Default, Debug, Deserialize, Serialize)]
-// #[serde(default, rename_all = "camelCase")]
-// pub struct QuoteResponse {
-//     pub api_version: String,
-//     pub data: QuoteData,
-// }
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct QuoteResponse {
+    pub api_version: String,
+    pub data: QuoteData,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Dealt {
-    #[serde(default = "default_naive_date_time")]
-    pub at: NaiveDateTime,
+    #[serde(default = "default_date_time")]
+    pub at: DateTime<FixedOffset>,
     #[serde(default)]
     pub price: f64,
     #[serde(default)]
@@ -310,26 +359,28 @@ pub struct DealtsData {
     pub dealts: Vec<Dealt>,
 }
 
-// #[derive(Default, Debug, Deserialize, Serialize)]
-// #[serde(default, rename_all = "camelCase")]
-// pub struct DealtsResponse {
-//     pub api_version: String,
-//     pub data: DealtsData,
-// }
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase", untagged)]
-enum Data {
-    DealtsData(DealtsData),
-    QuoteData(QuoteData),
-    MetaData(MetaData),
-    ChartData(ChartData),
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct DealtsResponse {
+    pub api_version: String,
+    pub data: DealtsData,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Response {
-    pub api_version: String,
-    pub data: Data,
+pub enum Response {
+    Chart(ChartResponse),
+    Quote(QuoteResponse),
+    Meta(MetaResponse),
+    Dealts(DealtsResponse),
+}
+
+#[derive(Debug)]
+pub enum ResponseType {
+    Chart,
+    Quote,
+    Meta,
+    Dealts,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -455,4 +506,92 @@ impl From<ErrorResponse> for FugleError {
             _ => FugleError::Unknown(err),
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_info_deserialize() {
+        let json = r#"{"date":"2021-05-21","mode":"twse-sem","symbolId":"2884","countryCode":"TW","timeZone":"Asia/Taipei","lastUpdatedAt":"2021-05-21T11:39:09.982+08:00"}"#;
+        let got: Info = serde_json::from_str(json).unwrap();
+        assert_eq!("2884", got.symbol_id);
+    }
+
+    #[test]
+    fn test_chart_data_deserialize() {
+        let json = r#"{
+          "info": {
+            "date": "2021-05-21",
+            "mode": "twse-sem",
+            "symbolId": "2884",
+            "countryCode": "TW",
+            "timeZone": "Asia/Taipei",
+            "lastUpdatedAt": "2021-05-21T11:39:09.982+08:00"
+          },
+          "chart": {
+            "2021-05-21T09:01:00.000+08:00": {
+              "open": 25.35,
+              "high": 25.45,
+              "low": 25.35,
+              "close": 25.4,
+              "volume": 400000,
+              "unit": 400
+            }
+          }
+        }"#;
+
+        let got: ChartData = serde_json::from_str(json).unwrap();
+        assert_eq!("2884", got.info.symbol_id);
+        assert_eq!(1, got.chart.len());
+    }
+
+    #[test]
+    fn test_chart_deserialize() {
+        let json = r#"{
+              "open": 25.35,
+              "high": 25.45,
+              "low": 25.35,
+              "close": 25.4,
+              "volume": 400000,
+              "unit": 400
+            }"#;
+
+        let got: Chart = serde_json::from_str(json).unwrap();
+        assert_eq!(25.35, got.open);
+        assert_eq!(25.45, got.high);
+        assert_eq!(25.35, got.low);
+        assert_eq!(25.4, got.close);
+        assert_eq!(400000, got.volume);
+        assert_eq!(400, got.unit);
+    }
+
+    // #[test]
+    // fn test_meta_data_deserialize() {
+    //     let json = r#"{
+    //       "info": {
+    //         "date": "2021-05-21",
+    //         "mode": "twse-sem",
+    //         "symbolId": "2884",
+    //         "countryCode": "TW",
+    //         "timeZone": "Asia/Taipei",
+    //         "lastUpdatedAt": "2021-05-21T11:39:09.982+08:00"
+    //       },
+    //       "chart": {
+    //         "2021-05-21T09:01:00.000+08:00": {
+    //           "open": 25.35,
+    //           "high": 25.45,
+    //           "low": 25.35,
+    //           "close": 25.4,
+    //           "volume": 400000,
+    //           "unit": 400
+    //         }
+    //       }
+    //     }"#;
+
+    //     let got: ChartData = serde_json::from_str(json).unwrap();
+    //     assert_eq!("2884", got.info.symbol_id);
+    //     assert_eq!(1, got.chart.len());
+    // }
 }

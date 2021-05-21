@@ -1,63 +1,84 @@
 use fugle::crawler;
-use fugle::schema::FugleError;
+use fugle::schema::{FugleError, Response};
+mod macros;
 
 #[test]
 fn test_intraday_chart_pass() {
-    let res = crawler::intraday_chart("2884", "demo");
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.chart("2884").call();
     match res {
-        Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
+        Ok(v) => {
+            let chart = fetch_enum!(Response::Chart, v);
+            assert_eq!(chart.data.info.symbol_id, "2884");
+        }
         Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
 #[test]
 fn test_intraday_chart_failed() {
-    let res = crawler::intraday_chart("", "");
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.chart("").call();
     assert!(res.is_err());
 }
 
 #[test]
 fn test_intraday_quote_pass() {
-    let res = crawler::intraday_quote("2884", "demo");
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.quote("2884").call();
     match res {
-        Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
+        Ok(v) => {
+            let quote = fetch_enum!(Response::Quote, v);
+            assert_eq!(quote.data.info.symbol_id, "2884");
+        }
         Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
 #[test]
 fn test_intraday_quote_failed() {
-    let res = crawler::intraday_quote("", "");
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.quote("").call();
     assert!(res.is_err());
 }
 
 #[test]
 fn test_intraday_meta_pass() {
-    let res = crawler::intraday_meta("2884", "demo");
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.meta("2884").call();
     match res {
-        Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
+        Ok(v) => {
+            let meta = fetch_enum!(Response::Meta, v);
+            assert_eq!(meta.data.info.symbol_id, "2884");
+        }
         Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
 #[test]
 fn test_intraday_meta_failed() {
-    let res = crawler::intraday_meta("", "");
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.meta("").call();
     assert!(res.is_err());
 }
 
 #[test]
 fn test_intraday_deals_pass() {
-    let res = crawler::intraday_dealts("2884", "demo", 0, 0);
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.dealts("2884").call();
     match res {
-        Ok(v) => assert_eq!(v.data.info.symbol_id, "2884"),
+        Ok(v) => {
+            let meta = fetch_enum!(Response::Dealts, v);
+            assert_eq!(meta.data.info.symbol_id, "2884");
+        }
         Err(e) => assert!(false, "error: {}", e.to_string()),
     };
 }
 
 #[test]
 fn test_intraday_dealts_failed() {
-    let res = crawler::intraday_dealts("", "", 0, 0);
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.dealts("").call();
     assert!(res.is_err());
 }
 
@@ -65,7 +86,8 @@ fn test_intraday_dealts_failed() {
 // this case was testing 401 unauthorized.
 #[test]
 fn test_error_rate_limit_exceeded() {
-    let res = crawler::intraday_dealts("0050", "demo", 0, 0);
+    let it = crawler::IntradayBuilder::new().build();
+    let res = it.dealts("2884").call();
     match res {
         Ok(v) => assert!(false, "ok: {:?}", v),
         Err(e) => match e {

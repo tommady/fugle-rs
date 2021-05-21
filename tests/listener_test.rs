@@ -1,5 +1,6 @@
 use fugle::{listener, schema::Response};
 use std::sync::mpsc;
+mod macros;
 
 #[test]
 fn test_intraday_chart_failed() {
@@ -15,9 +16,9 @@ fn test_intraday_chart_pass() {
     assert!(lis.chart("2884").is_ok());
     let res = rx.recv();
     assert!(res.is_ok());
-    if let Response::ChartResponse(c) = res.unwrap() {
-        assert_eq!(c.data.info.symbol_id, "2884");
-    }
+    let v = res.unwrap();
+    let chart = fetch_enum!(Response::Chart, v);
+    assert_eq!(chart.data.info.symbol_id, "2884");
 }
 
 #[test]
@@ -34,9 +35,9 @@ fn test_intraday_meta_pass() {
     assert!(lis.chart("2884").is_ok());
     let res = rx.recv();
     assert!(res.is_ok());
-    if let Response::MetaResponse(m) = res.unwrap() {
-        assert_eq!(m.data.info.symbol_id, "2884");
-    }
+    let v = res.unwrap();
+    let meta = fetch_enum!(Response::Meta, v);
+    assert_eq!(meta.data.info.symbol_id, "2884");
 }
 
 #[test]
@@ -53,7 +54,7 @@ fn test_intraday_quote_pass() {
     assert!(lis.chart("2884").is_ok());
     let res = rx.recv();
     assert!(res.is_ok());
-    if let Response::QuoteResponse(q) = res.unwrap() {
-        assert_eq!(q.data.info.symbol_id, "2884");
-    }
+    let v = res.unwrap();
+    let quote = fetch_enum!(Response::Quote, v);
+    assert_eq!(quote.data.info.symbol_id, "2884");
 }

@@ -1,4 +1,7 @@
-use crate::schema::{ErrorResponse, Response, Result};
+use crate::schema::{
+    ChartResponse, DealtsResponse, ErrorResponse, FugleError, MetaResponse, QuoteResponse,
+    Response, ResponseType, Result,
+};
 use std::time::Duration;
 use ureq::{Agent, AgentBuilder, Request};
 
@@ -49,11 +52,12 @@ impl Intraday {
     /// Fetching the current drawing data.
     pub fn chart(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
+            resposne_type: ResponseType::Chart,
             request: self
                 .agent
                 .get(INTRADAY_CHART)
                 .query("apiToken", self.token)
-                .query("symboldId", symbol_id),
+                .query("symbolId", symbol_id),
         }
     }
 
@@ -62,11 +66,12 @@ impl Intraday {
     /// Fetching the current status and statistics.
     pub fn quote(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
+            resposne_type: ResponseType::Quote,
             request: self
                 .agent
                 .get(INTRADAY_QUOTE)
                 .query("apiToken", self.token)
-                .query("symboldId", symbol_id),
+                .query("symbolId", symbol_id),
         }
     }
 
@@ -75,11 +80,12 @@ impl Intraday {
     /// Fetching today's basic informations.
     pub fn meta(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
+            resposne_type: ResponseType::Meta,
             request: self
                 .agent
                 .get(INTRADAY_META)
                 .query("apiToken", self.token)
-                .query("symboldId", symbol_id),
+                .query("symbolId", symbol_id),
         }
     }
 
@@ -88,17 +94,19 @@ impl Intraday {
     /// Fetching today's advantage information.
     pub fn dealts(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
+            resposne_type: ResponseType::Dealts,
             request: self
                 .agent
                 .get(INTRADAY_DEALTS)
                 .query("apiToken", self.token)
-                .query("symboldId", symbol_id),
+                .query("symbolId", symbol_id),
         }
     }
 }
 
 pub struct GetQueryBuilder {
     request: Request,
+    resposne_type: ResponseType,
 }
 
 impl GetQueryBuilder {
@@ -123,6 +131,12 @@ impl GetQueryBuilder {
             let err: ErrorResponse = response.into_json()?;
             return Err(err.into());
         }
-        Ok(response.into_json()?)
+
+        match self.resposne_type {
+            ResponseType::Chart => Ok(Response::Chart(response.into_json()?)),
+            ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
+            ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
+            ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
+        }
     }
 }
