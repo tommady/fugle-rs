@@ -53,3 +53,48 @@ fn test_dealts_response_deserialize() {
     assert_eq!("2884", res.data.info.symbol_id);
     assert_ne!(0, res.data.dealts.len());
 }
+
+#[test]
+fn test_error_response_deserialize() {
+    let input_json = r#"{
+      "apiVersion": "0.2.0",
+      "error": {
+        "code": 401,
+        "message": "Unauthorized"
+      }
+    }"#;
+    let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
+    let got = FugleError::from(err);
+    match got {
+        FugleError::Unauthorized => assert!(true),
+        _ => assert!(false),
+    }
+
+    let input_json = r#"{
+      "apiVersion": "0.2.0",
+      "error": {
+        "code": 403,
+        "message": "RateLimitExceeded"
+      }
+    }"#;
+    let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
+    let got = FugleError::from(err);
+    match got {
+        FugleError::RateLimitExceeded => assert!(true),
+        _ => assert!(false),
+    }
+
+    let input_json = r#"{
+      "apiVersion": "0.2.0",
+      "error": {
+        "code": 404,
+        "message": "ResourceNotFound"
+      }
+    }"#;
+    let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
+    let got = FugleError::from(err);
+    match got {
+        FugleError::ResourceNotFound => assert!(true),
+        _ => assert!(false),
+    }
+}
