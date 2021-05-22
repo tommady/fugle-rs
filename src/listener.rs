@@ -1,6 +1,5 @@
 use crate::schema::{FugleError, Response, Result};
 use log::error;
-use serde_json;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     mpsc::Sender,
@@ -23,18 +22,18 @@ pub struct Intraday {
 impl Intraday {
     pub fn new(token: &'static str, sender: Sender<Response>) -> Intraday {
         Intraday {
-            token: token,
+            token,
             workers: vec![],
             done: Arc::new(AtomicBool::new(false)),
-            sender: sender,
+            sender,
         }
     }
 
-    pub fn chart(&mut self, symbol_id: &str) -> Result<()> {
+    pub fn chart(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
         match Worker::new(
             format!(
-                "{}?symbolId={}&apiToken={}",
-                INTRADAY_CHART, symbol_id, self.token
+                "{}?symbolId={}&apiToken={}&oddLot={}",
+                INTRADAY_CHART, symbol_id, self.token, odd_lot,
             ),
             self.sender.clone(),
             self.done.clone(),
@@ -47,11 +46,11 @@ impl Intraday {
         }
     }
 
-    pub fn meta(&mut self, symbol_id: &str) -> Result<()> {
+    pub fn meta(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
         match Worker::new(
             format!(
-                "{}?symbolId={}&apiToken={}",
-                INTRADAY_META, symbol_id, self.token
+                "{}?symbolId={}&apiToken={}&oddLot={}",
+                INTRADAY_META, symbol_id, self.token, odd_lot,
             ),
             self.sender.clone(),
             self.done.clone(),
@@ -64,11 +63,11 @@ impl Intraday {
         }
     }
 
-    pub fn quote(&mut self, symbol_id: &str) -> Result<()> {
+    pub fn quote(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
         match Worker::new(
             format!(
-                "{}?symbolId={}&apiToken={}",
-                INTRADAY_QUOTE, symbol_id, self.token
+                "{}?symbolId={}&apiToken={}&oddLot={}",
+                INTRADAY_QUOTE, symbol_id, self.token, odd_lot,
             ),
             self.sender.clone(),
             self.done.clone(),

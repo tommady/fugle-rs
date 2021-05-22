@@ -7,12 +7,22 @@ const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.2/intraday/quote"
 const INTRADAY_META: &str = "https://api.fugle.tw/realtime/v0.2/intraday/meta";
 const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0.2/intraday/dealts";
 
+/// Accumulates options towards building an Intraday instance.
 pub struct IntradayBuilder {
     token: &'static str,
     agent_builder: AgentBuilder,
 }
 
+impl Default for IntradayBuilder {
+    fn default() -> IntradayBuilder {
+        IntradayBuilder::new()
+    }
+}
+
 impl IntradayBuilder {
+    /// returns a default IntradayBuilder with
+    /// * fugle "demo" token
+    /// * [ default ureq agent settings ] ( https://github.com/algesten/ureq/blob/main/src/agent.rs#L202 )
     pub fn new() -> IntradayBuilder {
         IntradayBuilder {
             token: "demo",

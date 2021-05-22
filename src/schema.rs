@@ -320,7 +320,7 @@ pub struct DealtsResponse {
 #[serde(rename_all = "camelCase")]
 pub enum Response {
     Chart(ChartResponse),
-    Quote(QuoteResponse),
+    Quote(Box<QuoteResponse>),
     Meta(MetaResponse),
     Dealts(DealtsResponse),
 }
