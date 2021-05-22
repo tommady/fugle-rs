@@ -1,7 +1,4 @@
-use crate::schema::{
-    ChartResponse, DealtsResponse, ErrorResponse, FugleError, MetaResponse, QuoteResponse,
-    Response, ResponseType, Result,
-};
+use crate::schema::{ErrorResponse, Response, ResponseType, Result};
 use std::time::Duration;
 use ureq::{Agent, AgentBuilder, Request};
 

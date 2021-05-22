@@ -1,6 +1,6 @@
 use fugle::crawler;
 use fugle::schema::{FugleError, Response};
-mod macros;
+mod util;
 
 #[test]
 fn test_intraday_chart_pass() {
@@ -92,19 +92,19 @@ fn test_intraday_dealts_failed() {
 // for run in {1..1000}; do curl -X GET "https://api.fugle.tw/realtime/v0.2/intraday/meta?apiToken=demo&symbolId=2884"; done
 // it was responding 403 before...
 //
-// TODO: enable when the fugle server start reponding 403
-// #[test]
-// fn test_error_rate_limit_exceeded() {
-//     let it = crawler::IntradayBuilder::new().build();
-//     loop {
-//         let res = it.dealts("2884").call();
-//         match res {
-//             Ok(_) => continue,
-//             Err(e) => match e {
-//                 FugleError::RateLimitExceeded => break,
-//                 _ => assert!(false, "error: {}", e),
-//             },
-//         }
-//     }
-//     assert!(true)
-// }
+// TODO: remove the for loop when the fugle server start reponding 403
+#[test]
+fn test_error_rate_limit_exceeded() {
+    let it = crawler::IntradayBuilder::new().build();
+    for _ in 0..9 {
+        let res = it.dealts("2884").call();
+        match res {
+            Ok(_) => continue,
+            Err(e) => match e {
+                FugleError::RateLimitExceeded => break,
+                _ => assert!(false, "error: {}", e),
+            },
+        }
+    }
+    assert!(true)
+}

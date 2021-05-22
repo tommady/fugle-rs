@@ -1,6 +1,15 @@
 use fugle::{listener, schema::Response};
 use std::sync::mpsc;
-mod macros;
+use std::time::Duration;
+mod util;
+
+// be aware of websocket testings
+// please check on this website
+// https://developer.fugle.tw/document/status
+//
+// to see the websocket servers status
+// if the status is ⚠ suspend
+// then all pass tests may blocking running into timeout
 
 #[test]
 fn test_intraday_chart_failed() {
@@ -11,14 +20,16 @@ fn test_intraday_chart_failed() {
 
 #[test]
 fn test_intraday_chart_pass() {
-    let (tx, rx) = mpsc::channel();
-    let mut lis = listener::Intraday::new("demo", tx.clone());
-    assert!(lis.chart("2884").is_ok());
-    let res = rx.recv();
-    assert!(res.is_ok());
-    let v = res.unwrap();
-    let chart = fetch_enum!(Response::Chart, v);
-    assert_eq!(chart.data.info.symbol_id, "2884");
+    util::timeout_after(Duration::from_secs(60), || {
+        let (tx, rx) = mpsc::channel();
+        let mut lis = listener::Intraday::new("demo", tx.clone());
+        assert!(lis.chart("2884").is_ok());
+        let res = rx.recv();
+        assert!(res.is_ok());
+        let v = res.unwrap();
+        let chart = fetch_enum!(Response::Chart, v);
+        assert_eq!(chart.data.info.symbol_id, "2884");
+    })
 }
 
 #[test]
@@ -30,14 +41,16 @@ fn test_intraday_meta_failed() {
 
 #[test]
 fn test_intraday_meta_pass() {
-    let (tx, rx) = mpsc::channel();
-    let mut lis = listener::Intraday::new("demo", tx.clone());
-    assert!(lis.chart("2884").is_ok());
-    let res = rx.recv();
-    assert!(res.is_ok());
-    let v = res.unwrap();
-    let meta = fetch_enum!(Response::Meta, v);
-    assert_eq!(meta.data.info.symbol_id, "2884");
+    util::timeout_after(Duration::from_secs(60), || {
+        let (tx, rx) = mpsc::channel();
+        let mut lis = listener::Intraday::new("demo", tx.clone());
+        assert!(lis.chart("2884").is_ok());
+        let res = rx.recv();
+        assert!(res.is_ok());
+        let v = res.unwrap();
+        let meta = fetch_enum!(Response::Meta, v);
+        assert_eq!(meta.data.info.symbol_id, "2884");
+    })
 }
 
 #[test]
@@ -49,12 +62,14 @@ fn test_intraday_quote_failed() {
 
 #[test]
 fn test_intraday_quote_pass() {
-    let (tx, rx) = mpsc::channel();
-    let mut lis = listener::Intraday::new("demo", tx.clone());
-    assert!(lis.chart("2884").is_ok());
-    let res = rx.recv();
-    assert!(res.is_ok());
-    let v = res.unwrap();
-    let quote = fetch_enum!(Response::Quote, v);
-    assert_eq!(quote.data.info.symbol_id, "2884");
+    util::timeout_after(Duration::from_secs(60), || {
+        let (tx, rx) = mpsc::channel();
+        let mut lis = listener::Intraday::new("demo", tx.clone());
+        assert!(lis.chart("2884").is_ok());
+        let res = rx.recv();
+        assert!(res.is_ok());
+        let v = res.unwrap();
+        let quote = fetch_enum!(Response::Quote, v);
+        assert_eq!(quote.data.info.symbol_id, "2884");
+    })
 }
