@@ -9,7 +9,7 @@ const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0.2/intraday/dealt
 
 /// Accumulates options towards building an Intraday instance.
 pub struct IntradayBuilder {
-    token: &'static str,
+    token: String,
     agent_builder: AgentBuilder,
 }
 
@@ -20,18 +20,33 @@ impl Default for IntradayBuilder {
 }
 
 impl IntradayBuilder {
-    /// returns a default IntradayBuilder with
+    /// Returns a default IntradayBuilder with
     /// * fugle "demo" token
     /// * [ default ureq agent settings ] ( https://github.com/algesten/ureq/blob/main/src/agent.rs#L202 )
     pub fn new() -> IntradayBuilder {
         IntradayBuilder {
-            token: "demo",
+            token: "demo".to_owned(),
             agent_builder: AgentBuilder::new(),
         }
     }
 
-    pub fn token(mut self, token: &'static str) -> IntradayBuilder {
-        self.token = token;
+    /// Setup your personal fugle token.
+    ///
+    /// By default the IntradayBuilder using fugle demo token which has limitations on querying,
+    /// please login into below web page
+    /// https://developer.fugle.tw/
+    /// then find your personal token.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::crawler::IntradayBuilder;
+    /// let agent = IntradayBuilder::new()
+    ///     .token("b52153ae36747b17c8bdee801da19542")
+    ///     .build();
+    /// ```
+    pub fn token(mut self, token: &str) -> IntradayBuilder {
+        self.token = token.to_owned();
         self
     }
 
@@ -49,7 +64,7 @@ impl IntradayBuilder {
 }
 
 pub struct Intraday {
-    token: &'static str,
+    token: String,
     agent: Agent,
 }
 
@@ -63,7 +78,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_CHART)
-                .query("apiToken", self.token)
+                .query("apiToken", &self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -77,7 +92,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_QUOTE)
-                .query("apiToken", self.token)
+                .query("apiToken", &self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -91,7 +106,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_META)
-                .query("apiToken", self.token)
+                .query("apiToken", &self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -105,7 +120,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_DEALTS)
-                .query("apiToken", self.token)
+                .query("apiToken", &self.token)
                 .query("symbolId", symbol_id),
         }
     }
