@@ -15,6 +15,6 @@ edition = "2018"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
-tungstenite = { version = "0.13", default-futures = false, features = ["rustls-tls"] }
+tungstenite = { git = "https://github.com/snapview/tungstenite-rs", branch = "master", default-futures = false, features = ["rustls-tls"] }
 log = "0.4"
 ureq = { version = "2.1", features = ["json"] }
