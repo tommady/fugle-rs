@@ -1,0 +1,114 @@
+{
+    "apiVersion": "0.2.0",
+    "data": {
+        "info": {
+            "date": "2021-05-21",
+            "mode": "twse-sem",
+            "symbolId": "2884",
+            "countryCode": "TW",
+            "timeZone": "Asia/Taipei",
+            "lastUpdatedAt": "2021-05-21T13:30:13.171+08:00"
+        },
+        "quote": {
+            "isCurbing": false,
+            "isCurbingRise": false,
+            "isCurbingFall": false,
+            "isTrial": false,
+            "isOpenDelayed": false,
+            "isCloseDelayed": false,
+            "isHalting": false,
+            "isClosed": true,
+            "total": {
+                "at": "2021-05-21T13:30:00.000+08:00",
+                "unit": 15419,
+                "volume": 15419000
+            },
+            "trial": {
+                "at": "2021-05-21T13:29:58.116+08:00",
+                "price": 25.45,
+                "unit": 1716,
+                "volume": 1716000
+            },
+            "trade": {
+                "at": "2021-05-21T13:30:00.000+08:00",
+                "price": 25.45,
+                "unit": 1795,
+                "volume": 1795000,
+                "serial": 8561797
+            },
+            "order": {
+                "at": "2021-05-21T13:30:00.000+08:00",
+                "bestBids": [
+                    {
+                        "price": 25.45,
+                        "unit": 652,
+                        "volume": 652000
+                    },
+                    {
+                        "price": 25.4,
+                        "unit": 174,
+                        "volume": 174000
+                    },
+                    {
+                        "price": 25.35,
+                        "unit": 1908,
+                        "volume": 1908000
+                    },
+                    {
+                        "price": 25.3,
+                        "unit": 615,
+                        "volume": 615000
+                    },
+                    {
+                        "price": 25.25,
+                        "unit": 1617,
+                        "volume": 1617000
+                    }
+                ],
+                "bestAsks": [
+                    {
+                        "price": 25.5,
+                        "unit": 621,
+                        "volume": 621000
+                    },
+                    {
+                        "price": 25.55,
+                        "unit": 802,
+                        "volume": 802000
+                    },
+                    {
+                        "price": 25.6,
+                        "unit": 1090,
+                        "volume": 1090000
+                    },
+                    {
+                        "price": 25.65,
+                        "unit": 545,
+                        "volume": 545000
+                    },
+                    {
+                        "price": 25.7,
+                        "unit": 472,
+                        "volume": 472000
+                    }
+                ]
+            },
+            "priceHigh": {
+                "price": 25.6,
+                "at": "2021-05-21T09:06:21.324+08:00"
+            },
+            "priceLow": {
+                "price": 25.25,
+                "at": "2021-05-21T10:26:09.926+08:00"
+            },
+            "priceOpen": {
+                "price": 25.35,
+                "at": "2021-05-21T09:00:12.175+08:00"
+            },
+            "change": 0.2,
+            "changePercent": 0.00792079207921,
+            "amplitude": 0.0138613861386,
+            "priceLimit": "NORMAL"
+        }
+    }
+}
