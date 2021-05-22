@@ -4,12 +4,16 @@ use std::time::Duration;
 mod util;
 
 // be aware of websocket testings
-// please check on this website
-// https://developer.fugle.tw/document/status
+// running pass tests by cargo test -- --ignored
 //
-// to see the websocket servers status
-// if the status is ⚠ suspend
-// then all pass tests may blocking running into timeout
+// there are two cases will causing the pass tests blocking
+// 1. fugle websocket server is down or suspend
+//    you can check on this website
+//    https://developer.fugle.tw/document/status
+//
+// 2. the Taiwan stock market is closing
+//    in this case fugle websocket server won't send any data
+//    while you connected into the server
 
 #[test]
 fn test_intraday_chart_failed() {
@@ -19,6 +23,7 @@ fn test_intraday_chart_failed() {
 }
 
 #[test]
+#[ignore]
 fn test_intraday_chart_pass() {
     util::timeout_after(Duration::from_secs(60), || {
         let (tx, rx) = mpsc::channel();
@@ -40,6 +45,7 @@ fn test_intraday_meta_failed() {
 }
 
 #[test]
+#[ignore]
 fn test_intraday_meta_pass() {
     util::timeout_after(Duration::from_secs(60), || {
         let (tx, rx) = mpsc::channel();
@@ -61,6 +67,7 @@ fn test_intraday_quote_failed() {
 }
 
 #[test]
+#[ignore]
 fn test_intraday_quote_pass() {
     util::timeout_after(Duration::from_secs(60), || {
         let (tx, rx) = mpsc::channel();
