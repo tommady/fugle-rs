@@ -1,5 +1,5 @@
 # fugle-rs
-[![Build status](https://img.shields.io/github/workflow/status/tommady/fugle-rs/CI/master)](https://github.com/tommady/fugle-rs/actions)
+[![Build status](https://github.com/tommady/fugle-rs/actions/workflows/rust.yml/badge.svg)](https://github.com/tommady/fugle-rs/actions)
 [![Latest version](https://img.shields.io/crates/v/fugle.svg)](https://crates.io/crates/fugle)
 [![Documentation](https://docs.rs/fugle/badge.svg)](https://docs.rs/fugle)
 ![License](https://img.shields.io/crates/l/fugle.svg)
