@@ -1,8 +1,8 @@
 # fugle-rs
 [![Build status](https://github.com/tommady/fugle-rs/actions/workflows/rust.yml/badge.svg)](https://github.com/tommady/fugle-rs/actions)
-[![Latest version](https://img.shields.io/crates/v/fugle?style=flat-square)](https://crates.io/crates/fugle)
+[![Latest version](https://img.shields.io/crates/v/fugle)](https://crates.io/crates/fugle)
 [![Documentation](https://docs.rs/fugle/badge.svg)](https://docs.rs/fugle)
-![License](https://img.shields.io/crates/l/fugle?style=flat-square)
+![License](https://img.shields.io/crates/l/fugle)
 ---
 
 A Simple, Lightweight, Fast and Safe Fugle Library.
