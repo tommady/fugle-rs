@@ -1,0 +1,32 @@
+{
+    "apiVersion": "0.2.0",
+    "data": {
+        "info": {
+            "date": "2021-05-21",
+            "mode": "twse-sem-oddlot",
+            "symbolId": "2884",
+            "countryCode": "TW",
+            "timeZone": "Asia/Taipei",
+            "lastUpdatedAt": "2021-05-21T07:30:31.111+08:00"
+        },
+        "meta": {
+            "isIndex": false,
+            "nameZhTw": "\u7389\u5c71\u91d1",
+            "priceReference": 25.25,
+            "priceHighLimit": 27.75,
+            "priceLowLimit": 22.75,
+            "canDayBuySell": false,
+            "canDaySellBuy": false,
+            "canShortMargin": false,
+            "canShortLend": false,
+            "volumePerUnit": 1000,
+            "currency": "TWD",
+            "isTerminated": false,
+            "isSuspended": false,
+            "isWarrant": false,
+            "typeZhTw": "\u4e00\u822c\u80a1\u7968",
+            "abnormal": "\u6b63\u5e38",
+            "isUnusuallyRecommended": false
+        }
+    }
+}

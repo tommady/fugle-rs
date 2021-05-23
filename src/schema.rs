@@ -49,7 +49,7 @@ pub struct Chart {
     pub high: f64,
     pub low: f64,
     pub open: f64,
-    pub unit: u64,
+    pub unit: f64,
     pub volume: u64,
 }
 
@@ -118,7 +118,7 @@ pub struct QuoteTotal {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub unit: u64,
+    pub unit: f64,
     #[serde(default)]
     pub volume: u64,
 }
@@ -140,7 +140,7 @@ pub struct QuoteTrial {
     #[serde(default)]
     pub price: f64,
     #[serde(default)]
-    pub unit: u64,
+    pub unit: f64,
     #[serde(default)]
     pub volume: u64,
 }
@@ -162,7 +162,7 @@ pub struct QuoteTrade {
     #[serde(default)]
     pub price: f64,
     #[serde(default)]
-    pub unit: u64,
+    pub unit: f64,
     #[serde(default)]
     pub volume: u64,
     #[serde(default)]
@@ -182,7 +182,7 @@ impl Default for QuoteTrade {
 #[serde(default, rename_all = "camelCase")]
 pub struct QuoteBest {
     pub price: f64,
-    pub unit: u64,
+    pub unit: f64,
     pub volume: u64,
 }
 
@@ -293,7 +293,7 @@ pub struct Dealt {
     #[serde(default)]
     pub price: f64,
     #[serde(default)]
-    pub unit: u64,
+    pub unit: f64,
     #[serde(default)]
     pub serial: u64,
 }
