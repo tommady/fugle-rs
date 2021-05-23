@@ -366,6 +366,7 @@ impl std::error::Error for ErrorResponse {
 #[derive(Debug)]
 pub enum FugleError {
     MpscSendError,
+    MpscRecvError(std::sync::mpsc::RecvError),
     // error from serde_json lib
     SerdeJson(serde_json::Error),
     // error from tungstenite lib
@@ -401,6 +402,7 @@ impl std::fmt::Display for FugleError {
             FugleError::RateLimitExceeded => write!(f, "Rate limit or quota exceeded"),
             FugleError::ResourceNotFound => write!(f, "Resource Not Found"),
             FugleError::MpscSendError => write!(f, "MPSC Send Error"),
+            FugleError::MpscRecvError(ref e) => write!(f, "MPSC Receive Error: {}", e),
         }
     }
 }
@@ -418,7 +420,14 @@ impl std::error::Error for FugleError {
             FugleError::RateLimitExceeded => None,
             FugleError::ResourceNotFound => None,
             FugleError::MpscSendError => None,
+            FugleError::MpscRecvError(ref e) => Some(e),
         }
+    }
+}
+
+impl From<std::sync::mpsc::RecvError> for FugleError {
+    fn from(err: std::sync::mpsc::RecvError) -> FugleError {
+        FugleError::MpscRecvError(err)
     }
 }
 

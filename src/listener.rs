@@ -12,26 +12,66 @@ const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/chart";
 const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/quote";
 const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/meta";
 
+/// Intraday is the Websocket listener to fugle wws endpoints.
 pub struct Intraday {
-    token: &'static str,
+    token: String,
     workers: Vec<Worker>,
     done: Arc<AtomicBool>,
     sender: Sender<Response>,
 }
 
 impl Intraday {
-    pub fn new(token: &'static str, sender: Sender<Response>) -> Intraday {
+    /// Returns an Intraday instance.
+    ///
+    /// When listening on each endpoint,
+    /// Intraday will fork a thread to do the listening job,
+    /// so need to use mpsc::channel receiver to receive response data.
+    ///
+    /// And as a daemon like process, it won't break while any error ocurs,
+    /// instead it will log the error.
+    ///
+    /// Please reference to below link to know how to print the log out.
+    /// https://github.com/rust-lang/log
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// # use fugle::listener;
+    /// # use std::sync::mpsc;
+    ///
+    /// let (tx, rx) = mpsc::channel();
+    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    /// ```
+    pub fn new(token: &str, sender: Sender<Response>) -> Intraday {
         Intraday {
-            token,
+            token: token.to_owned(),
             workers: vec![],
             done: Arc::new(AtomicBool::new(false)),
             sender,
         }
     }
 
+    /// Listening fugle Chart endpoint.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::listener;
+    /// # use std::sync::mpsc;
+    ///
+    /// let (tx, rx) = mpsc::channel();
+    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    ///
+    /// lis.chart("2884", true);
+    /// let response = rx.recv()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn chart(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
         match Worker::new(
-            format!(
+            &format!(
                 "{}?symbolId={}&apiToken={}&oddLot={}",
                 INTRADAY_CHART, symbol_id, self.token, odd_lot,
             ),
@@ -46,9 +86,27 @@ impl Intraday {
         }
     }
 
+    /// Listening fugle Meta endpoint.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::listener;
+    /// # use std::sync::mpsc;
+    ///
+    /// let (tx, rx) = mpsc::channel();
+    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    ///
+    /// lis.meta("2884", true);
+    /// let response = rx.recv()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn meta(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
         match Worker::new(
-            format!(
+            &format!(
                 "{}?symbolId={}&apiToken={}&oddLot={}",
                 INTRADAY_META, symbol_id, self.token, odd_lot,
             ),
@@ -63,9 +121,27 @@ impl Intraday {
         }
     }
 
+    /// Listening fugle Quote endpoint.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::listener;
+    /// # use std::sync::mpsc;
+    ///
+    /// let (tx, rx) = mpsc::channel();
+    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    ///
+    /// lis.quote("2884", true);
+    /// let response = rx.recv()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn quote(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
         match Worker::new(
-            format!(
+            &format!(
                 "{}?symbolId={}&apiToken={}&oddLot={}",
                 INTRADAY_QUOTE, symbol_id, self.token, odd_lot,
             ),
@@ -97,7 +173,7 @@ struct Worker {
 }
 
 impl Worker {
-    fn new(uri: String, sender: Sender<Response>, done: Arc<AtomicBool>) -> Result<Worker> {
+    fn new(uri: &str, sender: Sender<Response>, done: Arc<AtomicBool>) -> Result<Worker> {
         let (mut socket, _) = connect(uri)?;
 
         let thread = thread::spawn(move || {
