@@ -90,7 +90,7 @@ pub struct Intraday {
 }
 
 impl Intraday {
-    /// [Endpoint]: https://developer.fugle.tw/document/intraday/chart
+    /// [Endpoint](https://developer.fugle.tw/document/intraday/chart)
     ///
     /// Fetching the current drawing data.
     ///
@@ -117,7 +117,7 @@ impl Intraday {
         }
     }
 
-    /// [Endpoint]: https://developer.fugle.tw/document/intraday/quote
+    /// [Endpoint](https://developer.fugle.tw/document/intraday/quote)
     ///
     /// Fetching the current status and statistics.
     ///
@@ -144,7 +144,7 @@ impl Intraday {
         }
     }
 
-    /// [Endpoint]: https://developer.fugle.tw/document/intraday/meta
+    /// [Endpoint](https://developer.fugle.tw/document/intraday/meta)
     ///
     /// Fetching today's basic informations.
     ///
@@ -171,7 +171,7 @@ impl Intraday {
         }
     }
 
-    /// [Endpoint]: https://developer.fugle.tw/document/intraday/dealts
+    /// [Endpoint](https://developer.fugle.tw/document/intraday/dealts)
     ///
     /// Fetching today's advantage information.
     ///

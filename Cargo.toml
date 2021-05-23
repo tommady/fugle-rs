@@ -2,7 +2,7 @@
 name = "fugle"
 version = "0.2.0"
 authors = ["tommady <tommady@users.noreply.github.com>"]
-description = "a rust library of https://developer.fugle.tw"
+description = "A Simple, Lightweight, Fast and Safe Fugle Library"
 license-file = "LICENSE"
 readme = "README.md"
 homepage = "https://github.com/tommady/fugle-rs"
