@@ -16,5 +16,18 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 log = "0.4"
-tungstenite = { version = "0.13", default-futures = false, features = ["native-tls-vendored"] }
-ureq = { version = "2.1", default-futures = false, features = ["json", "native-certs"] }
+
+# tungstenite on the current version 0.13,
+# if disable default but it still using native-tls in somewhere so it causing 
+# compile dependency still have 
+# * openssl
+# * native-tls
+# * openssl-sys
+# but if change to use the master branch, it will compile failed by
+# using old rustls with new webpki and new webpki-roots
+# TODO: wait for the new version to see if this issue fixed
+# tungstenite = { version = "0.13", default-futures = false, features = ["rustls-tls"] }
+tungstenite = { version = "0.13", features = ["rustls-tls"] }
+
+# ureq using tls as default  feature which is rustls by default
+ureq = { version = "2.1", features = ["json"] }

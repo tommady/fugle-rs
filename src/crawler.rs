@@ -83,6 +83,7 @@ impl IntradayBuilder {
     }
 }
 
+/// Intraday is the RESTful API queryer to request fugle endpoints.
 pub struct Intraday {
     token: String,
     agent: Agent,
@@ -92,6 +93,19 @@ impl Intraday {
     /// [Endpoint]: https://developer.fugle.tw/document/intraday/chart
     ///
     /// Fetching the current drawing data.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.chart("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn chart(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
             resposne_type: ResponseType::Chart,
@@ -106,6 +120,19 @@ impl Intraday {
     /// [Endpoint]: https://developer.fugle.tw/document/intraday/quote
     ///
     /// Fetching the current status and statistics.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.quote("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn quote(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
             resposne_type: ResponseType::Quote,
@@ -120,6 +147,19 @@ impl Intraday {
     /// [Endpoint]: https://developer.fugle.tw/document/intraday/meta
     ///
     /// Fetching today's basic informations.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.meta("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn meta(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
             resposne_type: ResponseType::Meta,
@@ -134,6 +174,19 @@ impl Intraday {
     /// [Endpoint]: https://developer.fugle.tw/document/intraday/dealts
     ///
     /// Fetching today's advantage information.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.dealts("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn dealts(&self, symbol_id: &str) -> GetQueryBuilder {
         GetQueryBuilder {
             resposne_type: ResponseType::Dealts,
@@ -146,27 +199,100 @@ impl Intraday {
     }
 }
 
+/// Associate options when doing the request.
 pub struct GetQueryBuilder {
     request: Request,
     resposne_type: ResponseType,
 }
 
 impl GetQueryBuilder {
+    /// Set a limit param while using dealts request.
+    /// Default value on fugle API is 0
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.dealts("2884")
+    /// .limit(99)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn limit(mut self, limit: usize) -> GetQueryBuilder {
         self.request = self.request.query("limit", &limit.to_string());
         self
     }
 
+    /// Set an offset param while using dealts request.
+    /// Default value on fugle API is 50
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.dealts("2884")
+    /// .offset(3)
+    /// .limit(6)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn offset(mut self, offset: usize) -> GetQueryBuilder {
         self.request = self.request.query("offset", &offset.to_string());
         self
     }
 
+    /// To see odd lotter or not.
+    /// Default value on fugle API is false
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.meta("2884")
+    /// .odd_lot(true)
+    /// .call()?;
+    ///
+    /// agent.quote("2884")
+    /// .odd_lot(true)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn odd_lot(mut self, odd_lot: bool) -> GetQueryBuilder {
         self.request = self.request.query("oddLot", &odd_lot.to_string());
         self
     }
 
+    /// Send the request.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.meta("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn call(self) -> Result<Response> {
         let response = self.request.call()?;
         if response.status() != 200 {
