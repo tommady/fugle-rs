@@ -5,7 +5,11 @@ fn main() {
     let (tx, rx) = mpsc::channel();
     let mut lis = listener::Intraday::new("demo", tx.clone());
 
-    let works = vec![lis.chart("2884"), lis.meta("2884"), lis.quote("2884")];
+    let works = vec![
+        lis.chart("2884", true),
+        lis.meta("2884", false),
+        lis.quote("2884", true),
+    ];
     for work in &works {
         if let Err(e) = work {
             panic!("{}", e);
