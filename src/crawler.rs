@@ -50,11 +50,31 @@ impl IntradayBuilder {
         self
     }
 
+    /// Setup http read timeout option.
+    ///
+    /// By default there is no read timeout.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::crawler::IntradayBuilder;
+    /// let agent = IntradayBuilder::new()
+    ///     .read_timeout_sec(10) // set read timeout in 10 seconds
+    ///     .build();
+    /// ```
     pub fn read_timeout_sec(mut self, sec: u64) -> IntradayBuilder {
         self.agent_builder = self.agent_builder.timeout_read(Duration::from_secs(sec));
         self
     }
 
+    /// Create a new Intraday instance.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::crawler::IntradayBuilder;
+    /// let agent = IntradayBuilder::new().build();
+    /// ```
     pub fn build(self) -> Intraday {
         Intraday {
             token: self.token,
