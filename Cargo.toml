@@ -11,15 +11,22 @@ keywords = ["fugle", "stock"]
 categories = ["web-programming::http-client", "web-programming::websocket"]
 edition = "2018"
 
+[features]
+default = []
+websocket = ["tungstenite", "log"]
+
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
-log = "0.4"
-
-# use the newest master branch which merged this PR
-# https://github.com/snapview/tungstenite-rs/pull/205
-tungstenite = { git = "https://github.com/snapview/tungstenite-rs", branch = "master", features = ["rustls-tls"] }
-
+log = { version = "0.4", optional = true }
 # ureq using tls as default  feature which is rustls by default
 ureq = { version = "2.1", features = ["json"] }
+
+[dependencies.tungstenite]
+# use the newest master branch which merged this PR
+# https://github.com/snapview/tungstenite-rs/pull/205
+git = "https://github.com/snapview/tungstenite-rs"
+branch = "master"
+features = ["rustls-tls"]
+optional = true

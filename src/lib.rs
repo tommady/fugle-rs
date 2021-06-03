@@ -128,5 +128,6 @@
 //! [fugledealtsweb]: https://developer.fugle.tw/document/intraday/dealts
 
 pub mod crawler;
+#[cfg(feature = "websocket")]
 pub mod listener;
 pub mod schema;

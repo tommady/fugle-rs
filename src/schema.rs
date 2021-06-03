@@ -375,9 +375,10 @@ pub enum FugleError {
     // error from serde_json lib
     SerdeJson(serde_json::Error),
     // error from tungstenite lib
+    #[cfg(feature = "websocket")]
     Tungstenite(tungstenite::Error),
     // error from ureq lib
-    Ureq(ureq::Error),
+    Ureq(Box<ureq::Error>),
     // error from std io
     StdIO(std::io::Error),
     // from fugle API response code, to specific errors
@@ -398,6 +399,7 @@ impl std::fmt::Display for FugleError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             FugleError::SerdeJson(ref e) => write!(f, "Serde_json Lib error: {}", e),
+            #[cfg(feature = "websocket")]
             FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
             FugleError::Ureq(ref e) => write!(f, "Ureq Lib error: {}", e),
             FugleError::StdIO(ref e) => write!(f, "std io json Deserialize error: {}", e),
@@ -416,6 +418,7 @@ impl std::error::Error for FugleError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             FugleError::SerdeJson(ref e) => Some(e),
+            #[cfg(feature = "websocket")]
             FugleError::Tungstenite(ref e) => Some(e),
             FugleError::Ureq(ref e) => Some(e),
             FugleError::StdIO(ref e) => Some(e),
@@ -444,10 +447,11 @@ impl From<std::io::Error> for FugleError {
 
 impl From<ureq::Error> for FugleError {
     fn from(err: ureq::Error) -> FugleError {
-        FugleError::Ureq(err)
+        FugleError::Ureq(Box::new(err))
     }
 }
 
+#[cfg(feature = "websocket")]
 impl From<tungstenite::Error> for FugleError {
     fn from(err: tungstenite::Error) -> FugleError {
         FugleError::Tungstenite(err)
