@@ -263,8 +263,13 @@ pub struct Quote {
     pub change_percent: f64,
     #[serde(default)]
     pub amplitude: f64,
-    #[serde(default)]
-    pub price_limit: String,
+    //
+    // NOTE:
+    // #[serde(default)]
+    // this field is sometimes integer...
+    // but the document said it is a string...
+    // so skip it
+    // pub price_limit: String,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
