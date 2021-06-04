@@ -37,7 +37,10 @@ impl Default for Info {
         Info {
             last_updated_at: default_date_time(),
             date: default_naive_date(),
-            ..Default::default()
+            mode: "".to_string(),
+            symbol_id: "".to_string(),
+            country_code: "".to_string(),
+            time_zone: "".to_string(),
         }
     }
 }
@@ -127,7 +130,8 @@ impl Default for QuoteTotal {
     fn default() -> QuoteTotal {
         QuoteTotal {
             at: default_date_time(),
-            ..Default::default()
+            unit: 0.0,
+            volume: 0,
         }
     }
 }
@@ -149,7 +153,9 @@ impl Default for QuoteTrial {
     fn default() -> QuoteTrial {
         QuoteTrial {
             at: default_date_time(),
-            ..Default::default()
+            price: 0.0,
+            unit: 0.0,
+            volume: 0,
         }
     }
 }
@@ -173,7 +179,10 @@ impl Default for QuoteTrade {
     fn default() -> QuoteTrade {
         QuoteTrade {
             at: default_date_time(),
-            ..Default::default()
+            price: 0.0,
+            unit: 0.0,
+            volume: 0,
+            serial: 0,
         }
     }
 }
@@ -201,7 +210,8 @@ impl Default for QuoteOrder {
     fn default() -> QuoteOrder {
         QuoteOrder {
             at: default_date_time(),
-            ..Default::default()
+            best_bids: Vec::with_capacity(0),
+            best_asks: Vec::with_capacity(0),
         }
     }
 }
@@ -219,7 +229,7 @@ impl Default for QuotePrice {
     fn default() -> QuotePrice {
         QuotePrice {
             at: default_date_time(),
-            ..Default::default()
+            price: 0.0,
         }
     }
 }
@@ -325,7 +335,7 @@ pub struct DealtsResponse {
 #[serde(rename_all = "camelCase")]
 pub enum Response {
     Chart(ChartResponse),
-    Quote(Box<QuoteResponse>),
+    Quote(QuoteResponse),
     Meta(MetaResponse),
     Dealts(DealtsResponse),
 }
