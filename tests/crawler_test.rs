@@ -82,17 +82,14 @@ fn test_intraday_dealts_failed() {
     assert!(res.is_err());
 }
 
-// the fugle api returns 403 with message Forbidden in every errors now...
-// this case was testing 401 unauthorized.
-//
-// from this time now... i don't know why 403 is not responding...
+// from this time now... i don't know why 403 is not responding on demo token...
 // so this testcase cannot be tested right now...
 //
 // you can test with below command line
-// for run in {1..1000}; do curl -X GET "https://api.fugle.tw/realtime/v0.2/intraday/meta?apiToken=demo&symbolId=2884"; done
+// for run in {1..100}; do curl -X GET "https://api.fugle.tw/realtime/v0.2/intraday/meta?apiToken=demo&symbolId=2884"; done
 // it was responding 403 before...
 //
-// TODO: remove the for loop when the fugle server start reponding 403
+// TODO: remove the for loop when the fugle server start reponding 403 on demo token
 #[test]
 fn test_error_rate_limit_exceeded() {
     let it = crawler::IntradayBuilder::new().build();
