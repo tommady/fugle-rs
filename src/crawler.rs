@@ -301,25 +301,14 @@ impl GetQueryBuilder {
                     return Err(err.into());
                 }
                 match self.resposne_type {
-                    ResponseType::Chart => return Ok(Response::Chart(response.into_json()?)),
-                    ResponseType::Meta => return Ok(Response::Meta(response.into_json()?)),
-                    ResponseType::Quote => return Ok(Response::Quote(response.into_json()?)),
-                    ResponseType::Dealts => return Ok(Response::Dealts(response.into_json()?)),
+                    ResponseType::Chart => Ok(Response::Chart(response.into_json()?)),
+                    ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
+                    ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
+                    ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
                 }
             }
-            Err(e) => return Err(FugleError::Ureq(Box::new(e.into()))),
-        };
-        // if response.status() != 200 {
-        //     let err: ErrorResponse = response.into_json()?;
-        //     return Err(err.into());
-        // }
-
-        // match self.resposne_type {
-        //     ResponseType::Chart => Ok(Response::Chart(response.into_json()?)),
-        //     ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
-        //     ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
-        //     ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
-        // }
+            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
+        }
     }
 }
 
