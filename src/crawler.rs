@@ -311,16 +311,3 @@ impl GetQueryBuilder {
         }
     }
 }
-
-// ```
-// use ureq::Error::Status;
-// # fn main() -> std::result::Result<(), ureq::Transport> {
-// # ureq::is_test(true);
-// use ureq::OrAnyStatus;
-//
-// let resp = ureq::get("http://example.com/")
-//   .call()
-//   .or_any_status()?;
-// # Ok(())
-// # }
-// ```
