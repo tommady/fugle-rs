@@ -1,6 +1,6 @@
-use crate::schema::{ErrorResponse, Response, ResponseType, Result};
+use crate::schema::{ErrorResponse, FugleError, Response, ResponseType, Result};
 use std::time::Duration;
-use ureq::{Agent, AgentBuilder, Request};
+use ureq::{Agent, AgentBuilder, OrAnyStatus, Request};
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.2/intraday/chart";
 const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.2/intraday/quote";
@@ -294,17 +294,20 @@ impl GetQueryBuilder {
     /// # }
     /// ```
     pub fn call(self) -> Result<Response> {
-        let response = self.request.call()?;
-        if response.status() != 200 {
-            let err: ErrorResponse = response.into_json()?;
-            return Err(err.into());
-        }
-
-        match self.resposne_type {
-            ResponseType::Chart => Ok(Response::Chart(response.into_json()?)),
-            ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
-            ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
-            ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
+        match self.request.call().or_any_status() {
+            Ok(response) => {
+                if response.status() != 200 {
+                    let err: ErrorResponse = response.into_json()?;
+                    return Err(err.into());
+                }
+                match self.resposne_type {
+                    ResponseType::Chart => Ok(Response::Chart(response.into_json()?)),
+                    ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
+                    ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
+                    ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
+                }
+            }
+            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
         }
     }
 }
