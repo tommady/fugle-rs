@@ -11,7 +11,7 @@ fn test_intraday_chart_pass() {
             let chart = fetch_enum!(Response::Chart, v);
             assert_eq!(chart.data.info.symbol_id, "2884");
         }
-        Err(e) => assert!(false, "error: {}", e.to_string()),
+        Err(e) => panic!("error: {}", e),
     };
 }
 
@@ -31,7 +31,7 @@ fn test_intraday_quote_pass() {
             let quote = fetch_enum!(Response::Quote, v);
             assert_eq!(quote.data.info.symbol_id, "2884");
         }
-        Err(e) => assert!(false, "error: {}", e.to_string()),
+        Err(e) => panic!("error: {}", e),
     };
 }
 
@@ -51,7 +51,7 @@ fn test_intraday_meta_pass() {
             let meta = fetch_enum!(Response::Meta, v);
             assert_eq!(meta.data.info.symbol_id, "2884");
         }
-        Err(e) => assert!(false, "error: {}", e.to_string()),
+        Err(e) => panic!("error: {}", e),
     };
 }
 
@@ -71,7 +71,7 @@ fn test_intraday_deals_pass() {
             let meta = fetch_enum!(Response::Dealts, v);
             assert_eq!(meta.data.info.symbol_id, "2884");
         }
-        Err(e) => assert!(false, "error: {}", e.to_string()),
+        Err(e) => panic!("error: {}", e),
     };
 }
 
@@ -99,9 +99,8 @@ fn test_error_rate_limit_exceeded() {
             Ok(_) => continue,
             Err(e) => match e {
                 FugleError::RateLimitExceeded => break,
-                _ => assert!(false, "error: {}", e),
+                _ => panic!("error: {}", e),
             },
         }
     }
-    assert!(true)
 }

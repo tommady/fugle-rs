@@ -3,7 +3,7 @@ use std::sync::mpsc;
 
 fn main() {
     let (tx, rx) = mpsc::channel();
-    let mut lis = listener::Intraday::new("demo", tx.clone());
+    let mut lis = listener::Intraday::new("demo", tx);
 
     let works = vec![
         lis.chart("2884", true),

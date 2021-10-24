@@ -1,5 +1,4 @@
 use fugle::schema::*;
-use serde_json;
 use std::fs::File;
 use std::path::Path;
 
@@ -22,13 +21,28 @@ fn test_quote_response_deserialize() {
     assert_eq!("0.2.0", res.api_version);
     assert_eq!("2884", res.data.info.symbol_id);
     // assert_eq!("TSE", res.data.info.market);
-    assert_eq!(0.00792079207921, res.data.quote.change_percent);
-    assert_eq!(0.0138613861386, res.data.quote.amplitude);
+    assert_eq!(
+        0.00792079207921f64.to_string(),
+        res.data.quote.change_percent.to_string()
+    );
+    assert_eq!(
+        0.0138613861386f64.to_string(),
+        res.data.quote.amplitude.to_string()
+    );
     assert_ne!(0, res.data.quote.order.best_bids.len());
     assert_ne!(0, res.data.quote.order.best_asks.len());
-    assert_eq!(25.6, res.data.quote.price_high.price);
-    assert_eq!(25.25, res.data.quote.price_low.price);
-    assert_eq!(25.35, res.data.quote.price_open.price);
+    assert_eq!(
+        25.6f64.to_string(),
+        res.data.quote.price_high.price.to_string()
+    );
+    assert_eq!(
+        25.25f64.to_string(),
+        res.data.quote.price_low.price.to_string()
+    );
+    assert_eq!(
+        25.35f64.to_string(),
+        res.data.quote.price_open.price.to_string()
+    );
 }
 
 #[test]
@@ -40,10 +54,19 @@ fn test_meta_response_deserialize() {
     assert_eq!("2884", res.data.info.symbol_id);
     assert_eq!("TSE", res.data.info.market);
     assert_eq!("EQUITY", res.data.info.typ);
-    assert_eq!(26.5, res.data.meta.price_reference);
-    assert_eq!(29.15, res.data.meta.price_high_limit);
-    assert_eq!(23.85, res.data.meta.price_low_limit);
-    assert_eq!(true, res.data.meta.can_day_buy_sell);
+    assert_eq!(
+        26.5f64.to_string(),
+        res.data.meta.price_reference.to_string()
+    );
+    assert_eq!(
+        29.15f64.to_string(),
+        res.data.meta.price_high_limit.to_string()
+    );
+    assert_eq!(
+        23.85f64.to_string(),
+        res.data.meta.price_low_limit.to_string()
+    );
+    assert!(res.data.meta.can_day_buy_sell);
     assert_eq!("玉山金", res.data.meta.name_zh_tw);
     assert_eq!("金融保險", res.data.meta.industry_zh_tw);
 }
@@ -80,13 +103,28 @@ fn test_quote_response_with_oddlot_deserialize() {
     assert_eq!("0.2.0", res.api_version);
     assert_eq!("2884", res.data.info.symbol_id);
     // assert_eq!("TSE", res.data.info.market);
-    assert_eq!(0.00990099009901, res.data.quote.change_percent);
-    assert_eq!(0.00792079207921, res.data.quote.amplitude);
+    assert_eq!(
+        0.00990099009901f64.to_string(),
+        res.data.quote.change_percent.to_string()
+    );
+    assert_eq!(
+        0.00792079207921f64.to_string(),
+        res.data.quote.amplitude.to_string()
+    );
     assert_ne!(0, res.data.quote.order.best_bids.len());
     assert_ne!(0, res.data.quote.order.best_asks.len());
-    assert_eq!(25.6, res.data.quote.price_high.price);
-    assert_eq!(25.4, res.data.quote.price_low.price);
-    assert_eq!(25.55, res.data.quote.price_open.price);
+    assert_eq!(
+        25.6f64.to_string(),
+        res.data.quote.price_high.price.to_string()
+    );
+    assert_eq!(
+        25.4f64.to_string(),
+        res.data.quote.price_low.price.to_string()
+    );
+    assert_eq!(
+        25.55f64.to_string(),
+        res.data.quote.price_open.price.to_string()
+    );
 }
 
 #[test]
@@ -98,10 +136,19 @@ fn test_meta_response_with_oddlot_deserialize() {
     assert_eq!("2884", res.data.info.symbol_id);
     assert_eq!("TSE", res.data.info.market);
     assert_eq!("ODDLOT", res.data.info.typ);
-    assert_eq!(26.5, res.data.meta.price_reference);
-    assert_eq!(29.15, res.data.meta.price_high_limit);
-    assert_eq!(23.85, res.data.meta.price_low_limit);
-    assert_eq!(false, res.data.meta.can_day_buy_sell);
+    assert_eq!(
+        26.5f64.to_string(),
+        res.data.meta.price_reference.to_string()
+    );
+    assert_eq!(
+        29.15f64.to_string(),
+        res.data.meta.price_high_limit.to_string()
+    );
+    assert_eq!(
+        23.85f64.to_string(),
+        res.data.meta.price_low_limit.to_string()
+    );
+    assert!(!res.data.meta.can_day_buy_sell);
     assert_eq!("玉山金", res.data.meta.name_zh_tw);
 }
 
@@ -129,8 +176,8 @@ fn test_error_response_deserialize() {
     let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
     let got = FugleError::from(err);
     match got {
-        FugleError::Unauthorized => assert!(true),
-        _ => assert!(false),
+        FugleError::Unauthorized => {}
+        _ => unreachable!(),
     }
 
     let input_json = r#"{
@@ -143,8 +190,8 @@ fn test_error_response_deserialize() {
     let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
     let got = FugleError::from(err);
     match got {
-        FugleError::RateLimitExceeded => assert!(true),
-        _ => assert!(false),
+        FugleError::RateLimitExceeded => {}
+        _ => unreachable!(),
     }
 
     let input_json = r#"{
@@ -157,7 +204,7 @@ fn test_error_response_deserialize() {
     let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
     let got = FugleError::from(err);
     match got {
-        FugleError::ResourceNotFound => assert!(true),
-        _ => assert!(false),
+        FugleError::ResourceNotFound => {}
+        _ => unreachable!(),
     }
 }
