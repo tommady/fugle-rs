@@ -18,30 +18,32 @@ fn test_quote_response_deserialize() {
     let json_file = File::open(Path::new("tests/testdata/quote_response.json")).unwrap();
     let res: QuoteResponse = serde_json::from_reader(json_file).unwrap();
 
-    assert_eq!("0.2.0", res.api_version);
+    assert_eq!("0.3.0", res.api_version);
     assert_eq!("2884", res.data.info.symbol_id);
-    // assert_eq!("TSE", res.data.info.market);
+    assert_eq!("TSE", res.data.info.market);
+    assert_eq!("EQUITY", res.data.info.typ);
     assert_eq!(
-        0.00792079207921f64.to_string(),
+        (-0.19f64).to_string(),
         res.data.quote.change_percent.to_string()
     );
+    assert_eq!(0.38f64.to_string(), res.data.quote.amplitude.to_string());
+    assert_eq!(5, res.data.quote.order.bids.len());
+    assert_eq!(5, res.data.quote.order.asks.len());
     assert_eq!(
-        0.0138613861386f64.to_string(),
-        res.data.quote.amplitude.to_string()
-    );
-    assert_ne!(0, res.data.quote.order.best_bids.len());
-    assert_ne!(0, res.data.quote.order.best_asks.len());
-    assert_eq!(
-        25.6f64.to_string(),
+        26.5f64.to_string(),
         res.data.quote.price_high.price.to_string()
     );
     assert_eq!(
-        25.25f64.to_string(),
+        26.4f64.to_string(),
         res.data.quote.price_low.price.to_string()
     );
     assert_eq!(
-        25.35f64.to_string(),
+        26.5f64.to_string(),
         res.data.quote.price_open.price.to_string()
+    );
+    assert_eq!(
+        26.46f64.to_string(),
+        res.data.quote.price_avg.price.to_string()
     );
 }
 
@@ -100,30 +102,32 @@ fn test_quote_response_with_oddlot_deserialize() {
         File::open(Path::new("tests/testdata/quote_response_with_oddlot.json")).unwrap();
     let res: QuoteResponse = serde_json::from_reader(json_file).unwrap();
 
-    assert_eq!("0.2.0", res.api_version);
+    assert_eq!("0.3.0", res.api_version);
     assert_eq!("2884", res.data.info.symbol_id);
-    // assert_eq!("TSE", res.data.info.market);
+    assert_eq!("TSE", res.data.info.market);
+    assert_eq!("ODDLOT", res.data.info.typ);
     assert_eq!(
-        0.00990099009901f64.to_string(),
+        (-0.19f64).to_string(),
         res.data.quote.change_percent.to_string()
     );
+    assert_eq!(0.19f64.to_string(), res.data.quote.amplitude.to_string());
+    assert_eq!(5, res.data.quote.order.bids.len());
+    assert_eq!(5, res.data.quote.order.asks.len());
     assert_eq!(
-        0.00792079207921f64.to_string(),
-        res.data.quote.amplitude.to_string()
-    );
-    assert_ne!(0, res.data.quote.order.best_bids.len());
-    assert_ne!(0, res.data.quote.order.best_asks.len());
-    assert_eq!(
-        25.6f64.to_string(),
+        26.45f64.to_string(),
         res.data.quote.price_high.price.to_string()
     );
     assert_eq!(
-        25.4f64.to_string(),
+        26.4f64.to_string(),
         res.data.quote.price_low.price.to_string()
     );
     assert_eq!(
-        25.55f64.to_string(),
+        26.45f64.to_string(),
         res.data.quote.price_open.price.to_string()
+    );
+    assert_eq!(
+        26.43f64.to_string(),
+        res.data.quote.price_avg.price.to_string()
     );
 }
 

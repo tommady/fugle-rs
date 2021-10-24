@@ -126,17 +126,41 @@ pub struct QuoteTotal {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub unit: f64,
+    pub transaction: u64,
     #[serde(default)]
-    pub volume: u64,
+    pub trade_value: f64,
+    #[serde(default)]
+    pub trade_volume: u64,
+    #[serde(default)]
+    pub trade_volume_at_bid: u64,
+    #[serde(default)]
+    pub trade_volume_at_ask: u64,
+    #[serde(default)]
+    pub bid_orders: u64,
+    #[serde(default)]
+    pub ask_orders: u64,
+    #[serde(default)]
+    pub bid_volume: u64,
+    #[serde(default)]
+    pub ask_volume: u64,
+    #[serde(default)]
+    pub serial: u64,
 }
 
 impl Default for QuoteTotal {
     fn default() -> QuoteTotal {
         QuoteTotal {
             at: default_date_time(),
-            unit: 0.0,
-            volume: 0,
+            transaction: 0,
+            trade_value: 0.0,
+            trade_volume: 0,
+            trade_volume_at_bid: 0,
+            trade_volume_at_ask: 0,
+            bid_orders: 0,
+            ask_orders: 0,
+            bid_volume: 0,
+            ask_volume: 0,
+            serial: 0,
         }
     }
 }
@@ -147,9 +171,11 @@ pub struct QuoteTrial {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub price: f64,
+    pub bid: f64,
     #[serde(default)]
-    pub unit: f64,
+    pub ask: f64,
+    #[serde(default)]
+    pub price: f64,
     #[serde(default)]
     pub volume: u64,
 }
@@ -158,8 +184,9 @@ impl Default for QuoteTrial {
     fn default() -> QuoteTrial {
         QuoteTrial {
             at: default_date_time(),
+            bid: 0.0,
+            ask: 0.0,
             price: 0.0,
-            unit: 0.0,
             volume: 0,
         }
     }
@@ -171,9 +198,11 @@ pub struct QuoteTrade {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub price: f64,
+    pub bid: f64,
     #[serde(default)]
-    pub unit: f64,
+    pub ask: f64,
+    #[serde(default)]
+    pub price: f64,
     #[serde(default)]
     pub volume: u64,
     #[serde(default)]
@@ -185,7 +214,8 @@ impl Default for QuoteTrade {
         QuoteTrade {
             at: default_date_time(),
             price: 0.0,
-            unit: 0.0,
+            bid: 0.0,
+            ask: 0.0,
             volume: 0,
             serial: 0,
         }
@@ -194,9 +224,8 @@ impl Default for QuoteTrade {
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
-pub struct QuoteBest {
+pub struct QuoteBidAsk {
     pub price: f64,
-    pub unit: f64,
     pub volume: u64,
 }
 
@@ -206,17 +235,17 @@ pub struct QuoteOrder {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub best_bids: Vec<QuoteBest>,
+    pub bids: Vec<QuoteBidAsk>,
     #[serde(default)]
-    pub best_asks: Vec<QuoteBest>,
+    pub asks: Vec<QuoteBidAsk>,
 }
 
 impl Default for QuoteOrder {
     fn default() -> QuoteOrder {
         QuoteOrder {
             at: default_date_time(),
-            best_bids: Vec::with_capacity(0),
-            best_asks: Vec::with_capacity(0),
+            bids: Vec::with_capacity(0),
+            asks: Vec::with_capacity(0),
         }
     }
 }
@@ -273,18 +302,15 @@ pub struct Quote {
     #[serde(default)]
     pub price_open: QuotePrice,
     #[serde(default)]
+    pub price_avg: QuotePrice,
+    #[serde(default)]
     pub change: f64,
     #[serde(default)]
     pub change_percent: f64,
     #[serde(default)]
     pub amplitude: f64,
-    //
-    // NOTE:
-    // #[serde(default)]
-    // this field is sometimes integer...
-    // but the document said it is a string...
-    // so skip it
-    // pub price_limit: String,
+    #[serde(default)]
+    pub price_limit: u8,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
