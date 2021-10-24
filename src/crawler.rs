@@ -4,7 +4,7 @@ use ureq::{Agent, AgentBuilder, OrAnyStatus, Request};
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.2/intraday/chart";
 const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.2/intraday/quote";
-const INTRADAY_META: &str = "https://api.fugle.tw/realtime/v0.2/intraday/meta";
+const INTRADAY_META: &str = "https://api.fugle.tw/realtime/v0.3/intraday/meta";
 const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0.2/intraday/dealts";
 
 /// Accumulates options towards building an Intraday instance.

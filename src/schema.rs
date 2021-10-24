@@ -23,13 +23,17 @@ pub struct Info {
     #[serde(default = "default_naive_date")]
     pub date: NaiveDate,
     #[serde(default)]
-    pub mode: String,
-    #[serde(default)]
     pub symbol_id: String,
     #[serde(default)]
     pub country_code: String,
     #[serde(default)]
     pub time_zone: String,
+    #[serde(default)]
+    pub exchange: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default, rename = "type")]
+    pub typ: String,
 }
 
 impl Default for Info {
@@ -37,10 +41,12 @@ impl Default for Info {
         Info {
             last_updated_at: default_date_time(),
             date: default_naive_date(),
-            mode: "".to_string(),
             symbol_id: "".to_string(),
             country_code: "".to_string(),
             time_zone: "".to_string(),
+            exchange: "".to_string(),
+            market: "".to_string(),
+            typ: "".to_string(),
         }
     }
 }
@@ -77,7 +83,7 @@ pub struct ChartResponse {
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct Meta {
-    pub is_index: bool,
+    pub market: String,
     pub name_zh_tw: String,
     pub industry_zh_tw: String,
     pub price_reference: f64,
@@ -87,11 +93,10 @@ pub struct Meta {
     pub can_day_sell_buy: bool,
     pub can_short_margin: bool,
     pub can_short_lend: bool,
-    pub volume_per_unit: u64,
+    pub trading_unit: u64,
     pub currency: String,
     pub is_terminated: bool,
     pub is_suspended: bool,
-    pub is_warrant: bool,
     pub type_zh_tw: String,
     pub abnormal: String,
     pub is_unusually_recommended: bool,
