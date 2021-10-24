@@ -337,11 +337,28 @@ pub struct Dealt {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
+    pub bid: f64,
+    #[serde(default)]
+    pub ask: f64,
+    #[serde(default)]
     pub price: f64,
     #[serde(default)]
-    pub unit: f64,
+    pub volume: u64,
     #[serde(default)]
     pub serial: u64,
+}
+
+impl Default for Dealt {
+    fn default() -> Dealt {
+        Dealt {
+            at: default_date_time(),
+            bid: 0.0,
+            ask: 0.0,
+            price: 0.0,
+            volume: 0,
+            serial: 0,
+        }
+    }
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]

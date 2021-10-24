@@ -78,10 +78,11 @@ fn test_dealts_response_deserialize() {
     let json_file = File::open(Path::new("tests/testdata/dealts_response.json")).unwrap();
     let res: DealtsResponse = serde_json::from_reader(json_file).unwrap();
 
-    assert_eq!("0.2.0", res.api_version);
+    assert_eq!("0.3.0", res.api_version);
     assert_eq!("2884", res.data.info.symbol_id);
-    // assert_eq!("TSE", res.data.info.market);
-    assert_ne!(0, res.data.dealts.len());
+    assert_eq!("TSE", res.data.info.market);
+    assert_eq!("EQUITY", res.data.info.typ);
+    assert_eq!(5, res.data.dealts.len());
 }
 
 #[test]
@@ -162,10 +163,11 @@ fn test_dealts_response_with_oddlot_deserialize() {
         File::open(Path::new("tests/testdata/dealts_response_with_oddlot.json")).unwrap();
     let res: DealtsResponse = serde_json::from_reader(json_file).unwrap();
 
-    assert_eq!("0.2.0", res.api_version);
+    assert_eq!("0.3.0", res.api_version);
     assert_eq!("2884", res.data.info.symbol_id);
-    // assert_eq!("TSE", res.data.info.market);
-    assert_ne!(0, res.data.dealts.len());
+    assert_eq!("TSE", res.data.info.market);
+    assert_eq!("ODDLOT", res.data.info.typ);
+    assert_eq!(5, res.data.dealts.len());
 }
 
 #[test]
