@@ -21,6 +21,7 @@ jobs:
       with:
           toolchain: ${{ matrix.rust }}
           override: true
+    - run: rustup component add rustfmt clippy
     - name: Check Formatting
       run: cargo fmt --all -- --check 
     - name: Check Clippy Lints 
