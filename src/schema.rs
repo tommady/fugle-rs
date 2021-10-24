@@ -1,6 +1,5 @@
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
@@ -54,12 +53,18 @@ impl Default for Info {
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct Chart {
-    pub close: f64,
-    pub high: f64,
-    pub low: f64,
-    pub open: f64,
-    pub unit: f64,
-    pub volume: u64,
+    #[serde(rename = "o")]
+    pub open: Vec<f64>,
+    #[serde(rename = "h")]
+    pub high: Vec<f64>,
+    #[serde(rename = "l")]
+    pub low: Vec<f64>,
+    #[serde(rename = "c")]
+    pub close: Vec<f64>,
+    #[serde(rename = "v")]
+    pub volume: Vec<u64>,
+    #[serde(rename = "t")]
+    pub unix_timestamp: Vec<u64>,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -68,7 +73,7 @@ pub struct ChartData {
     #[serde(default)]
     pub info: Info,
     #[serde(default)]
-    pub chart: HashMap<DateTime<FixedOffset>, Chart>,
+    pub chart: Chart,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
