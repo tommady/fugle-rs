@@ -30,8 +30,15 @@ jobs:
       run: cargo test --all --all-features --no-fail-fast
   coverage:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [1.56.0]
     steps:
       - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: ${{ matrix.rust }}
+          override: true
       - name: Install Rust
         run: rustup toolchain install nightly --component llvm-tools-preview
       - name: Install cargo-llvm-cov
