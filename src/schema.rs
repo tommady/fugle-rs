@@ -1,6 +1,5 @@
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
@@ -23,13 +22,17 @@ pub struct Info {
     #[serde(default = "default_naive_date")]
     pub date: NaiveDate,
     #[serde(default)]
-    pub mode: String,
-    #[serde(default)]
     pub symbol_id: String,
     #[serde(default)]
     pub country_code: String,
     #[serde(default)]
     pub time_zone: String,
+    #[serde(default)]
+    pub exchange: String,
+    #[serde(default)]
+    pub market: String,
+    #[serde(default, rename = "type")]
+    pub typ: String,
 }
 
 impl Default for Info {
@@ -37,23 +40,56 @@ impl Default for Info {
         Info {
             last_updated_at: default_date_time(),
             date: default_naive_date(),
-            mode: "".to_string(),
             symbol_id: "".to_string(),
             country_code: "".to_string(),
             time_zone: "".to_string(),
+            exchange: "".to_string(),
+            market: "".to_string(),
+            typ: "".to_string(),
         }
     }
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
-pub struct Chart {
-    pub close: f64,
-    pub high: f64,
-    pub low: f64,
-    pub open: f64,
-    pub unit: f64,
+pub struct Volume {
+    pub price: f64,
     pub volume: u64,
+}
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VolumeData {
+    #[serde(default)]
+    pub info: Info,
+    #[serde(default)]
+    pub volumes: Vec<Volume>,
+}
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VolumesResponse {
+    #[serde(default)]
+    pub api_version: String,
+    #[serde(default)]
+    pub data: VolumeData,
+}
+
+#[derive(Default, Debug, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct Chart {
+    #[serde(rename = "o")]
+    pub open: Vec<f64>,
+    #[serde(rename = "h")]
+    pub high: Vec<f64>,
+    #[serde(rename = "l")]
+    pub low: Vec<f64>,
+    #[serde(rename = "c")]
+    pub close: Vec<f64>,
+    #[serde(rename = "v")]
+    pub volume: Vec<u64>,
+    #[serde(rename = "t")]
+    pub unix_timestamp: Vec<u64>,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -62,7 +98,7 @@ pub struct ChartData {
     #[serde(default)]
     pub info: Info,
     #[serde(default)]
-    pub chart: HashMap<DateTime<FixedOffset>, Chart>,
+    pub chart: Chart,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -77,7 +113,7 @@ pub struct ChartResponse {
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct Meta {
-    pub is_index: bool,
+    pub market: String,
     pub name_zh_tw: String,
     pub industry_zh_tw: String,
     pub price_reference: f64,
@@ -87,11 +123,10 @@ pub struct Meta {
     pub can_day_sell_buy: bool,
     pub can_short_margin: bool,
     pub can_short_lend: bool,
-    pub volume_per_unit: u64,
+    pub trading_unit: u64,
     pub currency: String,
     pub is_terminated: bool,
     pub is_suspended: bool,
-    pub is_warrant: bool,
     pub type_zh_tw: String,
     pub abnormal: String,
     pub is_unusually_recommended: bool,
@@ -121,17 +156,41 @@ pub struct QuoteTotal {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub unit: f64,
+    pub transaction: u64,
     #[serde(default)]
-    pub volume: u64,
+    pub trade_value: f64,
+    #[serde(default)]
+    pub trade_volume: u64,
+    #[serde(default)]
+    pub trade_volume_at_bid: u64,
+    #[serde(default)]
+    pub trade_volume_at_ask: u64,
+    #[serde(default)]
+    pub bid_orders: u64,
+    #[serde(default)]
+    pub ask_orders: u64,
+    #[serde(default)]
+    pub bid_volume: u64,
+    #[serde(default)]
+    pub ask_volume: u64,
+    #[serde(default)]
+    pub serial: u64,
 }
 
 impl Default for QuoteTotal {
     fn default() -> QuoteTotal {
         QuoteTotal {
             at: default_date_time(),
-            unit: 0.0,
-            volume: 0,
+            transaction: 0,
+            trade_value: 0.0,
+            trade_volume: 0,
+            trade_volume_at_bid: 0,
+            trade_volume_at_ask: 0,
+            bid_orders: 0,
+            ask_orders: 0,
+            bid_volume: 0,
+            ask_volume: 0,
+            serial: 0,
         }
     }
 }
@@ -142,9 +201,11 @@ pub struct QuoteTrial {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub price: f64,
+    pub bid: f64,
     #[serde(default)]
-    pub unit: f64,
+    pub ask: f64,
+    #[serde(default)]
+    pub price: f64,
     #[serde(default)]
     pub volume: u64,
 }
@@ -153,8 +214,9 @@ impl Default for QuoteTrial {
     fn default() -> QuoteTrial {
         QuoteTrial {
             at: default_date_time(),
+            bid: 0.0,
+            ask: 0.0,
             price: 0.0,
-            unit: 0.0,
             volume: 0,
         }
     }
@@ -166,9 +228,11 @@ pub struct QuoteTrade {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub price: f64,
+    pub bid: f64,
     #[serde(default)]
-    pub unit: f64,
+    pub ask: f64,
+    #[serde(default)]
+    pub price: f64,
     #[serde(default)]
     pub volume: u64,
     #[serde(default)]
@@ -180,7 +244,8 @@ impl Default for QuoteTrade {
         QuoteTrade {
             at: default_date_time(),
             price: 0.0,
-            unit: 0.0,
+            bid: 0.0,
+            ask: 0.0,
             volume: 0,
             serial: 0,
         }
@@ -189,9 +254,8 @@ impl Default for QuoteTrade {
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
-pub struct QuoteBest {
+pub struct QuoteBidAsk {
     pub price: f64,
-    pub unit: f64,
     pub volume: u64,
 }
 
@@ -201,17 +265,17 @@ pub struct QuoteOrder {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
-    pub best_bids: Vec<QuoteBest>,
+    pub bids: Vec<QuoteBidAsk>,
     #[serde(default)]
-    pub best_asks: Vec<QuoteBest>,
+    pub asks: Vec<QuoteBidAsk>,
 }
 
 impl Default for QuoteOrder {
     fn default() -> QuoteOrder {
         QuoteOrder {
             at: default_date_time(),
-            best_bids: Vec::with_capacity(0),
-            best_asks: Vec::with_capacity(0),
+            bids: Vec::with_capacity(0),
+            asks: Vec::with_capacity(0),
         }
     }
 }
@@ -268,18 +332,15 @@ pub struct Quote {
     #[serde(default)]
     pub price_open: QuotePrice,
     #[serde(default)]
+    pub price_avg: QuotePrice,
+    #[serde(default)]
     pub change: f64,
     #[serde(default)]
     pub change_percent: f64,
     #[serde(default)]
     pub amplitude: f64,
-    //
-    // NOTE:
-    // #[serde(default)]
-    // this field is sometimes integer...
-    // but the document said it is a string...
-    // so skip it
-    // pub price_limit: String,
+    #[serde(default)]
+    pub price_limit: u8,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -306,11 +367,28 @@ pub struct Dealt {
     #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
     #[serde(default)]
+    pub bid: f64,
+    #[serde(default)]
+    pub ask: f64,
+    #[serde(default)]
     pub price: f64,
     #[serde(default)]
-    pub unit: f64,
+    pub volume: u64,
     #[serde(default)]
     pub serial: u64,
+}
+
+impl Default for Dealt {
+    fn default() -> Dealt {
+        Dealt {
+            at: default_date_time(),
+            bid: 0.0,
+            ask: 0.0,
+            price: 0.0,
+            volume: 0,
+            serial: 0,
+        }
+    }
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -338,6 +416,7 @@ pub enum Response {
     Quote(Box<QuoteResponse>),
     Meta(MetaResponse),
     Dealts(DealtsResponse),
+    Volumes(VolumesResponse),
 }
 
 #[derive(Debug)]
@@ -346,6 +425,7 @@ pub enum ResponseType {
     Quote,
     Meta,
     Dealts,
+    Volumes,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]

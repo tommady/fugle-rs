@@ -1,32 +1,29 @@
 {
-    "apiVersion": "0.2.0",
+    "apiVersion": "0.3.0",
     "data": {
         "info": {
-            "date": "2021-05-21",
-            "mode": "twse-sem-oddlot",
+            "date": "2021-10-22",
+            "type": "ODDLOT",
+            "exchange": "TWSE",
+            "market": "TSE",
             "symbolId": "2884",
             "countryCode": "TW",
             "timeZone": "Asia/Taipei",
-            "lastUpdatedAt": "2021-05-21T07:30:31.111+08:00"
+            "lastUpdatedAt": "2021-10-22T07:30:32.252+08:00"
         },
         "meta": {
-            "isIndex": false,
+            "market": "TSE",
             "nameZhTw": "\u7389\u5c71\u91d1",
-            "priceReference": 25.25,
-            "priceHighLimit": 27.75,
-            "priceLowLimit": 22.75,
+            "priceReference": 26.5,
+            "priceHighLimit": 29.15,
+            "priceLowLimit": 23.85,
             "canDayBuySell": false,
             "canDaySellBuy": false,
-            "canShortMargin": false,
-            "canShortLend": false,
-            "volumePerUnit": 1000,
-            "currency": "TWD",
+            "tradingUnit": 1000,
             "isTerminated": false,
             "isSuspended": false,
-            "isWarrant": false,
             "typeZhTw": "\u4e00\u822c\u80a1\u7968",
-            "abnormal": "\u6b63\u5e38",
-            "isUnusuallyRecommended": false
+            "abnormal": "\u6b63\u5e38"
         }
     }
 }
