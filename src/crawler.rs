@@ -2,10 +2,11 @@ use crate::schema::{ErrorResponse, FugleError, Response, ResponseType, Result};
 use std::time::Duration;
 use ureq::{Agent, AgentBuilder, OrAnyStatus, Request};
 
-const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.2/intraday/chart";
-const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.2/intraday/quote";
+const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.3/intraday/chart";
+const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.3/intraday/quote";
 const INTRADAY_META: &str = "https://api.fugle.tw/realtime/v0.3/intraday/meta";
-const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0.2/intraday/dealts";
+const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0.3/intraday/dealts";
+const INTRADAY_VOLUMES: &str = "https://api.fugle.tw/realtime/v0.3/intraday/volumes";
 
 /// Accumulates options towards building an Intraday instance.
 pub struct IntradayBuilder {
@@ -197,6 +198,33 @@ impl Intraday {
                 .query("symbolId", symbol_id),
         }
     }
+
+    /// [Endpoint](https://developer.fugle.tw/document/intraday/volumes)
+    ///
+    /// Fetching today's volume information.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::crawler::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.volumes("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn volumes(&self, symbol_id: &str) -> GetQueryBuilder {
+        GetQueryBuilder {
+            resposne_type: ResponseType::Volumes,
+            request: self
+                .agent
+                .get(INTRADAY_VOLUMES)
+                .query("apiToken", &self.token)
+                .query("symbolId", symbol_id),
+        }
+    }
 }
 
 /// Associate options when doing the request.
@@ -305,6 +333,7 @@ impl GetQueryBuilder {
                     ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
                     ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
                     ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
+                    ResponseType::Volumes => Ok(Response::Volumes(response.into_json()?)),
                 }
             }
             Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),

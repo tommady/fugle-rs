@@ -121,11 +121,25 @@
 //! # }
 //! ```
 //!
+//! ### [Fugle Volumes][fuglevolumesweb]
+//!
+//! API
+//! ```rust
+//! # fn main() -> fugle::schema::Result<()> {
+//! # use fugle::crawler::IntradayBuilder;
+//!                                             
+//! let agent = IntradayBuilder::new().build();
+//! agent.volumes("2884").call()?;
+//!                                             
+//! # Ok(())
+//! # }
+//! ```
 //! [fugleweb]: https://developer.fugle.tw
 //! [fuglechartweb]: https://developer.fugle.tw/document/intraday/chart
 //! [fuglequoteweb]: https://developer.fugle.tw/document/intraday/quote
 //! [fuglemetaweb]: https://developer.fugle.tw/document/intraday/meta
 //! [fugledealtsweb]: https://developer.fugle.tw/document/intraday/dealts
+//! [fuglevolumesweb]: https://developer.fugle.tw/document/intraday/volumes
 
 pub mod crawler;
 #[cfg(feature = "websocket")]

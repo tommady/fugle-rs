@@ -3,6 +3,18 @@ use std::fs::File;
 use std::path::Path;
 
 #[test]
+fn test_volumes_response_deserialize() {
+    let json_file = File::open(Path::new("tests/testdata/volumes_response.json")).unwrap();
+    let res: VolumesResponse = serde_json::from_reader(json_file).unwrap();
+
+    assert_eq!("0.3.0", res.api_version);
+    assert_eq!("2884", res.data.info.symbol_id);
+    assert_eq!("TSE", res.data.info.market);
+    assert_eq!("EQUITY", res.data.info.typ);
+    assert_eq!(3, res.data.volumes.len());
+}
+
+#[test]
 fn test_chart_response_deserialize() {
     let json_file = File::open(Path::new("tests/testdata/chart_response.json")).unwrap();
     let res: ChartResponse = serde_json::from_reader(json_file).unwrap();
@@ -88,6 +100,21 @@ fn test_dealts_response_deserialize() {
     assert_eq!("TSE", res.data.info.market);
     assert_eq!("EQUITY", res.data.info.typ);
     assert_eq!(5, res.data.dealts.len());
+}
+
+#[test]
+fn test_volumes_response_with_oddlot_deserialize() {
+    let json_file = File::open(Path::new(
+        "tests/testdata/volumes_response_with_oddlot.json",
+    ))
+    .unwrap();
+    let res: VolumesResponse = serde_json::from_reader(json_file).unwrap();
+
+    assert_eq!("0.3.0", res.api_version);
+    assert_eq!("2884", res.data.info.symbol_id);
+    assert_eq!("TSE", res.data.info.market);
+    assert_eq!("ODDLOT", res.data.info.typ);
+    assert_eq!(3, res.data.volumes.len());
 }
 
 #[test]

@@ -1,0 +1,29 @@
+{
+    "apiVersion": "0.3.0",
+    "data": {
+        "info": {
+            "date": "2021-10-22",
+            "type": "ODDLOT",
+            "exchange": "TWSE",
+            "market": "TSE",
+            "symbolId": "2884",
+            "countryCode": "TW",
+            "timeZone": "Asia/Taipei",
+            "lastUpdatedAt": "2021-10-22T13:55:13.544+08:00"
+        },
+        "volumes": [
+            {
+                "price": 26.5,
+                "volume": 2611
+            },
+            {
+                "price": 26.45,
+                "volume": 4390
+            },
+            {
+                "price": 26.4,
+                "volume": 1350
+            }
+        ]
+    }
+}
