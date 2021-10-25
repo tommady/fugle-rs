@@ -24,6 +24,11 @@ fn main() {
         Err(e) => println!("{}", e),
     }
 
+    match agent.volumes("2884").call() {
+        Ok(v) => println!("{:?}", v),
+        Err(e) => println!("{}", e),
+    }
+
     // retry on 403 error.
     // there are many retry libraries better than this,
     // here is just a simple example.

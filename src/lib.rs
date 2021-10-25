@@ -5,10 +5,10 @@
 //!
 //! What is [Fugle][fugleweb]
 //!
-//! This is a rust version library to access Fugle's
+//! This is a library of rust version to access Fugle's
 //!
 //! * RESTful API
-//! * Websocket
+//! * Websocket (enable websocket feature)
 //!
 //! services in a very easy way.
 //!

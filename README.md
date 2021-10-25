@@ -7,90 +7,23 @@
 
 A Simple, Lightweight, Fast and Safe Fugle Library.
 
-What is [Fugle][fugleweb]
+What is [Fugle][fugledevweb] ?
 
-This is a rust version library to access Fugle's
+This is a library of rust version to access Fugle's
 
 * RESTful API
 * Websocket (enable websocket feature)
 
 services in a very easy way.
 
-## Examples
+please read the docs.rs for more information and examples.
 
-for more please reference to the examples folder
+[fugledevweb]: https://developer.fugle.tw
 
+## Motivation
+* For Data Science usage, like using this lib in the [evcxr](https://github.com/google/evcxr) 
+* Provide a new choice for the Fugle community
+* A Practice for myself to enjoy coding with Rust
 
-### [Fugle Chart][fuglechartweb]
-
-API
-```rust
-let agent = IntradayBuilder::new().build();
-agent.chart("2884").call()?;
-```
-
-Websocket
-```rust no_run
-let (tx, rx) = mpsc::channel();
-let mut lis = listener::Intraday::new("demo", tx.clone());
-                                                           
-lis.chart("2884", true);
-let response = rx.recv()?;
-```
-
-### [Fugle Quote][fuglequoteweb]
-
-API
-```rust
-let agent = IntradayBuilder::new().build();
-agent.quote("2884").call()?;
-```
-
-Websocket
-```rust no_run
-let (tx, rx) = mpsc::channel();
-let mut lis = listener::Intraday::new("demo", tx.clone());
-                                                           
-lis.quote("2884", true);
-let response = rx.recv()?;
-```
-
-### [Fugle Meta][fuglemetaweb]
-
-API
-```rust
-let agent = IntradayBuilder::new().build();
-agent.meta("2884").call()?;
-```
-
-Websocket
-```rust no_run
-let (tx, rx) = mpsc::channel();
-let mut lis = listener::Intraday::new("demo", tx.clone());
-                                                           
-lis.meta("2884", true);
-let response = rx.recv()?;
-```
-
-### [Fugle Dealts][fugledealtsweb]
-
-API
-```rust
-let agent = IntradayBuilder::new().build();
-agent.dealts("2884").call()?;
-```
-
-### [Fugle Volumes][fuglevolumesweb]
-
-API
-```rust
-let agent = IntradayBuilder::new().build();
-agent.volumes("2884").call()?;
-```
-
-[fugleweb]: https://developer.fugle.tw
-[fuglechartweb]: https://developer.fugle.tw/document/intraday/chart
-[fuglequoteweb]: https://developer.fugle.tw/document/intraday/quote
-[fuglemetaweb]: https://developer.fugle.tw/document/intraday/meta
-[fugledealtsweb]: https://developer.fugle.tw/document/intraday/dealts
-[fuglevolumesweb]: https://developer.fugle.tw/document/intraday/volumes
+## Contribution
+This project welcomes your PRs or issues, any kind of suggestions or ideas please just fire an issue on the board
