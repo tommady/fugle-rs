@@ -80,8 +80,17 @@ let agent = IntradayBuilder::new().build();
 agent.dealts("2884").call()?;
 ```
 
+### [Fugle Volumes][fuglevolumesweb]
+
+API
+```rust
+let agent = IntradayBuilder::new().build();
+agent.volumes("2884").call()?;
+```
+
 [fugleweb]: https://developer.fugle.tw
 [fuglechartweb]: https://developer.fugle.tw/document/intraday/chart
 [fuglequoteweb]: https://developer.fugle.tw/document/intraday/quote
 [fuglemetaweb]: https://developer.fugle.tw/document/intraday/meta
 [fugledealtsweb]: https://developer.fugle.tw/document/intraday/dealts
+[fuglevolumesweb]: https://developer.fugle.tw/document/intraday/volumes
