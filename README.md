@@ -1,8 +1,10 @@
 # fugle-rs
-[![Build status](https://github.com/tommady/fugle-rs/actions/workflows/rust.yml/badge.svg)](https://github.com/tommady/fugle-rs/actions)
-[![Latest version](https://img.shields.io/crates/v/fugle)](https://crates.io/crates/fugle)
-[![Documentation](https://docs.rs/fugle/badge.svg)](https://docs.rs/fugle)
-![License](https://img.shields.io/crates/l/fugle)
+[![ci status](https://github.com/tommady/fugle-rs/actions/workflows/rust.yml/badge.svg)](https://github.com/tommady/fugle-rs/actions)
+[![latest version](https://img.shields.io/crates/v/fugle)](https://crates.io/crates/fugle)
+[![codecov](https://codecov.io/gh/tommady/fugle-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/tommady/fugle-rs)
+[![rustc](https://img.shields.io/badge/rustc-1.56+-blue?style=flat&logo=rust)](https://www.rust-lang.org)
+[![docs.rs](https://docs.rs/fugle/badge.svg)](https://docs.rs/fugle)
+![license](https://img.shields.io/crates/l/fugle)
 ---
 
 A Simple, Lightweight, Fast and Safe Fugle Library.
