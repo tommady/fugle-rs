@@ -8,9 +8,9 @@ use std::sync::{
 use std::thread;
 use tungstenite::connect;
 
-const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/chart";
-const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/quote";
-const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0.2/intraday/meta";
+const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/chart";
+const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/quote";
+const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/meta";
 
 /// Intraday is the Websocket listener to fugle wws endpoints.
 pub struct Intraday {
