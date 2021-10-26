@@ -1,14 +1,23 @@
 #![macro_use]
 use fugle::crawler;
-use fugle::schema::Response;
+use fugle::schema::{FugleError, Response, Result};
 use std::{sync::mpsc, thread, time::Duration};
+
+macro_rules! assert_err {
+    ($expression:expr, $($pattern:tt)+) => {
+        match $expression {
+            $($pattern)+ => (),
+            ref e => panic!("expected: {} but got: {:?}", stringify!($($pattern)+), e),
+        }
+    }
+}
 
 macro_rules! fetch_enum {
     ($enum:path, $expr:expr) => {{
         if let $enum(item) = $expr {
             item
         } else {
-            panic!("failed to extract enum:{:?}", $expr)
+            panic!("failed to extract enum: {:?}", $expr)
         }
     }};
 }
@@ -30,6 +39,12 @@ where
         Ok(_) => handle.join().expect("thread panicked"),
         Err(_) => panic!("thread took too long"),
     }
+}
+
+#[test]
+fn test_assert_err() {
+    let some_fn = || -> Result<()> { Err(FugleError::ResourceNotFound) };
+    assert_err!(some_fn(), Err(FugleError::ResourceNotFound));
 }
 
 #[test]
