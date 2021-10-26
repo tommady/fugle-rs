@@ -86,13 +86,21 @@ fn test_intraday_meta_401_failed() {
 #[test]
 fn test_intraday_dealts_pass() {
     let it = crawler::IntradayBuilder::new().read_timeout_sec(3).build();
-    let dealts = fetch_enum!(Response::Dealts, it.dealts("2884").call().unwrap());
+    let dealts = fetch_enum!(
+        Response::Dealts,
+        it.dealts("2884").limit(9).offset(0).call().unwrap()
+    );
     assert_eq!(dealts.data.info.symbol_id, "2884");
     assert_eq!(dealts.data.info.typ, "EQUITY");
 
     let dealts = fetch_enum!(
         Response::Dealts,
-        it.dealts("2884").odd_lot(true).call().unwrap()
+        it.dealts("2884")
+            .odd_lot(true)
+            .limit(9)
+            .offset(0)
+            .call()
+            .unwrap()
     );
     assert_eq!(dealts.data.info.symbol_id, "2884");
     assert_eq!(dealts.data.info.typ, "ODDLOT");
