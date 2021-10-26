@@ -1,3 +1,4 @@
+#![cfg_attr(coverage, feature(no_coverage))]
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
