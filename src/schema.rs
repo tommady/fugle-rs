@@ -3,10 +3,12 @@ use serde::{Deserialize, Serialize};
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
+#[cfg_attr(coverage, no_coverage)]
 fn default_naive_date() -> NaiveDate {
     NaiveDate::from_num_days_from_ce(1)
 }
 
+#[cfg_attr(coverage, no_coverage)]
 fn default_date_time() -> DateTime<FixedOffset> {
     DateTime::<FixedOffset>::from_utc(
         NaiveDateTime::from_timestamp(0, 0),
@@ -36,6 +38,7 @@ pub struct Info {
 }
 
 impl Default for Info {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> Info {
         Info {
             last_updated_at: default_date_time(),
@@ -178,6 +181,7 @@ pub struct QuoteTotal {
 }
 
 impl Default for QuoteTotal {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteTotal {
         QuoteTotal {
             at: default_date_time(),
@@ -211,6 +215,7 @@ pub struct QuoteTrial {
 }
 
 impl Default for QuoteTrial {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteTrial {
         QuoteTrial {
             at: default_date_time(),
@@ -240,6 +245,7 @@ pub struct QuoteTrade {
 }
 
 impl Default for QuoteTrade {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteTrade {
         QuoteTrade {
             at: default_date_time(),
@@ -271,6 +277,7 @@ pub struct QuoteOrder {
 }
 
 impl Default for QuoteOrder {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteOrder {
         QuoteOrder {
             at: default_date_time(),
@@ -290,6 +297,7 @@ pub struct QuotePrice {
 }
 
 impl Default for QuotePrice {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuotePrice {
         QuotePrice {
             at: default_date_time(),
@@ -379,6 +387,7 @@ pub struct Dealt {
 }
 
 impl Default for Dealt {
+    #[cfg_attr(coverage, no_coverage)]
     fn default() -> Dealt {
         Dealt {
             at: default_date_time(),
@@ -419,6 +428,7 @@ pub enum Response {
     Volumes(VolumesResponse),
 }
 
+#[cfg_attr(coverage, no_coverage)]
 #[derive(Debug)]
 pub enum ResponseType {
     Chart,
@@ -443,6 +453,7 @@ pub struct ErrorResponse {
 }
 
 impl std::fmt::Display for ErrorResponse {
+    #[cfg_attr(coverage, no_coverage)]
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -453,11 +464,13 @@ impl std::fmt::Display for ErrorResponse {
 }
 
 impl std::error::Error for ErrorResponse {
+    #[cfg_attr(coverage, no_coverage)]
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         None
     }
 }
 
+#[cfg_attr(coverage, no_coverage)]
 #[derive(Debug)]
 pub enum FugleError {
     MpscSendError,
@@ -486,6 +499,7 @@ pub enum FugleError {
 }
 
 impl std::fmt::Display for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             FugleError::SerdeJson(ref e) => write!(f, "Serde_json Lib error: {}", e),
@@ -505,6 +519,7 @@ impl std::fmt::Display for FugleError {
 }
 
 impl std::error::Error for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             FugleError::SerdeJson(ref e) => Some(e),
@@ -524,18 +539,21 @@ impl std::error::Error for FugleError {
 }
 
 impl From<std::sync::mpsc::RecvError> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn from(err: std::sync::mpsc::RecvError) -> FugleError {
         FugleError::MpscRecvError(err)
     }
 }
 
 impl From<std::io::Error> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn from(err: std::io::Error) -> FugleError {
         FugleError::StdIO(err)
     }
 }
 
 impl From<ureq::Error> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn from(err: ureq::Error) -> FugleError {
         FugleError::Ureq(Box::new(err))
     }
@@ -543,18 +561,21 @@ impl From<ureq::Error> for FugleError {
 
 #[cfg(feature = "websocket")]
 impl From<tungstenite::Error> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn from(err: tungstenite::Error) -> FugleError {
         FugleError::Tungstenite(err)
     }
 }
 
 impl From<serde_json::Error> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn from(err: serde_json::Error) -> FugleError {
         FugleError::SerdeJson(err)
     }
 }
 
 impl From<ErrorResponse> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
     fn from(err: ErrorResponse) -> FugleError {
         match err.error.code {
             400 => FugleError::General(err),

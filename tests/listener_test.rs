@@ -16,6 +16,7 @@ mod util;
 //    while you connected into the server
 
 #[test]
+#[cfg(feature = "websocket")]
 fn test_intraday_chart_failed() {
     let (tx, _) = mpsc::channel();
     let mut lis = listener::Intraday::new("", tx);
@@ -23,6 +24,7 @@ fn test_intraday_chart_failed() {
 }
 
 #[test]
+#[cfg(feature = "websocket")]
 fn test_intraday_chart_pass() {
     util::timeout_after(Duration::from_secs(3), || {
         let (tx, rx) = mpsc::channel();
@@ -35,6 +37,7 @@ fn test_intraday_chart_pass() {
 }
 
 #[test]
+#[cfg(feature = "websocket")]
 fn test_intraday_meta_failed() {
     let (tx, _) = mpsc::channel();
     let mut lis = listener::Intraday::new("", tx);
@@ -42,6 +45,7 @@ fn test_intraday_meta_failed() {
 }
 
 #[test]
+#[cfg(feature = "websocket")]
 fn test_intraday_meta_pass() {
     util::timeout_after(Duration::from_secs(3), || {
         let (tx, rx) = mpsc::channel();
@@ -54,6 +58,7 @@ fn test_intraday_meta_pass() {
 }
 
 #[test]
+#[cfg(feature = "websocket")]
 fn test_intraday_quote_failed() {
     let (tx, _) = mpsc::channel();
     let mut lis = listener::Intraday::new("", tx);
@@ -61,6 +66,7 @@ fn test_intraday_quote_failed() {
 }
 
 #[test]
+#[cfg(feature = "websocket")]
 fn test_intraday_quote_pass() {
     util::timeout_after(Duration::from_secs(3), || {
         let (tx, rx) = mpsc::channel();
