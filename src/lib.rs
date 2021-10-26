@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::all)]
+#![cfg_attr(coverage, feature(no_coverage))]
 
 //! A Simple, Lightweight, Fast and Safe Fugle Library.
 //!
