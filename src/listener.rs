@@ -1,4 +1,4 @@
-use crate::schema::{FugleError, Response, Result};
+use crate::schema::{FugleError, Response, ResponseType, Result};
 use log::error;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -77,6 +77,7 @@ impl Intraday {
             ),
             self.sender.clone(),
             self.done.clone(),
+            ResponseType::Chart,
         ) {
             Ok(w) => {
                 self.workers.push(w);
@@ -112,6 +113,7 @@ impl Intraday {
             ),
             self.sender.clone(),
             self.done.clone(),
+            ResponseType::Meta,
         ) {
             Ok(w) => {
                 self.workers.push(w);
@@ -147,6 +149,7 @@ impl Intraday {
             ),
             self.sender.clone(),
             self.done.clone(),
+            ResponseType::Quote,
         ) {
             Ok(w) => {
                 self.workers.push(w);
@@ -173,7 +176,12 @@ struct Worker {
 }
 
 impl Worker {
-    fn new(uri: &str, sender: Sender<Response>, done: Arc<AtomicBool>) -> Result<Worker> {
+    fn new(
+        uri: &str,
+        sender: Sender<Response>,
+        done: Arc<AtomicBool>,
+        resposne_type: ResponseType,
+    ) -> Result<Worker> {
         let (mut socket, _) = connect(uri)?;
 
         let thread = thread::spawn(move || {
@@ -197,9 +205,18 @@ impl Worker {
                 }
 
                 let sending = || -> Result<()> {
-                    sender
-                        .send(serde_json::from_str(txt.as_str())?)
-                        .map_err(|_| FugleError::MpscSendError)?;
+                    match resposne_type {
+                        ResponseType::Chart => sender
+                            .send(Response::Chart(serde_json::from_str(txt.as_str())?))
+                            .map_err(|_| FugleError::MpscSendError)?,
+                        ResponseType::Meta => sender
+                            .send(Response::Meta(serde_json::from_str(txt.as_str())?))
+                            .map_err(|_| FugleError::MpscSendError)?,
+                        ResponseType::Quote => sender
+                            .send(Response::Quote(serde_json::from_str(txt.as_str())?))
+                            .map_err(|_| FugleError::MpscSendError)?,
+                        _ => unreachable!("not supported response type"),
+                    }
                     Ok(())
                 };
 
