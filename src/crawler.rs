@@ -9,24 +9,24 @@ const INTRADAY_DEALTS: &str = "https://api.fugle.tw/realtime/v0.3/intraday/dealt
 const INTRADAY_VOLUMES: &str = "https://api.fugle.tw/realtime/v0.3/intraday/volumes";
 
 /// Accumulates options towards building an Intraday instance.
-pub struct IntradayBuilder {
-    token: String,
+pub struct IntradayBuilder<'a> {
+    token: &'a str,
     agent_builder: AgentBuilder,
 }
 
-impl Default for IntradayBuilder {
-    fn default() -> IntradayBuilder {
+impl<'a> Default for IntradayBuilder<'a> {
+    fn default() -> IntradayBuilder<'static> {
         IntradayBuilder::new()
     }
 }
 
-impl IntradayBuilder {
+impl<'a> IntradayBuilder<'a> {
     /// Returns a default IntradayBuilder with
     /// * fugle "demo" token
     /// * [ default ureq agent settings ] ( https://github.com/algesten/ureq/blob/main/src/agent.rs#L202 )
-    pub fn new() -> IntradayBuilder {
+    pub fn new() -> IntradayBuilder<'a> {
         IntradayBuilder {
-            token: "demo".to_owned(),
+            token: "demo",
             agent_builder: AgentBuilder::new(),
         }
     }
@@ -46,8 +46,8 @@ impl IntradayBuilder {
     ///     .token("b52153ae36747b17c8bdee801da19542")
     ///     .build();
     /// ```
-    pub fn token(mut self, token: &str) -> IntradayBuilder {
-        self.token = token.to_owned();
+    pub fn token(mut self, token: &'a str) -> IntradayBuilder {
+        self.token = token;
         self
     }
 
@@ -63,7 +63,7 @@ impl IntradayBuilder {
     ///     .read_timeout_sec(10) // set read timeout in 10 seconds
     ///     .build();
     /// ```
-    pub fn read_timeout_sec(mut self, sec: u64) -> IntradayBuilder {
+    pub fn read_timeout_sec(mut self, sec: u64) -> IntradayBuilder<'a> {
         self.agent_builder = self.agent_builder.timeout_read(Duration::from_secs(sec));
         self
     }
@@ -76,7 +76,7 @@ impl IntradayBuilder {
     /// # use fugle::crawler::IntradayBuilder;
     /// let agent = IntradayBuilder::new().build();
     /// ```
-    pub fn build(self) -> Intraday {
+    pub fn build(self) -> Intraday<'a> {
         Intraday {
             token: self.token,
             agent: self.agent_builder.build(),
@@ -85,12 +85,12 @@ impl IntradayBuilder {
 }
 
 /// Intraday is the RESTful API queryer to request fugle endpoints.
-pub struct Intraday {
-    token: String,
+pub struct Intraday<'a> {
+    token: &'a str,
     agent: Agent,
 }
 
-impl Intraday {
+impl<'a> Intraday<'a> {
     /// [Endpoint](https://developer.fugle.tw/document/intraday/chart)
     ///
     /// Fetching the current drawing data.
@@ -113,7 +113,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_CHART)
-                .query("apiToken", &self.token)
+                .query("apiToken", self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -140,7 +140,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_QUOTE)
-                .query("apiToken", &self.token)
+                .query("apiToken", self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -167,7 +167,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_META)
-                .query("apiToken", &self.token)
+                .query("apiToken", self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -194,7 +194,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_DEALTS)
-                .query("apiToken", &self.token)
+                .query("apiToken", self.token)
                 .query("symbolId", symbol_id),
         }
     }
@@ -221,7 +221,7 @@ impl Intraday {
             request: self
                 .agent
                 .get(INTRADAY_VOLUMES)
-                .query("apiToken", &self.token)
+                .query("apiToken", self.token)
                 .query("symbolId", symbol_id),
         }
     }

@@ -14,7 +14,7 @@ const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/meta";
 
 /// Intraday is the Websocket listener to fugle wws endpoints.
 pub struct Intraday {
-    token: String,
+    token: &'static str,
     workers: Vec<Worker>,
     done: Arc<AtomicBool>,
     sender: Sender<Response>,
@@ -42,9 +42,9 @@ impl Intraday {
     /// let (tx, rx) = mpsc::channel();
     /// let mut lis = listener::Intraday::new("demo", tx.clone());
     /// ```
-    pub fn new(token: &str, sender: Sender<Response>) -> Intraday {
+    pub fn new(token: &'static str, sender: Sender<Response>) -> Intraday {
         Intraday {
-            token: token.to_owned(),
+            token,
             workers: vec![],
             done: Arc::new(AtomicBool::new(false)),
             sender,
