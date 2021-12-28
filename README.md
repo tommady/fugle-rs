@@ -2,7 +2,6 @@
 [![ci status](https://github.com/tommady/fugle-rs/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/tommady/fugle-rs/actions)
 [![latest version](https://img.shields.io/crates/v/fugle)](https://crates.io/crates/fugle)
 [![codecov](https://codecov.io/gh/tommady/fugle-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/tommady/fugle-rs)
-[![rustc](https://img.shields.io/badge/rustc-1.56+-blue?style=flat&logo=rust)](https://www.rust-lang.org)
 [![docs.rs](https://docs.rs/fugle/badge.svg)](https://docs.rs/fugle)
 ![license](https://img.shields.io/crates/l/fugle)
 ---
