@@ -12,16 +12,14 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust: [1.56.0]
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
-          toolchain: ${{ matrix.rust }}
-          override: true
-    - run: rustup component add rustfmt clippy
+          toolchain: stable
+          profile: minimal
+          default: true
+          components: clippy,rustfmt
     - name: Check Formatting
       run: cargo fmt --all -- --check 
     - name: Check Clippy Lints 
@@ -30,17 +28,14 @@ jobs:
       run: cargo test --all --all-features --no-fail-fast
   coverage:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust: [1.56.0]
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: nightly 
+          profile: minimal
           override: true
-    - name: Install Rust nightly llvm-tools-preview component
-      run: rustup toolchain install nightly --component llvm-tools-preview
+          components: llvm-tools-preview
     - name: Install cargo-llvm-cov
       run: curl -LsSf https://github.com/taiki-e/cargo-llvm-cov/releases/latest/download/cargo-llvm-cov-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
     - name: Generate code coverage
