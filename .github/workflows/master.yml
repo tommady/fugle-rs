@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
     - uses: actions-rs/toolchain@v1
       with:
           toolchain: stable
@@ -26,10 +28,13 @@ jobs:
       run: cargo clippy --all-targets --all-features -- -D warnings 
     - name: Run Tests 
       run: cargo test --all --all-features --no-fail-fast
+
   coverage:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
     - uses: actions-rs/toolchain@v1
       with:
           toolchain: nightly 
