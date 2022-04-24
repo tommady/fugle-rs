@@ -1,12 +1,19 @@
-use crate::schema::{FugleError, Response, ResponseType, Result};
-use log::error;
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    mpsc::Sender,
-    Arc,
+use std::{
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        mpsc::Sender,
+        Arc,
+    },
+    thread,
 };
-use std::thread;
+
+use log::error;
 use tungstenite::connect;
+
+use crate::{
+    errors::FugleError,
+    schema::{Response, ResponseType, Result},
+};
 
 const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/chart";
 const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/quote";

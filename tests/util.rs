@@ -1,7 +1,11 @@
 #![macro_use]
-use fugle::crawler;
-use fugle::schema::{FugleError, Response, Result};
 use std::{sync::mpsc, thread, time::Duration};
+
+use fugle::{
+    crawler,
+    errors::FugleError,
+    schema::{Response, Result},
+};
 
 macro_rules! assert_err {
     ($expression:expr, $($pattern:tt)+) => {

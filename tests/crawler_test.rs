@@ -1,5 +1,4 @@
-use fugle::crawler;
-use fugle::schema::{FugleError, Response};
+use fugle::{crawler, errors::FugleError, schema::Response};
 mod util;
 
 #[test]

@@ -143,6 +143,8 @@
 //! [fuglevolumesweb]: https://developer.fugle.tw/docs/data/intraday/volumes
 
 pub mod crawler;
+pub mod errors;
+pub mod intraday;
 #[cfg(feature = "websocket")]
 pub mod listener;
 pub mod schema;

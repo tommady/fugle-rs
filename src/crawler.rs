@@ -1,6 +1,11 @@
-use crate::schema::{ErrorResponse, FugleError, Response, ResponseType, Result};
 use std::time::Duration;
+
 use ureq::{Agent, AgentBuilder, OrAnyStatus, Request};
+
+use crate::{
+    errors::{ErrorResponse, FugleError},
+    schema::{Response, ResponseType, Result},
+};
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.3/intraday/chart";
 const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.3/intraday/quote";
