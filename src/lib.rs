@@ -136,11 +136,11 @@
 //! # }
 //! ```
 //! [fugleweb]: https://developer.fugle.tw
-//! [fuglechartweb]: https://developer.fugle.tw/document/intraday/chart
-//! [fuglequoteweb]: https://developer.fugle.tw/document/intraday/quote
-//! [fuglemetaweb]: https://developer.fugle.tw/document/intraday/meta
-//! [fugledealtsweb]: https://developer.fugle.tw/document/intraday/dealts
-//! [fuglevolumesweb]: https://developer.fugle.tw/document/intraday/volumes
+//! [fuglechartweb]: https://developer.fugle.tw/docs/data/intraday/chart
+//! [fuglequoteweb]: https://developer.fugle.tw/docs/data/intraday/quote
+//! [fuglemetaweb]: https://developer.fugle.tw/docs/data/intraday/meta
+//! [fugledealtsweb]: https://developer.fugle.tw/docs/data/intraday/dealts
+//! [fuglevolumesweb]: https://developer.fugle.tw/docs/data/intraday/volumes
 
 pub mod crawler;
 #[cfg(feature = "websocket")]
