@@ -1,6 +1,17 @@
-use crate::schema::{ErrorResponse, FugleError, Response, ResponseType, Result};
+pub mod chart;
+pub mod dealts;
+pub mod meta;
+pub mod quote;
+pub mod volumes;
+
 use std::time::Duration;
-use ureq::{Agent, AgentBuilder, OrAnyStatus, Request};
+
+use ureq::{Agent, AgentBuilder};
+
+use crate::intraday::{
+    chart::IntradayChartBuilder, dealts::IntradayDealtsBuilder, meta::IntradayMetaBuilder,
+    quote::IntradayQuoteBuilder, volumes::IntradayVolumesBuilder,
+};
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.3/intraday/chart";
 const INTRADAY_QUOTE: &str = "https://api.fugle.tw/realtime/v0.3/intraday/quote";
@@ -41,7 +52,7 @@ impl<'a> IntradayBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     /// let agent = IntradayBuilder::new()
     ///     .token("b52153ae36747b17c8bdee801da19542")
     ///     .build();
@@ -58,7 +69,7 @@ impl<'a> IntradayBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     /// let agent = IntradayBuilder::new()
     ///     .read_timeout_sec(10) // set read timeout in 10 seconds
     ///     .build();
@@ -73,7 +84,7 @@ impl<'a> IntradayBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     /// let agent = IntradayBuilder::new().build();
     /// ```
     pub fn build(self) -> Intraday<'a> {
@@ -99,7 +110,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.chart("2884").call()?;
@@ -107,9 +118,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn chart(&self, symbol_id: &str) -> GetQueryBuilder {
-        GetQueryBuilder {
-            resposne_type: ResponseType::Chart,
+    pub fn chart(&self, symbol_id: &str) -> IntradayChartBuilder {
+        IntradayChartBuilder {
             request: self
                 .agent
                 .get(INTRADAY_CHART)
@@ -126,7 +136,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.quote("2884").call()?;
@@ -134,9 +144,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn quote(&self, symbol_id: &str) -> GetQueryBuilder {
-        GetQueryBuilder {
-            resposne_type: ResponseType::Quote,
+    pub fn quote(&self, symbol_id: &str) -> IntradayQuoteBuilder {
+        IntradayQuoteBuilder {
             request: self
                 .agent
                 .get(INTRADAY_QUOTE)
@@ -153,7 +162,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.meta("2884").call()?;
@@ -161,9 +170,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn meta(&self, symbol_id: &str) -> GetQueryBuilder {
-        GetQueryBuilder {
-            resposne_type: ResponseType::Meta,
+    pub fn meta(&self, symbol_id: &str) -> IntradayMetaBuilder {
+        IntradayMetaBuilder {
             request: self
                 .agent
                 .get(INTRADAY_META)
@@ -180,7 +188,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.dealts("2884").call()?;
@@ -188,9 +196,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn dealts(&self, symbol_id: &str) -> GetQueryBuilder {
-        GetQueryBuilder {
-            resposne_type: ResponseType::Dealts,
+    pub fn dealts(&self, symbol_id: &str) -> IntradayDealtsBuilder {
+        IntradayDealtsBuilder {
             request: self
                 .agent
                 .get(INTRADAY_DEALTS)
@@ -207,7 +214,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
+    /// # use fugle::intraday::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.volumes("2884").call()?;
@@ -215,128 +222,13 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn volumes(&self, symbol_id: &str) -> GetQueryBuilder {
-        GetQueryBuilder {
-            resposne_type: ResponseType::Volumes,
+    pub fn volumes(&self, symbol_id: &str) -> IntradayVolumesBuilder {
+        IntradayVolumesBuilder {
             request: self
                 .agent
                 .get(INTRADAY_VOLUMES)
                 .query("apiToken", self.token)
                 .query("symbolId", symbol_id),
-        }
-    }
-}
-
-/// Associate options when doing the request.
-pub struct GetQueryBuilder {
-    request: Request,
-    resposne_type: ResponseType,
-}
-
-impl GetQueryBuilder {
-    /// Set a limit param while using dealts request.
-    /// Default value on fugle API is 0
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    /// agent.dealts("2884")
-    /// .limit(99)
-    /// .call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn limit(mut self, limit: usize) -> GetQueryBuilder {
-        self.request = self.request.query("limit", &limit.to_string());
-        self
-    }
-
-    /// Set an offset param while using dealts request.
-    /// Default value on fugle API is 50
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    /// agent.dealts("2884")
-    /// .offset(3)
-    /// .limit(6)
-    /// .call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn offset(mut self, offset: usize) -> GetQueryBuilder {
-        self.request = self.request.query("offset", &offset.to_string());
-        self
-    }
-
-    /// To see odd lotter or not.
-    /// Default value on fugle API is false
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    ///
-    /// agent.meta("2884")
-    /// .odd_lot(true)
-    /// .call()?;
-    ///
-    /// agent.quote("2884")
-    /// .odd_lot(true)
-    /// .call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn odd_lot(mut self, odd_lot: bool) -> GetQueryBuilder {
-        self.request = self.request.query("oddLot", &odd_lot.to_string());
-        self
-    }
-
-    /// Send the request.
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::crawler::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    ///
-    /// agent.meta("2884").call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn call(self) -> Result<Response> {
-        match self.request.call().or_any_status() {
-            Ok(response) => {
-                if response.status() != 200 {
-                    let err: ErrorResponse = response.into_json()?;
-                    return Err(err.into());
-                }
-                match self.resposne_type {
-                    ResponseType::Chart => Ok(Response::Chart(response.into_json()?)),
-                    ResponseType::Meta => Ok(Response::Meta(response.into_json()?)),
-                    ResponseType::Quote => Ok(Response::Quote(response.into_json()?)),
-                    ResponseType::Dealts => Ok(Response::Dealts(response.into_json()?)),
-                    ResponseType::Volumes => Ok(Response::Volumes(response.into_json()?)),
-                }
-            }
-            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
         }
     }
 }

@@ -1,12 +1,20 @@
-use crate::schema::{FugleError, Response, ResponseType, Result};
-use log::error;
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    mpsc::Sender,
-    Arc,
+use std::{
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        mpsc::{channel, Receiver, Sender},
+        Arc,
+    },
+    thread,
 };
-use std::thread;
+
+use log::error;
 use tungstenite::connect;
+
+use crate::{
+    errors::FugleError,
+    intraday::{chart::ChartResponse, meta::MetaResponse, quote::QuoteResponse},
+    schema::Result,
+};
 
 const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/chart";
 const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/quote";
@@ -17,7 +25,6 @@ pub struct Intraday {
     token: &'static str,
     workers: Vec<Worker>,
     done: Arc<AtomicBool>,
-    sender: Sender<Response>,
 }
 
 impl Intraday {
@@ -36,18 +43,15 @@ impl Intraday {
     /// Example:
     ///
     /// ```
-    /// # use fugle::listener;
-    /// # use std::sync::mpsc;
+    /// # use fugle::ws;
     ///
-    /// let (tx, rx) = mpsc::channel();
-    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    /// let mut lis = ws::Intraday::new("demo");
     /// ```
-    pub fn new(token: &'static str, sender: Sender<Response>) -> Intraday {
+    pub fn new(token: &'static str) -> Intraday {
         Intraday {
             token,
             workers: vec![],
             done: Arc::new(AtomicBool::new(false)),
-            sender,
         }
     }
 
@@ -57,31 +61,29 @@ impl Intraday {
     ///
     /// ```no_run
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::listener;
-    /// # use std::sync::mpsc;
+    /// # use fugle::ws;
     ///
-    /// let (tx, rx) = mpsc::channel();
-    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    /// let mut lis = ws::Intraday::new("demo");
     ///
-    /// lis.chart("2884", true);
+    /// let rx = lis.chart("2884", true)?;
     /// let response = rx.recv()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn chart(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
+    pub fn chart(&mut self, symbol_id: &str, odd_lot: bool) -> Result<Receiver<ChartResponse>> {
+        let (tx, rx) = channel();
         match Worker::new(
             &format!(
                 "{}?symbolId={}&apiToken={}&oddLot={}",
                 INTRADAY_CHART, symbol_id, self.token, odd_lot,
             ),
-            self.sender.clone(),
+            tx,
             self.done.clone(),
-            ResponseType::Chart,
         ) {
             Ok(w) => {
                 self.workers.push(w);
-                Ok(())
+                Ok(rx)
             }
             Err(e) => Err(e),
         }
@@ -93,31 +95,29 @@ impl Intraday {
     ///
     /// ```no_run
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::listener;
-    /// # use std::sync::mpsc;
+    /// # use fugle::ws;
     ///
-    /// let (tx, rx) = mpsc::channel();
-    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    /// let mut lis = ws::Intraday::new("demo");
     ///
-    /// lis.meta("2884", true);
+    /// let rx = lis.meta("2884", true)?;
     /// let response = rx.recv()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn meta(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
+    pub fn meta(&mut self, symbol_id: &str, odd_lot: bool) -> Result<Receiver<MetaResponse>> {
+        let (tx, rx) = channel();
         match Worker::new(
             &format!(
                 "{}?symbolId={}&apiToken={}&oddLot={}",
                 INTRADAY_META, symbol_id, self.token, odd_lot,
             ),
-            self.sender.clone(),
+            tx,
             self.done.clone(),
-            ResponseType::Meta,
         ) {
             Ok(w) => {
                 self.workers.push(w);
-                Ok(())
+                Ok(rx)
             }
             Err(e) => Err(e),
         }
@@ -129,31 +129,29 @@ impl Intraday {
     ///
     /// ```no_run
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::listener;
-    /// # use std::sync::mpsc;
+    /// # use fugle::ws;
     ///
-    /// let (tx, rx) = mpsc::channel();
-    /// let mut lis = listener::Intraday::new("demo", tx.clone());
+    /// let mut lis = ws::Intraday::new("demo");
     ///
-    /// lis.quote("2884", true);
+    /// let rx = lis.quote("2884", true)?;
     /// let response = rx.recv()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn quote(&mut self, symbol_id: &str, odd_lot: bool) -> Result<()> {
+    pub fn quote(&mut self, symbol_id: &str, odd_lot: bool) -> Result<Receiver<QuoteResponse>> {
+        let (tx, rx) = channel();
         match Worker::new(
             &format!(
                 "{}?symbolId={}&apiToken={}&oddLot={}",
                 INTRADAY_QUOTE, symbol_id, self.token, odd_lot,
             ),
-            self.sender.clone(),
+            tx,
             self.done.clone(),
-            ResponseType::Quote,
         ) {
             Ok(w) => {
                 self.workers.push(w);
-                Ok(())
+                Ok(rx)
             }
             Err(e) => Err(e),
         }
@@ -176,20 +174,17 @@ struct Worker {
 }
 
 impl Worker {
-    fn new(
-        uri: &str,
-        sender: Sender<Response>,
-        done: Arc<AtomicBool>,
-        resposne_type: ResponseType,
-    ) -> Result<Worker> {
+    fn new<T>(uri: &str, sender: Sender<T>, done: Arc<AtomicBool>) -> Result<Worker>
+    where
+        T: for<'de> serde::Deserialize<'de> + Send + 'static,
+    {
         let (mut socket, _) = connect(uri)?;
 
         let thread = thread::spawn(move || {
             while !done.load(Ordering::SeqCst) {
                 let mut socket_receiver = || -> Result<String> {
                     let msg = socket.read_message()?;
-                    let txt = msg.to_text()?;
-                    Ok(txt.to_owned())
+                    Ok(msg.to_text()?.to_string())
                 };
 
                 let txt = match socket_receiver() {
@@ -205,18 +200,9 @@ impl Worker {
                 }
 
                 let sending = || -> Result<()> {
-                    match resposne_type {
-                        ResponseType::Chart => sender
-                            .send(Response::Chart(serde_json::from_str(txt.as_str())?))
-                            .map_err(|_| FugleError::MpscSendError)?,
-                        ResponseType::Meta => sender
-                            .send(Response::Meta(serde_json::from_str(txt.as_str())?))
-                            .map_err(|_| FugleError::MpscSendError)?,
-                        ResponseType::Quote => sender
-                            .send(Response::Quote(serde_json::from_str(txt.as_str())?))
-                            .map_err(|_| FugleError::MpscSendError)?,
-                        _ => unreachable!("not supported response type"),
-                    }
+                    sender
+                        .send(serde_json::from_str(txt.as_str())?)
+                        .map_err(|_| FugleError::MpscSendError)?;
                     Ok(())
                 };
 

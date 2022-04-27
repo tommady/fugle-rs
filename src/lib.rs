@@ -23,7 +23,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::crawler::IntradayBuilder;
+//! # use fugle::intraday::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.chart("2884").call()?;
@@ -35,13 +35,11 @@
 //! Websocket
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::listener;
-//! # use std::sync::mpsc;
+//! # use fugle::ws::Intraday;
 //!                                                            
-//! let (tx, rx) = mpsc::channel();
-//! let mut lis = listener::Intraday::new("demo", tx.clone());
+//! let mut lis = Intraday::new("demo");
 //!                                                            
-//! lis.chart("2884", true);
+//! let rx = lis.chart("2884", true)?;
 //! let response = rx.recv()?;
 //!                                                            
 //! # Ok(())
@@ -53,7 +51,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::crawler::IntradayBuilder;
+//! # use fugle::intraday::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.quote("2884").call()?;
@@ -65,13 +63,11 @@
 //! Websocket
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::listener;
-//! # use std::sync::mpsc;
+//! # use fugle::ws::Intraday;;
 //!                                                            
-//! let (tx, rx) = mpsc::channel();
-//! let mut lis = listener::Intraday::new("demo", tx.clone());
+//! let mut lis = Intraday::new("demo");
 //!                                                            
-//! lis.quote("2884", true);
+//! let rx = lis.quote("2884", true)?;
 //! let response = rx.recv()?;
 //!                                                            
 //! # Ok(())
@@ -83,7 +79,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::crawler::IntradayBuilder;
+//! # use fugle::intraday::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.meta("2884").call()?;
@@ -95,13 +91,11 @@
 //! Websocket
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::listener;
-//! # use std::sync::mpsc;
+//! # use fugle::ws::Intraday;;
 //!                                                            
-//! let (tx, rx) = mpsc::channel();
-//! let mut lis = listener::Intraday::new("demo", tx.clone());
+//! let mut lis = Intraday::new("demo");
 //!                                                            
-//! lis.meta("2884", true);
+//! let rx = lis.meta("2884", true)?;
 //! let response = rx.recv()?;
 //!                                                            
 //! # Ok(())
@@ -113,7 +107,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::crawler::IntradayBuilder;
+//! # use fugle::intraday::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.dealts("2884").call()?;
@@ -127,7 +121,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::crawler::IntradayBuilder;
+//! # use fugle::intraday::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.volumes("2884").call()?;
@@ -142,7 +136,8 @@
 //! [fugledealtsweb]: https://developer.fugle.tw/docs/data/intraday/dealts
 //! [fuglevolumesweb]: https://developer.fugle.tw/docs/data/intraday/volumes
 
-pub mod crawler;
-#[cfg(feature = "websocket")]
-pub mod listener;
+pub mod errors;
+pub mod intraday;
 pub mod schema;
+#[cfg(feature = "websocket")]
+pub mod ws;

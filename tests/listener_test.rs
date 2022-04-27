@@ -1,5 +1,4 @@
-use fugle::{listener, schema::Response};
-use std::sync::mpsc;
+use fugle::ws::Intraday;
 use std::time::Duration;
 mod util;
 
@@ -18,8 +17,7 @@ mod util;
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_failed() {
-    let (tx, _) = mpsc::channel();
-    let mut lis = listener::Intraday::new("", tx);
+    let mut lis = Intraday::new("");
     assert!(lis.chart("2884", true).is_err());
 }
 
@@ -27,10 +25,9 @@ fn test_intraday_chart_failed() {
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_pass() {
     util::timeout_after(Duration::from_secs(3), || {
-        let (tx, rx) = mpsc::channel();
-        let mut lis = listener::Intraday::new("demo", tx);
-        assert!(lis.chart("2884", false).is_ok());
-        let chart = fetch_enum!(Response::Chart, rx.recv().unwrap());
+        let mut lis = Intraday::new("demo");
+        let rx = lis.chart("2884", false).unwrap();
+        let chart = rx.recv().unwrap();
         assert_eq!(chart.data.info.symbol_id, "2884");
         assert_eq!(chart.data.info.typ, "EQUITY");
     })
@@ -39,8 +36,7 @@ fn test_intraday_chart_pass() {
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_failed() {
-    let (tx, _) = mpsc::channel();
-    let mut lis = listener::Intraday::new("", tx);
+    let mut lis = Intraday::new("");
     assert!(lis.meta("2884", true).is_err());
 }
 
@@ -48,10 +44,9 @@ fn test_intraday_meta_failed() {
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_pass() {
     util::timeout_after(Duration::from_secs(3), || {
-        let (tx, rx) = mpsc::channel();
-        let mut lis = listener::Intraday::new("demo", tx);
-        assert!(lis.meta("2884", false).is_ok());
-        let meta = fetch_enum!(Response::Meta, rx.recv().unwrap());
+        let mut lis = Intraday::new("demo");
+        let rx = lis.meta("2884", false).unwrap();
+        let meta = rx.recv().unwrap();
         assert_eq!(meta.data.info.symbol_id, "2884");
         assert_eq!(meta.data.info.typ, "EQUITY");
     })
@@ -60,8 +55,7 @@ fn test_intraday_meta_pass() {
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_failed() {
-    let (tx, _) = mpsc::channel();
-    let mut lis = listener::Intraday::new("", tx);
+    let mut lis = Intraday::new("");
     assert!(lis.quote("2884", true).is_err());
 }
 
@@ -69,10 +63,9 @@ fn test_intraday_quote_failed() {
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_pass() {
     util::timeout_after(Duration::from_secs(3), || {
-        let (tx, rx) = mpsc::channel();
-        let mut lis = listener::Intraday::new("demo", tx);
-        assert!(lis.quote("2884", false).is_ok());
-        let quote = fetch_enum!(Response::Quote, rx.recv().unwrap());
+        let mut lis = Intraday::new("demo");
+        let rx = lis.quote("2884", false).unwrap();
+        let quote = rx.recv().unwrap();
         assert_eq!(quote.data.info.symbol_id, "2884");
         assert_eq!(quote.data.info.typ, "EQUITY");
     })

@@ -1,6 +1,12 @@
-use fugle::schema::*;
-use std::fs::File;
-use std::path::Path;
+use std::{fs::File, path::Path};
+
+use fugle::{
+    errors::{ErrorResponse, FugleError},
+    intraday::{
+        chart::ChartResponse, dealts::DealtsResponse, meta::MetaResponse, quote::QuoteResponse,
+        volumes::VolumesResponse,
+    },
+};
 
 #[test]
 fn test_volumes_response_deserialize() {

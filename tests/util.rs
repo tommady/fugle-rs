@@ -1,7 +1,7 @@
 #![macro_use]
-use fugle::crawler;
-use fugle::schema::{FugleError, Response, Result};
 use std::{sync::mpsc, thread, time::Duration};
+
+use fugle::{errors::FugleError, schema::Result};
 
 macro_rules! assert_err {
     ($expression:expr, $($pattern:tt)+) => {
@@ -10,16 +10,6 @@ macro_rules! assert_err {
             ref e => panic!("expected: {} but got: {:?}", stringify!($($pattern)+), e),
         }
     }
-}
-
-macro_rules! fetch_enum {
-    ($enum:path, $expr:expr) => {{
-        if let $enum(item) = $expr {
-            item
-        } else {
-            panic!("failed to extract enum: {:?}", $expr)
-        }
-    }};
 }
 
 pub(crate) fn timeout_after<T, F>(d: Duration, f: F) -> T
@@ -45,17 +35,6 @@ where
 fn test_assert_err() {
     let some_fn = || -> Result<()> { Err(FugleError::ResourceNotFound) };
     assert_err!(some_fn(), Err(FugleError::ResourceNotFound));
-}
-
-#[test]
-fn test_fetch_enum() {
-    let res = crawler::IntradayBuilder::new()
-        .build()
-        .chart("2884")
-        .call()
-        .unwrap();
-    let v = fetch_enum!(Response::Chart, res);
-    assert_eq!(v.data.info.symbol_id, "2884");
 }
 
 #[test]
