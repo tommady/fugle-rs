@@ -1,16 +1,17 @@
-use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+use time::PrimitiveDateTime;
 use ureq::{OrAnyStatus, Request};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
-    schema::{default_date_time, Info, Result},
+    schema::{de_primitive_date_time, Info, Result},
 };
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct QuoteTotal {
-    pub at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "de_primitive_date_time")]
+    pub at: PrimitiveDateTime,
     pub transaction: u64,
     pub trade_value: f64,
     pub trade_volume: u64,
@@ -24,10 +25,9 @@ pub struct QuoteTotal {
 }
 
 impl Default for QuoteTotal {
-    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteTotal {
         QuoteTotal {
-            at: default_date_time(),
+            at: PrimitiveDateTime::MIN,
             transaction: 0,
             trade_value: 0.0,
             trade_volume: 0,
@@ -45,7 +45,8 @@ impl Default for QuoteTotal {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct QuoteTrial {
-    pub at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "de_primitive_date_time")]
+    pub at: PrimitiveDateTime,
     pub bid: f64,
     pub ask: f64,
     pub price: f64,
@@ -53,10 +54,9 @@ pub struct QuoteTrial {
 }
 
 impl Default for QuoteTrial {
-    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteTrial {
         QuoteTrial {
-            at: default_date_time(),
+            at: PrimitiveDateTime::MIN,
             bid: 0.0,
             ask: 0.0,
             price: 0.0,
@@ -68,7 +68,8 @@ impl Default for QuoteTrial {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct QuoteTrade {
-    pub at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "de_primitive_date_time")]
+    pub at: PrimitiveDateTime,
     pub bid: f64,
     pub ask: f64,
     pub price: f64,
@@ -77,10 +78,9 @@ pub struct QuoteTrade {
 }
 
 impl Default for QuoteTrade {
-    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteTrade {
         QuoteTrade {
-            at: default_date_time(),
+            at: PrimitiveDateTime::MIN,
             price: 0.0,
             bid: 0.0,
             ask: 0.0,
@@ -100,16 +100,16 @@ pub struct QuoteBidAsk {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct QuoteOrder {
-    pub at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "de_primitive_date_time")]
+    pub at: PrimitiveDateTime,
     pub bids: Vec<QuoteBidAsk>,
     pub asks: Vec<QuoteBidAsk>,
 }
 
 impl Default for QuoteOrder {
-    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuoteOrder {
         QuoteOrder {
-            at: default_date_time(),
+            at: PrimitiveDateTime::MIN,
             bids: Vec::with_capacity(0),
             asks: Vec::with_capacity(0),
         }
@@ -120,14 +120,14 @@ impl Default for QuoteOrder {
 #[serde(rename_all = "camelCase", default)]
 pub struct QuotePrice {
     pub price: f64,
-    pub at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "de_primitive_date_time")]
+    pub at: PrimitiveDateTime,
 }
 
 impl Default for QuotePrice {
-    #[cfg_attr(coverage, no_coverage)]
     fn default() -> QuotePrice {
         QuotePrice {
-            at: default_date_time(),
+            at: PrimitiveDateTime::MIN,
             price: 0.0,
         }
     }
@@ -241,5 +241,57 @@ mod test {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());
+    }
+
+    #[test]
+    fn test_quote_total_default() {
+        let q = QuoteTotal::default();
+        assert_eq!(q.at, PrimitiveDateTime::MIN);
+        assert_eq!(q.transaction, 0);
+        assert_eq!(q.trade_value, 0.0);
+        assert_eq!(q.trade_volume, 0);
+        assert_eq!(q.trade_volume_at_bid, 0);
+        assert_eq!(q.trade_volume_at_ask, 0);
+        assert_eq!(q.bid_orders, 0);
+        assert_eq!(q.ask_orders, 0);
+        assert_eq!(q.bid_volume, 0);
+        assert_eq!(q.ask_volume, 0);
+        assert_eq!(q.serial, 0);
+    }
+
+    #[test]
+    fn test_quote_trial_default() {
+        let q = QuoteTrial::default();
+        assert_eq!(q.at, PrimitiveDateTime::MIN);
+        assert_eq!(q.bid, 0.0);
+        assert_eq!(q.ask, 0.0);
+        assert_eq!(q.price, 0.0);
+        assert_eq!(q.volume, 0);
+    }
+
+    #[test]
+    fn test_quote_trade_default() {
+        let q = QuoteTrade::default();
+        assert_eq!(q.at, PrimitiveDateTime::MIN);
+        assert_eq!(q.bid, 0.0);
+        assert_eq!(q.ask, 0.0);
+        assert_eq!(q.price, 0.0);
+        assert_eq!(q.volume, 0);
+        assert_eq!(q.serial, 0);
+    }
+
+    #[test]
+    fn test_quote_order_default() {
+        let q = QuoteOrder::default();
+        assert_eq!(q.at, PrimitiveDateTime::MIN);
+        assert_eq!(q.bids.len(), 0);
+        assert_eq!(q.asks.len(), 0);
+    }
+
+    #[test]
+    fn test_quote_price() {
+        let q = QuotePrice::default();
+        assert_eq!(q.at, PrimitiveDateTime::MIN);
+        assert_eq!(q.price, 0.0);
     }
 }

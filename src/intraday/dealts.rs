@@ -1,16 +1,17 @@
-use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+use time::PrimitiveDateTime;
 use ureq::{OrAnyStatus, Request};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
-    schema::{default_date_time, Info, Result},
+    schema::{de_primitive_date_time, Info, Result},
 };
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Dealt {
-    pub at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "de_primitive_date_time")]
+    pub at: PrimitiveDateTime,
     pub bid: f64,
     pub ask: f64,
     pub price: f64,
@@ -19,10 +20,9 @@ pub struct Dealt {
 }
 
 impl Default for Dealt {
-    #[cfg_attr(coverage, no_coverage)]
     fn default() -> Dealt {
         Dealt {
-            at: default_date_time(),
+            at: PrimitiveDateTime::MIN,
             bid: 0.0,
             ask: 0.0,
             price: 0.0,
@@ -160,5 +160,16 @@ mod test {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());
+    }
+
+    #[test]
+    fn test_dealt_default() {
+        let d = Dealt::default();
+        assert_eq!(d.at, PrimitiveDateTime::MIN);
+        assert_eq!(d.bid, 0.0);
+        assert_eq!(d.ask, 0.0);
+        assert_eq!(d.price, 0.0);
+        assert_eq!(d.volume, 0);
+        assert_eq!(d.serial, 0);
     }
 }
