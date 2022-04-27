@@ -103,3 +103,17 @@ impl IntradayMetaBuilder {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ureq::AgentBuilder;
+
+    #[test]
+    fn test_call_failed_on_transport() {
+        let it = IntradayMetaBuilder {
+            request: AgentBuilder::new().build().get("not-exists-endpoint"),
+        };
+        assert!(it.call().is_err());
+    }
+}
