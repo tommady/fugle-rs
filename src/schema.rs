@@ -1,13 +1,7 @@
 use chrono::{DateTime, FixedOffset, NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    errors::FugleError,
-    intraday::{
-        chart::ChartResponse, dealts::DealtsResponse, meta::MetaResponse, quote::QuoteResponse,
-        volumes::VolumesResponse,
-    },
-};
+use crate::errors::FugleError;
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
@@ -59,24 +53,4 @@ impl Default for Info {
             typ: "".to_string(),
         }
     }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Response {
-    Chart(ChartResponse),
-    Quote(Box<QuoteResponse>),
-    Meta(MetaResponse),
-    Dealts(DealtsResponse),
-    Volumes(VolumesResponse),
-}
-
-#[cfg_attr(coverage, no_coverage)]
-#[derive(Debug)]
-pub enum ResponseType {
-    Chart,
-    Quote,
-    Meta,
-    Dealts,
-    Volumes,
 }

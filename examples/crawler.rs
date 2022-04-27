@@ -1,7 +1,7 @@
-use fugle::{crawler, errors::FugleError, intraday::meta::MetaResponse, schema};
+use fugle::{errors::FugleError, intraday::meta::MetaResponse, intraday::IntradayBuilder};
 
 fn main() {
-    let agent = crawler::IntradayBuilder::new().build();
+    let agent = IntradayBuilder::new().build();
 
     match agent.chart("2884").call() {
         Ok(v) => println!("{:?}", v),
@@ -36,9 +36,7 @@ fn main() {
     'retry_loop: for _ in 0..3 {
         match agent.meta("2884").call() {
             Ok(v) => {
-                if let schema::Response::Meta(meta) = v {
-                    result = meta;
-                }
+                result = v;
                 break 'retry_loop;
             }
             Err(e) => match e {

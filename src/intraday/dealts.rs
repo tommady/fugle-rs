@@ -1,22 +1,20 @@
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+use ureq::{OrAnyStatus, Request};
 
-use crate::schema::{default_date_time, Info};
+use crate::{
+    errors::{ErrorResponse, FugleError},
+    schema::{default_date_time, Info, Result},
+};
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct Dealt {
-    #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
-    #[serde(default)]
     pub bid: f64,
-    #[serde(default)]
     pub ask: f64,
-    #[serde(default)]
     pub price: f64,
-    #[serde(default)]
     pub volume: u64,
-    #[serde(default)]
     pub serial: u64,
 }
 
@@ -35,19 +33,118 @@ impl Default for Dealt {
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct DealtsData {
-    #[serde(default)]
     pub info: Info,
-    #[serde(default)]
     pub dealts: Vec<Dealt>,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct DealtsResponse {
-    #[serde(default)]
     pub api_version: String,
-    #[serde(default)]
     pub data: DealtsData,
+}
+
+/// Associate options when doing the request.
+pub struct IntradayDealtsBuilder {
+    pub request: Request,
+}
+
+impl IntradayDealtsBuilder {
+    /// Set a limit param while using dealts request.
+    /// Default value on fugle API is 0
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.dealts("2884")
+    /// .limit(99)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn limit(mut self, limit: usize) -> IntradayDealtsBuilder {
+        self.request = self.request.query("limit", &limit.to_string());
+        self
+    }
+
+    /// Set an offset param while using dealts request.
+    /// Default value on fugle API is 50
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    /// agent.dealts("2884")
+    /// .offset(3)
+    /// .limit(6)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn offset(mut self, offset: usize) -> IntradayDealtsBuilder {
+        self.request = self.request.query("offset", &offset.to_string());
+        self
+    }
+
+    /// To see odd lotter or not.
+    /// Default value on fugle API is false
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.dealts("2884")
+    /// .odd_lot(true)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn odd_lot(mut self, odd_lot: bool) -> IntradayDealtsBuilder {
+        self.request = self.request.query("oddLot", &odd_lot.to_string());
+        self
+    }
+
+    /// Send the request.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.dealts("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn call(self) -> Result<DealtsResponse> {
+        match self.request.call().or_any_status() {
+            Ok(response) => {
+                if response.status() != 200 {
+                    let err: ErrorResponse = response.into_json()?;
+                    return Err(err.into());
+                }
+                Ok(response.into_json()?)
+            }
+            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
+        }
+    }
 }

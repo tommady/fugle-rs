@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
+use ureq::{OrAnyStatus, Request};
 
-use crate::schema::Info;
+use crate::{
+    errors::{ErrorResponse, FugleError},
+    schema::{Info, Result},
+};
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -40,4 +44,62 @@ pub struct MetaResponse {
     pub api_version: String,
     #[serde(default)]
     pub data: MetaData,
+}
+
+/// Associate options when doing the request.
+pub struct IntradayMetaBuilder {
+    pub request: Request,
+}
+
+impl IntradayMetaBuilder {
+    /// To see odd lotter or not.
+    /// Default value on fugle API is false
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.meta("2884")
+    /// .odd_lot(true)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn odd_lot(mut self, odd_lot: bool) -> IntradayMetaBuilder {
+        self.request = self.request.query("oddLot", &odd_lot.to_string());
+        self
+    }
+
+    /// Send the request.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.meta("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn call(self) -> Result<MetaResponse> {
+        match self.request.call().or_any_status() {
+            Ok(response) => {
+                if response.status() != 200 {
+                    let err: ErrorResponse = response.into_json()?;
+                    return Err(err.into());
+                }
+                Ok(response.into_json()?)
+            }
+            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
+        }
+    }
 }

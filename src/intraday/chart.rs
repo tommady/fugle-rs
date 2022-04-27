@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
+use ureq::{OrAnyStatus, Request};
 
-use crate::schema::Info;
+use crate::{
+    errors::{ErrorResponse, FugleError},
+    schema::{Info, Result},
+};
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
@@ -20,19 +24,73 @@ pub struct Chart {
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct ChartData {
-    #[serde(default)]
     pub info: Info,
-    #[serde(default)]
     pub chart: Chart,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct ChartResponse {
-    #[serde(default)]
     pub api_version: String,
-    #[serde(default)]
     pub data: ChartData,
+}
+
+/// Associate options when doing the request.
+pub struct IntradayChartBuilder {
+    pub request: Request,
+}
+
+impl IntradayChartBuilder {
+    /// To see odd lotter or not.
+    /// Default value on fugle API is false
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.chart("2884")
+    /// .odd_lot(true)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn odd_lot(mut self, odd_lot: bool) -> IntradayChartBuilder {
+        self.request = self.request.query("oddLot", &odd_lot.to_string());
+        self
+    }
+
+    /// Send the request.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.chart("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn call(self) -> Result<ChartResponse> {
+        match self.request.call().or_any_status() {
+            Ok(response) => {
+                if response.status() != 200 {
+                    let err: ErrorResponse = response.into_json()?;
+                    return Err(err.into());
+                }
+                Ok(response.into_json()?)
+            }
+            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
+        }
+    }
 }

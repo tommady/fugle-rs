@@ -1,32 +1,25 @@
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+use ureq::{OrAnyStatus, Request};
 
-use crate::schema::{default_date_time, Info};
+use crate::{
+    errors::{ErrorResponse, FugleError},
+    schema::{default_date_time, Info, Result},
+};
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteTotal {
-    #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
-    #[serde(default)]
     pub transaction: u64,
-    #[serde(default)]
     pub trade_value: f64,
-    #[serde(default)]
     pub trade_volume: u64,
-    #[serde(default)]
     pub trade_volume_at_bid: u64,
-    #[serde(default)]
     pub trade_volume_at_ask: u64,
-    #[serde(default)]
     pub bid_orders: u64,
-    #[serde(default)]
     pub ask_orders: u64,
-    #[serde(default)]
     pub bid_volume: u64,
-    #[serde(default)]
     pub ask_volume: u64,
-    #[serde(default)]
     pub serial: u64,
 }
 
@@ -50,17 +43,12 @@ impl Default for QuoteTotal {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteTrial {
-    #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
-    #[serde(default)]
     pub bid: f64,
-    #[serde(default)]
     pub ask: f64,
-    #[serde(default)]
     pub price: f64,
-    #[serde(default)]
     pub volume: u64,
 }
 
@@ -78,19 +66,13 @@ impl Default for QuoteTrial {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteTrade {
-    #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
-    #[serde(default)]
     pub bid: f64,
-    #[serde(default)]
     pub ask: f64,
-    #[serde(default)]
     pub price: f64,
-    #[serde(default)]
     pub volume: u64,
-    #[serde(default)]
     pub serial: u64,
 }
 
@@ -109,20 +91,17 @@ impl Default for QuoteTrade {
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteBidAsk {
     pub price: f64,
     pub volume: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteOrder {
-    #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
-    #[serde(default)]
     pub bids: Vec<QuoteBidAsk>,
-    #[serde(default)]
     pub asks: Vec<QuoteBidAsk>,
 }
 
@@ -138,11 +117,9 @@ impl Default for QuoteOrder {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuotePrice {
-    #[serde(default)]
     pub price: f64,
-    #[serde(default = "default_date_time")]
     pub at: DateTime<FixedOffset>,
 }
 
@@ -157,64 +134,98 @@ impl Default for QuotePrice {
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct Quote {
-    #[serde(default)]
     pub is_curbing: bool,
-    #[serde(default)]
     pub is_curbing_rise: bool,
-    #[serde(default)]
     pub is_curbing_fall: bool,
-    #[serde(default)]
     pub is_trial: bool,
-    #[serde(default)]
     pub is_open_delayed: bool,
-    #[serde(default)]
     pub is_close_delayed: bool,
-    #[serde(default)]
     pub is_halting: bool,
-    #[serde(default)]
     pub is_closed: bool,
-    #[serde(default)]
     pub total: QuoteTotal,
-    #[serde(default)]
     pub trial: QuoteTrial,
-    #[serde(default)]
     pub trade: QuoteTrade,
-    #[serde(default)]
     pub order: QuoteOrder,
-    #[serde(default)]
     pub price_high: QuotePrice,
-    #[serde(default)]
     pub price_low: QuotePrice,
-    #[serde(default)]
     pub price_open: QuotePrice,
-    #[serde(default)]
     pub price_avg: QuotePrice,
-    #[serde(default)]
     pub change: f64,
-    #[serde(default)]
     pub change_percent: f64,
-    #[serde(default)]
     pub amplitude: f64,
-    #[serde(default)]
     pub price_limit: u8,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteData {
-    #[serde(default)]
     pub info: Info,
-    #[serde(default)]
     pub quote: Quote,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", default)]
 pub struct QuoteResponse {
-    #[serde(default)]
     pub api_version: String,
-    #[serde(default)]
     pub data: QuoteData,
+}
+
+/// Associate options when doing the request.
+pub struct IntradayQuoteBuilder {
+    pub request: Request,
+}
+
+impl IntradayQuoteBuilder {
+    /// To see odd lotter or not.
+    /// Default value on fugle API is false
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.quote("2884")
+    /// .odd_lot(true)
+    /// .call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn odd_lot(mut self, odd_lot: bool) -> IntradayQuoteBuilder {
+        self.request = self.request.query("oddLot", &odd_lot.to_string());
+        self
+    }
+
+    /// Send the request.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::intraday::IntradayBuilder;
+    ///
+    /// let agent = IntradayBuilder::new().build();
+    ///
+    /// agent.quote("2884").call()?;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn call(self) -> Result<QuoteResponse> {
+        match self.request.call().or_any_status() {
+            Ok(response) => {
+                if response.status() != 200 {
+                    let err: ErrorResponse = response.into_json()?;
+                    return Err(err.into());
+                }
+                Ok(response.into_json()?)
+            }
+            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
+        }
+    }
 }
