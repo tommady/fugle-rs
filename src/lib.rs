@@ -129,15 +129,32 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ### [Fugle Candles][fuglecandlesweb]
+//!
+//! API
+//! ```rust
+//! # fn main() -> fugle::schema::Result<()> {
+//! # use fugle::marketdata::MarketdataBuilder;
+//!
+//! let agent = MarketdataBuilder::new().build();
+//! agent.candles("2884").call()?;
+//!
+//! # Ok(())
+//! # }
+//! ```
+//!
 //! [fugleweb]: https://developer.fugle.tw
 //! [fuglechartweb]: https://developer.fugle.tw/docs/data/intraday/chart
 //! [fuglequoteweb]: https://developer.fugle.tw/docs/data/intraday/quote
 //! [fuglemetaweb]: https://developer.fugle.tw/docs/data/intraday/meta
 //! [fugledealtsweb]: https://developer.fugle.tw/docs/data/intraday/dealts
 //! [fuglevolumesweb]: https://developer.fugle.tw/docs/data/intraday/volumes
+//! [fuglecandlesweb]: https://developer.fugle.tw/docs/data/marketdata/candles
 
 pub mod errors;
 pub mod intraday;
+pub mod marketdata;
 pub mod schema;
 #[cfg(feature = "websocket")]
 pub mod ws;

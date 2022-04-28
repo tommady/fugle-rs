@@ -9,8 +9,8 @@ use std::time::Duration;
 use ureq::{Agent, AgentBuilder};
 
 use crate::intraday::{
-    chart::IntradayChartBuilder, dealts::IntradayDealtsBuilder, meta::IntradayMetaBuilder,
-    quote::IntradayQuoteBuilder, volumes::IntradayVolumesBuilder,
+    chart::ChartBuilder, dealts::DealtsBuilder, meta::MetaBuilder, quote::QuoteBuilder,
+    volumes::VolumesBuilder,
 };
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.3/intraday/chart";
@@ -102,7 +102,7 @@ pub struct Intraday<'a> {
 }
 
 impl<'a> Intraday<'a> {
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/chart)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/chart)
     ///
     /// Fetching the current drawing data.
     ///
@@ -118,8 +118,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn chart(&self, symbol_id: &str) -> IntradayChartBuilder {
-        IntradayChartBuilder {
+    pub fn chart(&self, symbol_id: &str) -> ChartBuilder {
+        ChartBuilder {
             request: self
                 .agent
                 .get(INTRADAY_CHART)
@@ -128,7 +128,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/quote)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/quote)
     ///
     /// Fetching the current status and statistics.
     ///
@@ -144,8 +144,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn quote(&self, symbol_id: &str) -> IntradayQuoteBuilder {
-        IntradayQuoteBuilder {
+    pub fn quote(&self, symbol_id: &str) -> QuoteBuilder {
+        QuoteBuilder {
             request: self
                 .agent
                 .get(INTRADAY_QUOTE)
@@ -154,7 +154,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/meta)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/meta)
     ///
     /// Fetching today's basic informations.
     ///
@@ -170,8 +170,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn meta(&self, symbol_id: &str) -> IntradayMetaBuilder {
-        IntradayMetaBuilder {
+    pub fn meta(&self, symbol_id: &str) -> MetaBuilder {
+        MetaBuilder {
             request: self
                 .agent
                 .get(INTRADAY_META)
@@ -180,7 +180,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/dealts)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/dealts)
     ///
     /// Fetching today's advantage information.
     ///
@@ -196,8 +196,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn dealts(&self, symbol_id: &str) -> IntradayDealtsBuilder {
-        IntradayDealtsBuilder {
+    pub fn dealts(&self, symbol_id: &str) -> DealtsBuilder {
+        DealtsBuilder {
             request: self
                 .agent
                 .get(INTRADAY_DEALTS)
@@ -206,7 +206,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/volumes)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/volumes)
     ///
     /// Fetching today's volume information.
     ///
@@ -222,8 +222,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn volumes(&self, symbol_id: &str) -> IntradayVolumesBuilder {
-        IntradayVolumesBuilder {
+    pub fn volumes(&self, symbol_id: &str) -> VolumesBuilder {
+        VolumesBuilder {
             request: self
                 .agent
                 .get(INTRADAY_VOLUMES)

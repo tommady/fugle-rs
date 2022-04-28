@@ -173,11 +173,11 @@ pub struct QuoteResponse {
 }
 
 /// Associate options when doing the request.
-pub struct IntradayQuoteBuilder {
+pub struct QuoteBuilder {
     pub request: Request,
 }
 
-impl IntradayQuoteBuilder {
+impl QuoteBuilder {
     /// To see odd lotter or not.
     /// Default value on fugle API is false
     ///
@@ -196,7 +196,7 @@ impl IntradayQuoteBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn odd_lot(mut self, odd_lot: bool) -> IntradayQuoteBuilder {
+    pub fn odd_lot(mut self, odd_lot: bool) -> QuoteBuilder {
         self.request = self.request.query("oddLot", &odd_lot.to_string());
         self
     }
@@ -237,7 +237,7 @@ mod test {
 
     #[test]
     fn test_call_failed_on_transport() {
-        let it = IntradayQuoteBuilder {
+        let it = QuoteBuilder {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());

@@ -47,11 +47,11 @@ pub struct DealtsResponse {
 }
 
 /// Associate options when doing the request.
-pub struct IntradayDealtsBuilder {
+pub struct DealtsBuilder {
     pub request: Request,
 }
 
-impl IntradayDealtsBuilder {
+impl DealtsBuilder {
     /// Set a limit param while using dealts request.
     /// Default value on fugle API is 0
     ///
@@ -69,7 +69,7 @@ impl IntradayDealtsBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn limit(mut self, limit: usize) -> IntradayDealtsBuilder {
+    pub fn limit(mut self, limit: usize) -> DealtsBuilder {
         self.request = self.request.query("limit", &limit.to_string());
         self
     }
@@ -92,7 +92,7 @@ impl IntradayDealtsBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn offset(mut self, offset: usize) -> IntradayDealtsBuilder {
+    pub fn offset(mut self, offset: usize) -> DealtsBuilder {
         self.request = self.request.query("offset", &offset.to_string());
         self
     }
@@ -115,7 +115,7 @@ impl IntradayDealtsBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn odd_lot(mut self, odd_lot: bool) -> IntradayDealtsBuilder {
+    pub fn odd_lot(mut self, odd_lot: bool) -> DealtsBuilder {
         self.request = self.request.query("oddLot", &odd_lot.to_string());
         self
     }
@@ -156,7 +156,7 @@ mod test {
 
     #[test]
     fn test_call_failed_on_transport() {
-        let it = IntradayDealtsBuilder {
+        let it = DealtsBuilder {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());

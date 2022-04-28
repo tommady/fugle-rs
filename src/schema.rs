@@ -5,7 +5,7 @@ use crate::errors::FugleError;
 
 pub type Result<T> = std::result::Result<T, FugleError>;
 
-fn de_date<'de, D>(deserializer: D) -> std::result::Result<Date, D::Error>
+pub fn de_date<'de, D>(deserializer: D) -> std::result::Result<Date, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -64,7 +64,7 @@ mod test {
     #[test]
     fn test_info_default() {
         let i = Info::default();
-        // assert_eq!(i.last_updated_at, OffsetDateTime::UNIX_EPOCH);
+        assert_eq!(i.last_updated_at, PrimitiveDateTime::MIN);
         assert_eq!(i.date, Date::MIN);
         assert_eq!(i.symbol_id, "".to_string());
         assert_eq!(i.country_code, "".to_string());

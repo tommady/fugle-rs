@@ -6,6 +6,7 @@ use fugle::{
         chart::ChartResponse, dealts::DealtsResponse, meta::MetaResponse, quote::QuoteResponse,
         volumes::VolumesResponse,
     },
+    marketdata::candles::CandlesResponse,
 };
 
 #[test]
@@ -211,6 +212,26 @@ fn test_dealts_response_with_oddlot_deserialize() {
     assert_eq!("TSE", res.data.info.market);
     assert_eq!("ODDLOT", res.data.info.typ);
     assert_eq!(5, res.data.dealts.len());
+}
+
+#[test]
+fn test_candles_response_deserialize() {
+    let json_file = File::open(Path::new("tests/testdata/candles_response.json")).unwrap();
+    let res: CandlesResponse = serde_json::from_reader(json_file).unwrap();
+
+    assert_eq!("2884", res.symbol_id);
+    assert_eq!("TSE", res.market);
+    assert_eq!("EQUITY", res.typ);
+    assert_eq!("TWSE", res.exchange);
+    assert_eq!(6, res.candles.len());
+    assert_eq!(33.4, res.candles[0].open);
+    assert_eq!(33.25, res.candles[1].high);
+    assert_eq!(32.5, res.candles[2].low);
+    assert_eq!(32.45, res.candles[3].close);
+    assert_eq!(36634330, res.candles[4].volume);
+    assert_eq!(2022, res.candles[5].date.year());
+    assert_eq!(time::Month::April, res.candles[5].date.month());
+    assert_eq!(21, res.candles[5].date.day());
 }
 
 #[test]

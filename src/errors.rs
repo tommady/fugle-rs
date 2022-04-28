@@ -7,21 +7,39 @@ pub struct Error {
     pub message: String,
 }
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct ErrorResponse {
-    pub api_version: String,
-    pub error: Error,
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum ErrorResponse {
+    IntradayError {
+        #[serde(rename = "apiVersion")]
+        api_version: String,
+        error: Error,
+    },
+    MarketdataError {
+        #[serde(rename = "statusCode")]
+        status_code: i32,
+        message: String,
+    },
 }
 
 impl std::fmt::Display for ErrorResponse {
     #[cfg_attr(coverage, no_coverage)]
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "FugleAPI: {{ api_version:{}, code:{}, msg:{} }}",
-            self.api_version, self.error.code, self.error.message,
-        )
+        match self {
+            ErrorResponse::IntradayError { api_version, error } => {
+                write!(
+                    f,
+                    "FugleAPI: {{ api_version:{}, code:{}, msg:{} }}",
+                    api_version, error.code, error.message,
+                )
+            }
+            ErrorResponse::MarketdataError {
+                status_code,
+                message,
+            } => {
+                write!(f, "FugleAPI: {{ code:{}, msg:{} }}", status_code, message,)
+            }
+        }
     }
 }
 
@@ -139,12 +157,27 @@ impl From<serde_json::Error> for FugleError {
 impl From<ErrorResponse> for FugleError {
     #[cfg_attr(coverage, no_coverage)]
     fn from(err: ErrorResponse) -> FugleError {
-        match err.error.code {
-            400 => FugleError::General(err),
-            401 => FugleError::Unauthorized,
-            403 => FugleError::RateLimitExceeded,
-            404 => FugleError::ResourceNotFound,
-            _ => FugleError::Unknown(err),
+        match err {
+            ErrorResponse::IntradayError {
+                api_version: _,
+                ref error,
+            } => match error.code {
+                400 => FugleError::General(err),
+                401 => FugleError::Unauthorized,
+                403 => FugleError::RateLimitExceeded,
+                404 => FugleError::ResourceNotFound,
+                _ => FugleError::Unknown(err),
+            },
+            ErrorResponse::MarketdataError {
+                status_code,
+                message: _,
+            } => match status_code {
+                400 => FugleError::General(err),
+                401 => FugleError::Unauthorized,
+                403 => FugleError::RateLimitExceeded,
+                404 => FugleError::ResourceNotFound,
+                _ => FugleError::Unknown(err),
+            },
         }
     }
 }
