@@ -138,6 +138,7 @@
 
 pub mod errors;
 pub mod intraday;
+pub mod marketdata;
 pub mod schema;
 #[cfg(feature = "websocket")]
 pub mod ws;

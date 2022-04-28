@@ -9,8 +9,8 @@ use std::time::Duration;
 use ureq::{Agent, AgentBuilder};
 
 use crate::intraday::{
-    chart::IntradayChartBuilder, dealts::IntradayDealtsBuilder, meta::IntradayMetaBuilder,
-    quote::IntradayQuoteBuilder, volumes::IntradayVolumesBuilder,
+    chart::ChartBuilder, dealts::DealtsBuilder, meta::MetaBuilder, quote::QuoteBuilder,
+    volumes::VolumesBuilder,
 };
 
 const INTRADAY_CHART: &str = "https://api.fugle.tw/realtime/v0.3/intraday/chart";
@@ -118,8 +118,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn chart(&self, symbol_id: &str) -> IntradayChartBuilder {
-        IntradayChartBuilder {
+    pub fn chart(&self, symbol_id: &str) -> ChartBuilder {
+        ChartBuilder {
             request: self
                 .agent
                 .get(INTRADAY_CHART)
@@ -144,8 +144,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn quote(&self, symbol_id: &str) -> IntradayQuoteBuilder {
-        IntradayQuoteBuilder {
+    pub fn quote(&self, symbol_id: &str) -> QuoteBuilder {
+        QuoteBuilder {
             request: self
                 .agent
                 .get(INTRADAY_QUOTE)
@@ -170,8 +170,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn meta(&self, symbol_id: &str) -> IntradayMetaBuilder {
-        IntradayMetaBuilder {
+    pub fn meta(&self, symbol_id: &str) -> MetaBuilder {
+        MetaBuilder {
             request: self
                 .agent
                 .get(INTRADAY_META)
@@ -196,8 +196,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn dealts(&self, symbol_id: &str) -> IntradayDealtsBuilder {
-        IntradayDealtsBuilder {
+    pub fn dealts(&self, symbol_id: &str) -> DealtsBuilder {
+        DealtsBuilder {
             request: self
                 .agent
                 .get(INTRADAY_DEALTS)
@@ -222,8 +222,8 @@ impl<'a> Intraday<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn volumes(&self, symbol_id: &str) -> IntradayVolumesBuilder {
-        IntradayVolumesBuilder {
+    pub fn volumes(&self, symbol_id: &str) -> VolumesBuilder {
+        VolumesBuilder {
             request: self
                 .agent
                 .get(INTRADAY_VOLUMES)
