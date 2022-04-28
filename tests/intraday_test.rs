@@ -4,7 +4,6 @@ mod util;
 #[test]
 fn test_intraday_chart_pass() {
     let it = IntradayBuilder::new().read_timeout_sec(3).build();
-    // let chart = fetch_enum!(Response::Chart, it.chart("2884").call().unwrap());
     let chart = it.chart("2884").call().unwrap();
     assert_eq!(chart.data.info.symbol_id, "2884");
     assert_eq!(chart.data.info.typ, "EQUITY");

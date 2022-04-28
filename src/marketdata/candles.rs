@@ -132,3 +132,28 @@ impl CandlesBuilder {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ureq::AgentBuilder;
+
+    #[test]
+    fn test_call_failed_on_transport() {
+        let it = CandlesBuilder {
+            request: AgentBuilder::new().build().get("not-exists-endpoint"),
+        };
+        assert!(it.call().is_err());
+    }
+
+    #[test]
+    fn test_candle_default() {
+        let c = Candle::default();
+        assert_eq!(c.date, Date::MIN);
+        assert_eq!(c.open, 0.0);
+        assert_eq!(c.high, 0.0);
+        assert_eq!(c.low, 0.0);
+        assert_eq!(c.close, 0.0);
+        assert_eq!(c.volume, 0);
+    }
+}
