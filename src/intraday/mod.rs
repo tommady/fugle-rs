@@ -102,7 +102,7 @@ pub struct Intraday<'a> {
 }
 
 impl<'a> Intraday<'a> {
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/chart)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/chart)
     ///
     /// Fetching the current drawing data.
     ///
@@ -128,7 +128,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/quote)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/quote)
     ///
     /// Fetching the current status and statistics.
     ///
@@ -154,7 +154,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/meta)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/meta)
     ///
     /// Fetching today's basic informations.
     ///
@@ -180,7 +180,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/dealts)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/dealts)
     ///
     /// Fetching today's advantage information.
     ///
@@ -206,7 +206,7 @@ impl<'a> Intraday<'a> {
         }
     }
 
-    /// [Endpoint](https://developer.fugle.tw/document/intraday/volumes)
+    /// [Endpoint](https://developer.fugle.tw/docs/data/intraday/volumes)
     ///
     /// Fetching today's volume information.
     ///
