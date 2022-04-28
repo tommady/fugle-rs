@@ -3,10 +3,7 @@ mod util;
 
 #[test]
 fn test_marketdata_candles_pass() {
-    let mk = MarketdataBuilder::new()
-        .read_timeout_sec(3)
-        .token("demo")
-        .build();
+    let mk = MarketdataBuilder::default().read_timeout_sec(3).build();
     let candles = mk
         .candles("2884")
         .from("2022-04-21")
@@ -23,9 +20,6 @@ fn test_marketdata_candles_pass() {
 // not provided, not like intraday endpoints have more richable error status
 #[test]
 fn test_marketdata_candles_401_failed() {
-    let mk = MarketdataBuilder::default().build();
-    assert_err!(mk.candles("2884").call(), Err(FugleError::Unauthorized));
-
     let mk = MarketdataBuilder::new().token("").build();
     assert_err!(mk.candles("2884").call(), Err(FugleError::Unauthorized));
 
