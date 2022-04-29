@@ -1,6 +1,6 @@
 [package]
 name = "fugle"
-version = "0.3.4"
+version = "0.3.5"
 authors = ["tommady <tommady@users.noreply.github.com>"]
 description = "A Simple, Lightweight, Fast and Safe Fugle Library"
 license = "MIT"
