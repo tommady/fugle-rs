@@ -35,11 +35,11 @@
 //! Websocket
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::ws::Intraday;
+//! # use fugle::websocket::IntradayBuilder;
 //!                                                            
-//! let mut lis = Intraday::new("demo");
+//! let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
 //!                                                            
-//! let rx = lis.chart("2884", true)?;
+//! let rx = ws.chart()?;
 //! let response = rx.recv()?;
 //!                                                            
 //! # Ok(())
@@ -63,11 +63,11 @@
 //! Websocket
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::ws::Intraday;;
+//! # use fugle::websocket::IntradayBuilder;;
 //!                                                            
-//! let mut lis = Intraday::new("demo");
+//! let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
 //!                                                            
-//! let rx = lis.quote("2884", true)?;
+//! let rx = ws.quote()?;
 //! let response = rx.recv()?;
 //!                                                            
 //! # Ok(())
@@ -91,11 +91,11 @@
 //! Websocket
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::ws::Intraday;;
+//! # use fugle::websocket::IntradayBuilder;;
 //!                                                            
-//! let mut lis = Intraday::new("demo");
+//! let mut lis = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
 //!                                                            
-//! let rx = lis.meta("2884", true)?;
+//! let rx = lis.meta()?;
 //! let response = rx.recv()?;
 //!                                                            
 //! # Ok(())
@@ -156,5 +156,5 @@ pub mod errors;
 pub mod intraday;
 pub mod marketdata;
 pub mod schema;
-#[cfg(feature = "websocket")]
-pub mod ws;
+#[cfg(any(feature = "websocket", feature = "async-websocket"))]
+pub mod websocket;

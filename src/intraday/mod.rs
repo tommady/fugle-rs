@@ -26,7 +26,7 @@ pub struct IntradayBuilder<'a> {
 }
 
 impl<'a> Default for IntradayBuilder<'a> {
-    fn default() -> IntradayBuilder<'static> {
+    fn default() -> IntradayBuilder<'a> {
         IntradayBuilder::new()
     }
 }

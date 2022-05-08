@@ -58,7 +58,7 @@ pub enum FugleError {
     // error from serde_json lib
     SerdeJson(serde_json::Error),
     // error from tungstenite lib
-    #[cfg(feature = "websocket")]
+    #[cfg(any(feature = "websocket", feature = "async-websocket"))]
     Tungstenite(tungstenite::Error),
     // error from ureq lib
     Ureq(Box<ureq::Error>),

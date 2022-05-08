@@ -1,4 +1,4 @@
-use fugle::ws::Intraday;
+use fugle::websocket::IntradayBuilder;
 use std::time::Duration;
 mod util;
 
@@ -17,16 +17,20 @@ mod util;
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_failed() {
-    let mut lis = Intraday::new("");
-    assert!(lis.chart("2884", true).is_err());
+    let mut ws = IntradayBuilder::new()
+        .odd_lot()
+        .token("")
+        .symbol_id("2884")
+        .build();
+    assert!(ws.chart().is_err());
 }
 
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_pass() {
     util::timeout_after(Duration::from_secs(3), || {
-        let mut lis = Intraday::new("demo");
-        let rx = lis.chart("2884", false).unwrap();
+        let mut ws = IntradayBuilder::new().symbol_id("2884").build();
+        let rx = ws.chart().unwrap();
         let chart = rx.recv().unwrap();
         assert_eq!(chart.data.info.symbol_id, "2884");
         assert_eq!(chart.data.info.typ, "EQUITY");
@@ -36,16 +40,20 @@ fn test_intraday_chart_pass() {
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_failed() {
-    let mut lis = Intraday::new("");
-    assert!(lis.meta("2884", true).is_err());
+    let mut ws = IntradayBuilder::new()
+        .odd_lot()
+        .token("")
+        .symbol_id("2884")
+        .build();
+    assert!(ws.meta().is_err());
 }
 
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_pass() {
     util::timeout_after(Duration::from_secs(3), || {
-        let mut lis = Intraday::new("demo");
-        let rx = lis.meta("2884", false).unwrap();
+        let mut ws = IntradayBuilder::new().symbol_id("2884").build();
+        let rx = ws.meta().unwrap();
         let meta = rx.recv().unwrap();
         assert_eq!(meta.data.info.symbol_id, "2884");
         assert_eq!(meta.data.info.typ, "EQUITY");
@@ -55,16 +63,20 @@ fn test_intraday_meta_pass() {
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_failed() {
-    let mut lis = Intraday::new("");
-    assert!(lis.quote("2884", true).is_err());
+    let mut ws = IntradayBuilder::new()
+        .symbol_id("2884")
+        .odd_lot()
+        .token("")
+        .build();
+    assert!(ws.quote().is_err());
 }
 
 #[test]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_pass() {
     util::timeout_after(Duration::from_secs(3), || {
-        let mut lis = Intraday::new("demo");
-        let rx = lis.quote("2884", false).unwrap();
+        let mut ws = IntradayBuilder::new().symbol_id("2884").build();
+        let rx = ws.quote().unwrap();
         let quote = rx.recv().unwrap();
         assert_eq!(quote.data.info.symbol_id, "2884");
         assert_eq!(quote.data.info.typ, "EQUITY");
