@@ -107,6 +107,7 @@ impl<'a> IntradayBuilder<'a> {
                 self.symbol_id, self.token, self.is_odd_lot,
             ),
             workers: vec![],
+            #[cfg(feature = "async-websocket")]
             async_workers: vec![],
             done: Arc::new(AtomicBool::new(false)),
         }
@@ -117,6 +118,7 @@ impl<'a> IntradayBuilder<'a> {
 pub struct Intraday {
     uri: String,
     workers: Vec<Worker>,
+    #[cfg(feature = "async-websocket")]
     async_workers: Vec<AsyncWorker>,
     done: Arc<AtomicBool>,
 }
@@ -180,13 +182,22 @@ impl Intraday {
     /// ```
     pub fn meta(&mut self) -> Result<Receiver<MetaResponse>> {
         let (tx, rx) = channel();
-        match Worker::new(
-            &format!("{}?{}", INTRADAY_META, self.uri,),
-            tx,
-            self.done.clone(),
-        ) {
+        let uri = &format!("{}?{}", INTRADAY_META, self.uri);
+        match Worker::new(uri, tx, self.done.clone()) {
             Ok(w) => {
                 self.workers.push(w);
+                Ok(rx)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    pub async fn async_meta(&mut self) -> Result<Receiver<MetaResponse>> {
+        let (tx, rx) = channel();
+        let uri = &format!("{}?{}", INTRADAY_META, self.uri);
+        match AsyncWorker::new(uri, tx, self.done.clone()).await {
+            Ok(w) => {
+                self.async_workers.push(w);
                 Ok(rx)
             }
             Err(e) => Err(e),
@@ -211,13 +222,22 @@ impl Intraday {
     /// ```
     pub fn quote(&mut self) -> Result<Receiver<QuoteResponse>> {
         let (tx, rx) = channel();
-        match Worker::new(
-            &format!("{}?{}", INTRADAY_QUOTE, self.uri,),
-            tx,
-            self.done.clone(),
-        ) {
+        let uri = &format!("{}?{}", INTRADAY_QUOTE, self.uri);
+        match Worker::new(uri, tx, self.done.clone()) {
             Ok(w) => {
                 self.workers.push(w);
+                Ok(rx)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    pub async fn async_quote(&mut self) -> Result<Receiver<QuoteResponse>> {
+        let (tx, rx) = channel();
+        let uri = &format!("{}?{}", INTRADAY_QUOTE, self.uri);
+        match AsyncWorker::new(uri, tx, self.done.clone()).await {
+            Ok(w) => {
+                self.async_workers.push(w);
                 Ok(rx)
             }
             Err(e) => Err(e),
@@ -235,9 +255,11 @@ impl<'a> Drop for Intraday {
             }
         }
 
-        for worker in &mut self.async_workers {
-            if let Some(routine) = worker.routine.take() {
-                drop(routine);
+        if cfg!(feature = "async-websocket") {
+            for worker in &mut self.async_workers {
+                if let Some(routine) = worker.routine.take() {
+                    drop(routine)
+                }
             }
         }
     }
@@ -285,17 +307,17 @@ impl AsyncWorker {
     where
         T: for<'de> serde::Deserialize<'de> + Send + 'static,
     {
-        let (socket, _) = connect_async(uri).await?;
-        let (_, mut reader) = socket.split();
+        let (mut socket, _) = connect_async(uri).await?;
 
         let routine = tokio::spawn(async move {
             while !done.load(Ordering::SeqCst) {
-                if let Some(msg) = reader.next().await {
+                if let Some(msg) = socket.next().await {
                     if let Err(e) = handler(sender.clone(), msg.unwrap()) {
                         error!("{}", e);
                     }
                 }
             }
+            let _ = socket.close(None).await;
         });
 
         Ok(AsyncWorker {
