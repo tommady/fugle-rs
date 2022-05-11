@@ -27,29 +27,13 @@ impl Async {
 
         let routine = tokio::spawn(async move {
             while !done.load(Ordering::SeqCst) {
-                if let Some(msg) = socket.next().await {
-                    let m = match msg {
-                        Ok(m) => match m.to_text() {
-                            Ok(m) => match serde_json::from_str(m) {
-                                Ok(m) => m,
-                                Err(e) => {
-                                    error!("{}", e);
-                                    continue;
-                                }
-                            },
-                            Err(e) => {
+                if let Some(Ok(msg)) = socket.next().await {
+                    if let Ok(m) = msg.to_text() {
+                        if let Ok(m) = serde_json::from_str(m) {
+                            if let Err(e) = sender.send(m) {
                                 error!("{}", e);
-                                continue;
                             }
-                        },
-                        Err(e) => {
-                            error!("{}", e);
-                            continue;
                         }
-                    };
-                    if let Err(e) = sender.send(m) {
-                        error!("{}", e);
-                        continue;
                     }
                 }
             }

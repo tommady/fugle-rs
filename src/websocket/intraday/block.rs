@@ -25,28 +25,13 @@ impl Block {
 
         let thread = thread::spawn(move || {
             while !done.load(Ordering::SeqCst) {
-                match socket.read_message() {
-                    Ok(msg) => {
-                        let m = match msg.to_text() {
-                            Ok(m) => match serde_json::from_str(m) {
-                                Ok(j) => j,
-                                Err(e) => {
-                                    error!("{}", e);
-                                    continue;
-                                }
-                            },
-                            Err(e) => {
+                if let Ok(msg) = socket.read_message() {
+                    if let Ok(m) = msg.to_text() {
+                        if let Ok(m) = serde_json::from_str(m) {
+                            if let Err(e) = sender.send(m) {
                                 error!("{}", e);
-                                continue;
                             }
-                        };
-                        if let Err(e) = sender.send(m) {
-                            error!("{}", e);
-                            continue;
                         }
-                    }
-                    Err(e) => {
-                        error!("{}", e);
                     }
                 }
             }
