@@ -69,3 +69,29 @@ impl super::Worker for Async {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use tokio::sync::mpsc::unbounded_channel;
+
+    use super::{
+        super::{QuoteResponse, Worker, INTRADAY_QUOTE},
+        *,
+    };
+
+    #[tokio::test]
+    async fn test_async_worker_stop() {
+        let (tx, _) = unbounded_channel::<QuoteResponse>();
+        let done = Arc::new(AtomicBool::new(false));
+        let mut worker = Async::new(
+            &format!("{}?symbolId=2884&apiToken=demo", INTRADAY_QUOTE),
+            tx,
+            done.clone(),
+        )
+        .await
+        .unwrap();
+
+        done.store(true, Ordering::SeqCst);
+        worker.stop();
+    }
+}

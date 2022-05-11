@@ -66,3 +66,28 @@ impl super::Worker for Block {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use std::sync::mpsc::channel;
+
+    use super::{
+        super::{QuoteResponse, Worker, INTRADAY_QUOTE},
+        *,
+    };
+
+    #[test]
+    fn test_block_worker_stop() {
+        let (tx, _) = channel::<QuoteResponse>();
+        let done = Arc::new(AtomicBool::new(false));
+        let mut worker = Block::new(
+            &format!("{}?symbolId=2884&apiToken=demo", INTRADAY_QUOTE),
+            tx,
+            done.clone(),
+        )
+        .unwrap();
+
+        done.store(true, Ordering::SeqCst);
+        worker.stop();
+    }
+}
