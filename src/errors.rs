@@ -83,7 +83,7 @@ impl std::fmt::Display for FugleError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             FugleError::SerdeJson(ref e) => write!(f, "Serde_json Lib error: {}", e),
-            #[cfg(feature = "websocket")]
+            #[cfg(any(feature = "websocket", feature = "async-websocket"))]
             FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
             FugleError::Ureq(ref e) => write!(f, "Ureq Lib error: {}", e),
             FugleError::StdIO(ref e) => write!(f, "std io json Deserialize error: {}", e),
@@ -103,7 +103,7 @@ impl std::error::Error for FugleError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             FugleError::SerdeJson(ref e) => Some(e),
-            #[cfg(feature = "websocket")]
+            #[cfg(any(feature = "websocket", feature = "async-websocket"))]
             FugleError::Tungstenite(ref e) => Some(e),
             FugleError::Ureq(ref e) => Some(e),
             FugleError::StdIO(ref e) => Some(e),
@@ -139,7 +139,7 @@ impl From<ureq::Error> for FugleError {
     }
 }
 
-#[cfg(feature = "websocket")]
+#[cfg(any(feature = "websocket", feature = "async-websocket"))]
 impl From<tungstenite::Error> for FugleError {
     #[cfg_attr(coverage, no_coverage)]
     fn from(err: tungstenite::Error) -> FugleError {

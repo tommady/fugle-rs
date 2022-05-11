@@ -296,7 +296,7 @@ impl Intraday {
     }
 }
 
-impl<'a> Drop for Intraday {
+impl Drop for Intraday {
     fn drop(&mut self) {
         self.done.store(true, Ordering::SeqCst);
 
