@@ -1,6 +1,9 @@
-use fugle::websocket::IntradayBuilder;
 use std::{thread::sleep as std_sleep, time::Duration};
+
+use fugle::websocket::IntradayBuilder;
+use serial_test::serial;
 use tokio::time::sleep as async_sleep;
+
 mod util;
 
 // be aware of websocket testings
@@ -16,6 +19,7 @@ mod util;
 //    while you connected into the server
 
 #[test]
+#[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_failed() {
     let mut ws = IntradayBuilder::new()
@@ -27,19 +31,21 @@ fn test_intraday_chart_failed() {
 }
 
 #[test]
+#[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_pass() {
-    util::timeout_after(Duration::from_secs(6), || {
+    util::timeout_after(Duration::from_secs(9), || {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
         let rx = ws.chart().unwrap();
         std_sleep(Duration::from_secs(1));
-        let chart = rx.recv().unwrap();
+        let chart = rx.recv_timeout(Duration::from_secs(3)).unwrap();
         assert_eq!(chart.data.info.symbol_id, "2884");
         assert_eq!(chart.data.info.typ, "EQUITY");
     })
 }
 
 #[test]
+#[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_failed() {
     let mut ws = IntradayBuilder::new()
@@ -51,19 +57,21 @@ fn test_intraday_meta_failed() {
 }
 
 #[test]
+#[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_pass() {
-    util::timeout_after(Duration::from_secs(6), || {
+    util::timeout_after(Duration::from_secs(15), || {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
         let rx = ws.meta().unwrap();
-        std_sleep(Duration::from_secs(1));
-        let meta = rx.recv().unwrap();
+        std_sleep(Duration::from_secs(3));
+        let meta = rx.recv_timeout(Duration::from_secs(3)).unwrap();
         assert_eq!(meta.data.info.symbol_id, "2884");
         assert_eq!(meta.data.info.typ, "EQUITY");
     })
 }
 
 #[test]
+#[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_failed() {
     let mut ws = IntradayBuilder::new()
@@ -75,19 +83,21 @@ fn test_intraday_quote_failed() {
 }
 
 #[test]
+#[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_pass() {
-    util::timeout_after(Duration::from_secs(6), || {
+    util::timeout_after(Duration::from_secs(9), || {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
         let rx = ws.quote().unwrap();
         std_sleep(Duration::from_secs(1));
-        let quote = rx.recv().unwrap();
+        let quote = rx.recv_timeout(Duration::from_secs(3)).unwrap();
         assert_eq!(quote.data.info.symbol_id, "2884");
         assert_eq!(quote.data.info.typ, "EQUITY");
     })
 }
 
 #[tokio::test]
+#[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_chart_failed() {
     let mut ws = IntradayBuilder::new()
@@ -99,13 +109,14 @@ async fn test_intraday_async_chart_failed() {
 }
 
 #[tokio::test]
+#[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_chart_pass() {
-    util::async_timeout_after(Duration::from_secs(6), move || async move {
+    util::async_timeout_after(Duration::from_secs(3), move || async move {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
-        let rx = ws.async_chart().await.unwrap();
+        let mut rx = ws.async_chart().await.unwrap();
         async_sleep(Duration::from_secs(1)).await;
-        let chart = rx.recv().unwrap();
+        let chart = rx.recv().await.unwrap();
         assert_eq!(chart.data.info.symbol_id, "2884");
         assert_eq!(chart.data.info.typ, "EQUITY");
     })
@@ -113,6 +124,7 @@ async fn test_intraday_async_chart_pass() {
 }
 
 #[tokio::test]
+#[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_meta_failed() {
     let mut ws = IntradayBuilder::new()
@@ -124,13 +136,14 @@ async fn test_intraday_async_meta_failed() {
 }
 
 #[tokio::test]
+#[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_meta_pass() {
-    util::async_timeout_after(Duration::from_secs(6), move || async move {
+    util::async_timeout_after(Duration::from_secs(3), move || async move {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
-        let rx = ws.async_meta().await.unwrap();
+        let mut rx = ws.async_meta().await.unwrap();
         async_sleep(Duration::from_secs(1)).await;
-        let meta = rx.recv().unwrap();
+        let meta = rx.recv().await.unwrap();
         assert_eq!(meta.data.info.symbol_id, "2884");
         assert_eq!(meta.data.info.typ, "EQUITY");
     })
@@ -138,6 +151,7 @@ async fn test_intraday_async_meta_pass() {
 }
 
 #[tokio::test]
+#[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_quote_failed() {
     let mut ws = IntradayBuilder::new()
@@ -149,13 +163,14 @@ async fn test_intraday_async_quote_failed() {
 }
 
 #[tokio::test]
+#[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_quote_pass() {
-    util::async_timeout_after(Duration::from_secs(6), move || async move {
+    util::async_timeout_after(Duration::from_secs(3), move || async move {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
-        let rx = ws.async_quote().await.unwrap();
+        let mut rx = ws.async_quote().await.unwrap();
         async_sleep(Duration::from_secs(1)).await;
-        let quote = rx.recv().unwrap();
+        let quote = rx.recv().await.unwrap();
         assert_eq!(quote.data.info.symbol_id, "2884");
         assert_eq!(quote.data.info.typ, "EQUITY");
     })

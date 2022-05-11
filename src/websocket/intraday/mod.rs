@@ -1,26 +1,24 @@
-use std::{
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        mpsc::{channel, Receiver, Sender},
-        Arc,
-    },
-    thread,
-};
+#[cfg(feature = "websocket")]
+mod block;
+#[cfg(feature = "websocket")]
+use block::Block as BlockWorker;
 
-use log::error;
+#[cfg(feature = "async-websocket")]
+mod r#async;
+#[cfg(feature = "async-websocket")]
+use r#async::Async as AsyncWorker;
 
 #[cfg(feature = "websocket")]
-use tungstenite::connect;
+use std::sync::mpsc::{channel, Receiver};
+#[cfg(feature = "async-websocket")]
+use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver};
 
-#[cfg(feature = "async-websocket")]
-use futures_util::StreamExt;
-#[cfg(feature = "async-websocket")]
-use tokio;
-#[cfg(feature = "async-websocket")]
-use tokio_tungstenite::connect_async;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 
 use crate::{
-    errors::FugleError,
     intraday::{chart::ChartResponse, meta::MetaResponse, quote::QuoteResponse},
     schema::Result,
 };
@@ -107,8 +105,6 @@ impl<'a> IntradayBuilder<'a> {
                 self.symbol_id, self.token, self.is_odd_lot,
             ),
             workers: vec![],
-            #[cfg(feature = "async-websocket")]
-            async_workers: vec![],
             done: Arc::new(AtomicBool::new(false)),
         }
     }
@@ -117,9 +113,7 @@ impl<'a> IntradayBuilder<'a> {
 /// Intraday is the Websocket listener to fugle wws endpoints.
 pub struct Intraday {
     uri: String,
-    workers: Vec<Worker>,
-    #[cfg(feature = "async-websocket")]
-    async_workers: Vec<AsyncWorker>,
+    workers: Vec<Box<dyn Worker>>,
     done: Arc<AtomicBool>,
 }
 
@@ -140,28 +134,22 @@ impl Intraday {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "websocket")]
     pub fn chart(&mut self) -> Result<Receiver<ChartResponse>> {
         let (tx, rx) = channel();
         let uri = &format!("{}?{}", INTRADAY_CHART, self.uri);
-        match Worker::new(uri, tx, self.done.clone()) {
-            Ok(w) => {
-                self.workers.push(w);
-                Ok(rx)
-            }
-            Err(e) => Err(e),
-        }
+        let worker = BlockWorker::new(uri, tx, self.done.clone())?;
+        self.workers.push(Box::new(worker));
+        Ok(rx)
     }
 
-    pub async fn async_chart(&mut self) -> Result<Receiver<ChartResponse>> {
-        let (tx, rx) = channel();
+    #[cfg(feature = "async-websocket")]
+    pub async fn async_chart(&mut self) -> Result<UnboundedReceiver<ChartResponse>> {
+        let (tx, rx) = unbounded_channel();
         let uri = &format!("{}?{}", INTRADAY_CHART, self.uri);
-        match AsyncWorker::new(uri, tx, self.done.clone()).await {
-            Ok(w) => {
-                self.async_workers.push(w);
-                Ok(rx)
-            }
-            Err(e) => Err(e),
-        }
+        let worker = AsyncWorker::new(uri, tx, self.done.clone()).await?;
+        self.workers.push(Box::new(worker));
+        Ok(rx)
     }
 
     /// Listening fugle Meta endpoint.
@@ -180,28 +168,22 @@ impl Intraday {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "websocket")]
     pub fn meta(&mut self) -> Result<Receiver<MetaResponse>> {
         let (tx, rx) = channel();
         let uri = &format!("{}?{}", INTRADAY_META, self.uri);
-        match Worker::new(uri, tx, self.done.clone()) {
-            Ok(w) => {
-                self.workers.push(w);
-                Ok(rx)
-            }
-            Err(e) => Err(e),
-        }
+        let worker = BlockWorker::new(uri, tx, self.done.clone())?;
+        self.workers.push(Box::new(worker));
+        Ok(rx)
     }
 
-    pub async fn async_meta(&mut self) -> Result<Receiver<MetaResponse>> {
-        let (tx, rx) = channel();
+    #[cfg(feature = "async-websocket")]
+    pub async fn async_meta(&mut self) -> Result<UnboundedReceiver<MetaResponse>> {
+        let (tx, rx) = unbounded_channel();
         let uri = &format!("{}?{}", INTRADAY_META, self.uri);
-        match AsyncWorker::new(uri, tx, self.done.clone()).await {
-            Ok(w) => {
-                self.async_workers.push(w);
-                Ok(rx)
-            }
-            Err(e) => Err(e),
-        }
+        let worker = AsyncWorker::new(uri, tx, self.done.clone()).await?;
+        self.workers.push(Box::new(worker));
+        Ok(rx)
     }
 
     /// Listening fugle Quote endpoint.
@@ -220,28 +202,22 @@ impl Intraday {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "websocket")]
     pub fn quote(&mut self) -> Result<Receiver<QuoteResponse>> {
         let (tx, rx) = channel();
         let uri = &format!("{}?{}", INTRADAY_QUOTE, self.uri);
-        match Worker::new(uri, tx, self.done.clone()) {
-            Ok(w) => {
-                self.workers.push(w);
-                Ok(rx)
-            }
-            Err(e) => Err(e),
-        }
+        let worker = BlockWorker::new(uri, tx, self.done.clone())?;
+        self.workers.push(Box::new(worker));
+        Ok(rx)
     }
 
-    pub async fn async_quote(&mut self) -> Result<Receiver<QuoteResponse>> {
-        let (tx, rx) = channel();
+    #[cfg(feature = "async-websocket")]
+    pub async fn async_quote(&mut self) -> Result<UnboundedReceiver<QuoteResponse>> {
+        let (tx, rx) = unbounded_channel();
         let uri = &format!("{}?{}", INTRADAY_QUOTE, self.uri);
-        match AsyncWorker::new(uri, tx, self.done.clone()).await {
-            Ok(w) => {
-                self.async_workers.push(w);
-                Ok(rx)
-            }
-            Err(e) => Err(e),
-        }
+        let worker = AsyncWorker::new(uri, tx, self.done.clone()).await?;
+        self.workers.push(Box::new(worker));
+        Ok(rx)
     }
 }
 
@@ -249,93 +225,12 @@ impl<'a> Drop for Intraday {
     fn drop(&mut self) {
         self.done.store(true, Ordering::SeqCst);
 
-        for worker in &mut self.workers {
-            if let Some(thread) = worker.thread.take() {
-                let _ = thread.join();
-            }
-        }
-
-        if cfg!(feature = "async-websocket") {
-            for worker in &mut self.async_workers {
-                if let Some(routine) = worker.routine.take() {
-                    drop(routine)
-                }
-            }
+        for worker in self.workers.iter_mut() {
+            worker.stop();
         }
     }
 }
 
-struct Worker {
-    thread: Option<thread::JoinHandle<()>>,
-}
-
-impl Worker {
-    fn new<T>(uri: &str, sender: Sender<T>, done: Arc<AtomicBool>) -> Result<Worker>
-    where
-        T: for<'de> serde::Deserialize<'de> + Send + 'static,
-    {
-        let (mut socket, _) = connect(uri)?;
-
-        let thread = thread::spawn(move || {
-            while !done.load(Ordering::SeqCst) {
-                match socket.read_message() {
-                    Ok(msg) => {
-                        if let Err(e) = handler(sender.clone(), msg) {
-                            error!("{}", e);
-                        }
-                    }
-                    Err(e) => {
-                        error!("{}", e);
-                    }
-                }
-            }
-            let _ = socket.close(None);
-        });
-
-        Ok(Worker {
-            thread: Some(thread),
-        })
-    }
-}
-
-struct AsyncWorker {
-    routine: Option<tokio::task::JoinHandle<()>>,
-}
-
-impl AsyncWorker {
-    async fn new<T>(uri: &str, sender: Sender<T>, done: Arc<AtomicBool>) -> Result<AsyncWorker>
-    where
-        T: for<'de> serde::Deserialize<'de> + Send + 'static,
-    {
-        let (mut socket, _) = connect_async(uri).await?;
-
-        let routine = tokio::spawn(async move {
-            while !done.load(Ordering::SeqCst) {
-                if let Some(msg) = socket.next().await {
-                    if let Err(e) = handler(sender.clone(), msg.unwrap()) {
-                        error!("{}", e);
-                    }
-                }
-            }
-            let _ = socket.close(None).await;
-        });
-
-        Ok(AsyncWorker {
-            routine: Some(routine),
-        })
-    }
-}
-
-fn handler<T>(sender: Sender<T>, msg: tungstenite::Message) -> Result<()>
-where
-    T: for<'de> serde::Deserialize<'de> + Send + 'static,
-{
-    let m = msg.to_text()?;
-    if m.is_empty() {
-        return Ok(());
-    }
-
-    sender
-        .send(serde_json::from_str(m)?)
-        .map_err(|_| FugleError::MpscSendError)
+pub(crate) trait Worker: Send {
+    fn stop(&mut self);
 }
