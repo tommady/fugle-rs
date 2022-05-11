@@ -22,7 +22,7 @@ mod util;
 #[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_failed() {
-    let mut ws = IntradayBuilder::new()
+    let mut ws = IntradayBuilder::default()
         .odd_lot()
         .token("")
         .symbol_id("2884")
@@ -47,7 +47,7 @@ fn test_intraday_chart_pass() {
 #[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_failed() {
-    let mut ws = IntradayBuilder::new()
+    let mut ws = IntradayBuilder::default()
         .odd_lot()
         .token("")
         .symbol_id("2884")
@@ -72,7 +72,7 @@ fn test_intraday_meta_pass() {
 #[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_failed() {
-    let mut ws = IntradayBuilder::new()
+    let mut ws = IntradayBuilder::default()
         .symbol_id("2884")
         .odd_lot()
         .token("")
@@ -97,7 +97,7 @@ fn test_intraday_quote_pass() {
 #[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_chart_failed() {
-    let mut ws = IntradayBuilder::new()
+    let mut ws = IntradayBuilder::default()
         .odd_lot()
         .token("")
         .symbol_id("2884")
@@ -124,7 +124,7 @@ async fn test_intraday_async_chart_pass() {
 #[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_meta_failed() {
-    let mut ws = IntradayBuilder::new()
+    let mut ws = IntradayBuilder::default()
         .odd_lot()
         .token("")
         .symbol_id("2884")
@@ -151,7 +151,7 @@ async fn test_intraday_async_meta_pass() {
 #[serial]
 #[cfg(feature = "async-websocket")]
 async fn test_intraday_async_quote_failed() {
-    let mut ws = IntradayBuilder::new()
+    let mut ws = IntradayBuilder::default()
         .symbol_id("2884")
         .odd_lot()
         .token("")
