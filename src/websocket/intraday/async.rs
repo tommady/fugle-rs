@@ -56,7 +56,10 @@ impl super::Worker for Async {
 
 #[cfg(test)]
 mod test {
-    use tokio::sync::mpsc::unbounded_channel;
+    use tokio::{
+        sync::mpsc::unbounded_channel,
+        time::{sleep, Duration},
+    };
 
     use super::{
         super::{QuoteResponse, Worker, INTRADAY_QUOTE},
@@ -75,6 +78,7 @@ mod test {
         .await
         .unwrap();
 
+        sleep(Duration::from_millis(3)).await;
         done.store(true, Ordering::SeqCst);
         worker.stop();
     }

@@ -54,7 +54,7 @@ impl super::Worker for Block {
 
 #[cfg(test)]
 mod test {
-    use std::sync::mpsc::channel;
+    use std::{sync::mpsc::channel, thread::sleep, time::Duration};
 
     use super::{
         super::{QuoteResponse, Worker, INTRADAY_QUOTE},
@@ -72,6 +72,7 @@ mod test {
         )
         .unwrap();
 
+        sleep(Duration::from_millis(3));
         done.store(true, Ordering::SeqCst);
         worker.stop();
     }
