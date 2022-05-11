@@ -1,4 +1,4 @@
-use std::{thread::sleep as std_sleep, time::Duration};
+use std::time::Duration;
 
 use fugle::websocket::IntradayBuilder;
 use serial_test::serial;
@@ -34,11 +34,10 @@ fn test_intraday_chart_failed() {
 #[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_chart_pass() {
-    util::timeout_after(Duration::from_secs(9), || {
+    util::timeout_after(Duration::from_secs(3), || {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
         let rx = ws.chart().unwrap();
-        std_sleep(Duration::from_secs(1));
-        let chart = rx.recv_timeout(Duration::from_secs(3)).unwrap();
+        let chart = rx.recv().unwrap();
         assert_eq!(chart.data.info.symbol_id, "2884");
         assert_eq!(chart.data.info.typ, "EQUITY");
     })
@@ -60,11 +59,10 @@ fn test_intraday_meta_failed() {
 #[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_meta_pass() {
-    util::timeout_after(Duration::from_secs(15), || {
+    util::timeout_after(Duration::from_secs(3), || {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
         let rx = ws.meta().unwrap();
-        std_sleep(Duration::from_secs(3));
-        let meta = rx.recv_timeout(Duration::from_secs(3)).unwrap();
+        let meta = rx.recv().unwrap();
         assert_eq!(meta.data.info.symbol_id, "2884");
         assert_eq!(meta.data.info.typ, "EQUITY");
     })
@@ -86,11 +84,10 @@ fn test_intraday_quote_failed() {
 #[serial]
 #[cfg(feature = "websocket")]
 fn test_intraday_quote_pass() {
-    util::timeout_after(Duration::from_secs(9), || {
+    util::timeout_after(Duration::from_secs(3), || {
         let mut ws = IntradayBuilder::new().symbol_id("2884").build();
         let rx = ws.quote().unwrap();
-        std_sleep(Duration::from_secs(1));
-        let quote = rx.recv_timeout(Duration::from_secs(3)).unwrap();
+        let quote = rx.recv().unwrap();
         assert_eq!(quote.data.info.symbol_id, "2884");
         assert_eq!(quote.data.info.typ, "EQUITY");
     })
