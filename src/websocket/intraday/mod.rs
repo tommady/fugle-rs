@@ -27,7 +27,7 @@ const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/chart";
 const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/quote";
 const INTRADAY_META: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/meta";
 
-/// Accumulates options towards building an Intraday instance.
+/// Accumulates options towards building an Intraday instance of WebSocket.
 pub struct IntradayBuilder<'a> {
     token: &'a str,
     symbol_id: &'a str,
@@ -41,6 +41,10 @@ impl<'a> Default for IntradayBuilder<'a> {
 }
 
 impl<'a> IntradayBuilder<'a> {
+    /// Returns a default IntradayBuilder with
+    /// * fugle "demo" token
+    /// * empty symbol id
+    /// * false of odd lot
     pub fn new() -> IntradayBuilder<'a> {
         IntradayBuilder {
             token: "demo",
@@ -69,11 +73,31 @@ impl<'a> IntradayBuilder<'a> {
         self
     }
 
+    /// Set a stock identification code to receive WebSocket data.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::websocket::IntradayBuilder;
+    /// let ws = IntradayBuilder::new()
+    ///     .symbol_id("b52153ae36747b17c8bdee801da19542")
+    ///     .build();
+    /// ```
     pub fn symbol_id(mut self, symbol_id: &'a str) -> IntradayBuilder {
         self.symbol_id = symbol_id;
         self
     }
 
+    /// To see odd lotter or not.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::websocket::IntradayBuilder;
+    /// let ws = IntradayBuilder::new()
+    ///     .odd_lot()
+    ///     .build();
+    /// ```
     pub fn odd_lot(mut self) -> IntradayBuilder<'a> {
         self.is_odd_lot = true;
         self
@@ -143,6 +167,23 @@ impl Intraday {
         Ok(rx)
     }
 
+    /// Listening fugle Chart endpoint.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # #[tokio::main]
+    /// # async fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::websocket::IntradayBuilder;
+    ///
+    /// let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
+    ///
+    /// let mut rx = ws.async_chart().await?;
+    /// let response = rx.recv().await;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     #[cfg(feature = "async-websocket")]
     pub async fn async_chart(&mut self) -> Result<UnboundedReceiver<ChartResponse>> {
         let (tx, rx) = unbounded_channel();
@@ -177,6 +218,23 @@ impl Intraday {
         Ok(rx)
     }
 
+    /// Listening fugle Meta endpoint.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # #[tokio::main]
+    /// # async fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::websocket::IntradayBuilder;
+    ///
+    /// let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
+    ///
+    /// let mut rx = ws.async_meta().await?;
+    /// let response = rx.recv().await;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     #[cfg(feature = "async-websocket")]
     pub async fn async_meta(&mut self) -> Result<UnboundedReceiver<MetaResponse>> {
         let (tx, rx) = unbounded_channel();
@@ -211,6 +269,23 @@ impl Intraday {
         Ok(rx)
     }
 
+    /// Listening fugle Quote endpoint.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # #[tokio::main]
+    /// # async fn main() -> fugle::schema::Result<()> {
+    /// # use fugle::websocket::IntradayBuilder;
+    ///
+    /// let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
+    ///
+    /// let mut rx = ws.async_quote().await?;
+    /// let response = rx.recv().await;
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     #[cfg(feature = "async-websocket")]
     pub async fn async_quote(&mut self) -> Result<UnboundedReceiver<QuoteResponse>> {
         let (tx, rx) = unbounded_channel();
