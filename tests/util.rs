@@ -1,5 +1,5 @@
 #![macro_use]
-use std::{sync::mpsc, thread, time::Duration};
+use std::time::Duration;
 
 use fugle::{errors::FugleError, schema::Result};
 
@@ -18,6 +18,8 @@ where
     F: FnOnce() -> T,
     F: Send + 'static,
 {
+    use std::{sync::mpsc, thread};
+
     let (done_tx, done_rx) = mpsc::channel();
     let handle = thread::spawn(move || {
         let val = f();
@@ -28,6 +30,32 @@ where
     match done_rx.recv_timeout(d) {
         Ok(_) => handle.join().expect("thread panicked"),
         Err(_) => panic!("thread took too long"),
+    }
+}
+pub(crate) async fn async_timeout_after<F, Fut>(d: Duration, f: F)
+where
+    F: FnOnce() -> Fut,
+    F: Send + 'static,
+    Fut: std::future::Future,
+    Fut: Send + 'static,
+{
+    use tokio::{
+        sync::oneshot::channel,
+        time::{interval_at, Instant},
+    };
+
+    let mut timeout = interval_at(Instant::now() + d, d);
+    let (done_tx, done_rx) = channel();
+    tokio::spawn(async {
+        f().await;
+        done_tx.send(()).expect("unable to send completion signal");
+    });
+
+    'looper: loop {
+        tokio::select! {
+            _ = done_rx => { break 'looper }
+            _ = timeout.tick() => { panic!("routine took too long") }
+        }
     }
 }
 
@@ -41,6 +69,15 @@ fn test_assert_err() {
 #[should_panic]
 fn test_timeout_after() {
     timeout_after(Duration::from_millis(100), || {
-        thread::sleep(Duration::from_millis(200));
+        std::thread::sleep(Duration::from_millis(200));
     })
+}
+
+#[tokio::test]
+#[should_panic]
+async fn test_async_timeout_after() {
+    async_timeout_after(Duration::from_millis(100), move || async move {
+        tokio::time::sleep(Duration::from_millis(200)).await;
+    })
+    .await
 }
