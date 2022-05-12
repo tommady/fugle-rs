@@ -72,8 +72,9 @@ mod test {
         )
         .unwrap();
 
-        sleep(Duration::from_millis(3));
         done.store(true, Ordering::SeqCst);
+        sleep(Duration::from_millis(3));
+
         worker.stop();
     }
 }

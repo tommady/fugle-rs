@@ -78,8 +78,9 @@ mod test {
         .await
         .unwrap();
 
-        sleep(Duration::from_millis(3)).await;
         done.store(true, Ordering::SeqCst);
+        sleep(Duration::from_millis(3)).await;
+
         worker.stop();
     }
 }
