@@ -13,7 +13,7 @@ What is [Fugle][fugledevweb] ?
 This is a library of rust version to access Fugle's
 
 * RESTful API
-* Websocket (enable websocket feature)
+* Websocket (enable websocket or async-websocket feature)
 
 services in a very easy way.
 
