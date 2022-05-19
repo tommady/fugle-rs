@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use ureq::{Agent, AgentBuilder};
 
-use crate::intraday::{
+use crate::http::intraday::{
     chart::ChartBuilder, dealts::DealtsBuilder, meta::MetaBuilder, quote::QuoteBuilder,
     volumes::VolumesBuilder,
 };
@@ -52,7 +52,7 @@ impl<'a> IntradayBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     /// let agent = IntradayBuilder::new()
     ///     .token("b52153ae36747b17c8bdee801da19542")
     ///     .build();
@@ -69,7 +69,7 @@ impl<'a> IntradayBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     /// let agent = IntradayBuilder::new()
     ///     .read_timeout_sec(10) // set read timeout in 10 seconds
     ///     .build();
@@ -84,7 +84,7 @@ impl<'a> IntradayBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     /// let agent = IntradayBuilder::new().build();
     /// ```
     pub fn build(self) -> Intraday<'a> {
@@ -110,7 +110,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.chart("2884").call()?;
@@ -136,7 +136,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.quote("2884").call()?;
@@ -162,7 +162,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.meta("2884").call()?;
@@ -188,7 +188,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.dealts("2884").call()?;
@@ -214,7 +214,7 @@ impl<'a> Intraday<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     /// agent.volumes("2884").call()?;

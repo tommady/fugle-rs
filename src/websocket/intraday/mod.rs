@@ -18,10 +18,7 @@ use std::sync::{
     Arc,
 };
 
-use crate::{
-    intraday::{chart::ChartResponse, meta::MetaResponse, quote::QuoteResponse},
-    schema::Result,
-};
+use crate::schema::{ChartResponse, MetaResponse, QuoteResponse, Result};
 
 const INTRADAY_CHART: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/chart";
 const INTRADAY_QUOTE: &str = "wss://api.fugle.tw/realtime/v0.3/intraday/quote";

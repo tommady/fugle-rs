@@ -1,4 +1,4 @@
-use fugle::{errors::FugleError, intraday::meta::MetaResponse, intraday::IntradayBuilder};
+use fugle::{errors::FugleError, http::IntradayBuilder, schema::MetaResponse};
 
 fn main() {
     let agent = IntradayBuilder::new().build();

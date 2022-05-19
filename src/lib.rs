@@ -23,7 +23,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::intraday::IntradayBuilder;
+//! # use fugle::http::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.chart("2884").call()?;
@@ -51,7 +51,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::intraday::IntradayBuilder;
+//! # use fugle::http::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.quote("2884").call()?;
@@ -79,7 +79,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::intraday::IntradayBuilder;
+//! # use fugle::http::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.meta("2884").call()?;
@@ -107,7 +107,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::intraday::IntradayBuilder;
+//! # use fugle::http::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.dealts("2884").call()?;
@@ -121,7 +121,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::intraday::IntradayBuilder;
+//! # use fugle::http::IntradayBuilder;
 //!                                             
 //! let agent = IntradayBuilder::new().build();
 //! agent.volumes("2884").call()?;
@@ -135,7 +135,7 @@
 //! API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::marketdata::MarketdataBuilder;
+//! # use fugle::http::MarketdataBuilder;
 //!
 //! let agent = MarketdataBuilder::new().build();
 //! agent.candles("2884").call()?;
@@ -153,8 +153,7 @@
 //! [fuglecandlesweb]: https://developer.fugle.tw/docs/data/marketdata/candles
 
 pub mod errors;
-pub mod intraday;
-pub mod marketdata;
+pub mod http;
 pub mod schema;
 #[cfg(any(feature = "websocket", feature = "async-websocket"))]
 pub mod websocket;

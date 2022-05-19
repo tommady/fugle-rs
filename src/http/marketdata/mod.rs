@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use ureq::{Agent, AgentBuilder};
 
-use crate::marketdata::candles::CandlesBuilder;
+use crate::http::marketdata::candles::CandlesBuilder;
 
 const MARKETDATA_CANDLES: &str = "https://api.fugle.tw/marketdata/v0.3/candles";
 
@@ -41,7 +41,7 @@ impl<'a> MarketdataBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::marketdata::MarketdataBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     /// let agent = MarketdataBuilder::new()
     ///     .token("b52153ae36747b17c8bdee801da19542")
     ///     .build();
@@ -58,7 +58,7 @@ impl<'a> MarketdataBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::marketdata::MarketdataBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     /// let agent = MarketdataBuilder::new()
     ///     .read_timeout_sec(10) // set read timeout in 10 seconds
     ///     .build();
@@ -73,7 +73,7 @@ impl<'a> MarketdataBuilder<'a> {
     /// # Example:
     ///
     /// ```
-    /// # use fugle::marketdata::MarketdataBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     /// let agent = MarketdataBuilder::new().build();
     /// ```
     pub fn build(self) -> Marketdata<'a> {
@@ -99,7 +99,7 @@ impl<'a> Marketdata<'a> {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::marketdata::MarketdataBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     ///
     /// let agent = MarketdataBuilder::new().build();
     /// agent.candles("2884").call()?;

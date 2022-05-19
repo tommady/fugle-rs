@@ -1,4 +1,4 @@
-use fugle::{errors::FugleError, intraday::IntradayBuilder};
+use fugle::{errors::FugleError, http::IntradayBuilder};
 mod util;
 
 #[test]

@@ -1,57 +1,16 @@
-use serde::{Deserialize, Serialize};
 use ureq::{OrAnyStatus, Request};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
-    schema::{Info, Result},
+    schema::{Result, VolumesResponse},
 };
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct Meta {
-    pub market: String,
-    pub name_zh_tw: String,
-    pub industry_zh_tw: String,
-    pub price_reference: f64,
-    pub price_high_limit: f64,
-    pub price_low_limit: f64,
-    pub can_day_buy_sell: bool,
-    pub can_day_sell_buy: bool,
-    pub can_short_margin: bool,
-    pub can_short_lend: bool,
-    pub trading_unit: u64,
-    pub currency: String,
-    pub is_terminated: bool,
-    pub is_suspended: bool,
-    pub type_zh_tw: String,
-    pub abnormal: String,
-    pub is_unusually_recommended: bool,
-}
-
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetaData {
-    #[serde(default)]
-    pub info: Info,
-    #[serde(default)]
-    pub meta: Meta,
-}
-
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MetaResponse {
-    #[serde(default)]
-    pub api_version: String,
-    #[serde(default)]
-    pub data: MetaData,
-}
-
 /// Associate options when doing the request.
-pub struct MetaBuilder {
+pub struct VolumesBuilder {
     pub request: Request,
 }
 
-impl MetaBuilder {
+impl VolumesBuilder {
     /// To see odd lotter or not.
     /// Default value on fugle API is false
     ///
@@ -59,18 +18,18 @@ impl MetaBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     ///
-    /// agent.meta("2884")
+    /// agent.volumes("2884")
     /// .odd_lot(true)
     /// .call()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn odd_lot(mut self, odd_lot: bool) -> MetaBuilder {
+    pub fn odd_lot(mut self, odd_lot: bool) -> VolumesBuilder {
         self.request = self.request.query("oddLot", &odd_lot.to_string());
         self
     }
@@ -81,16 +40,16 @@ impl MetaBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     ///
-    /// agent.meta("2884").call()?;
+    /// agent.volumes("2884").call()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn call(self) -> Result<MetaResponse> {
+    pub fn call(self) -> Result<VolumesResponse> {
         match self.request.call().or_any_status() {
             Ok(response) => {
                 if response.status() != 200 {
@@ -111,7 +70,7 @@ mod test {
 
     #[test]
     fn test_call_failed_on_transport() {
-        let it = MetaBuilder {
+        let it = VolumesBuilder {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());

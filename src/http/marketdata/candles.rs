@@ -1,59 +1,9 @@
-use serde::{Deserialize, Serialize};
-use time::Date;
 use ureq::{OrAnyStatus, Request};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
-    schema::{de_date, Result},
+    schema::{CandlesResponse, Result},
 };
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase", default)]
-pub struct Candle {
-    #[serde(deserialize_with = "de_date")]
-    pub date: Date,
-    pub open: f64,
-    pub high: f64,
-    pub low: f64,
-    pub close: f64,
-    pub volume: u64,
-}
-
-impl Default for Candle {
-    fn default() -> Candle {
-        Candle {
-            date: Date::MIN,
-            open: 0.0,
-            high: 0.0,
-            low: 0.0,
-            close: 0.0,
-            volume: 0,
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase", default)]
-pub struct CandlesResponse {
-    pub symbol_id: String,
-    #[serde(rename = "type")]
-    pub typ: String,
-    pub exchange: String,
-    pub market: String,
-    pub candles: Vec<Candle>,
-}
-
-impl Default for CandlesResponse {
-    fn default() -> CandlesResponse {
-        CandlesResponse {
-            symbol_id: "".to_string(),
-            typ: "".to_string(),
-            exchange: "".to_string(),
-            market: "".to_string(),
-            candles: vec![],
-        }
-    }
-}
 
 /// Associate options when doing the request.
 pub struct CandlesBuilder {
@@ -67,7 +17,7 @@ impl CandlesBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::marketdata::MarketdataBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     ///
     /// let agent = MarketdataBuilder::new().build();
     ///
@@ -87,7 +37,7 @@ impl CandlesBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::marketdata::MarketdataBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     ///
     /// let agent = MarketdataBuilder::new().build();
     ///
@@ -110,11 +60,11 @@ impl CandlesBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::MarketdataBuilder;
     ///
-    /// let agent = IntradayBuilder::new().build();
+    /// let agent = MarketdataBuilder::new().build();
     ///
-    /// agent.volumes("2884").call()?;
+    /// agent.candles("2884").call()?;
     ///
     /// # Ok(())
     /// # }
@@ -144,16 +94,5 @@ mod test {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());
-    }
-
-    #[test]
-    fn test_candle_default() {
-        let c = Candle::default();
-        assert_eq!(c.date, Date::MIN);
-        assert_eq!(c.open, 0.0);
-        assert_eq!(c.high, 0.0);
-        assert_eq!(c.low, 0.0);
-        assert_eq!(c.close, 0.0);
-        assert_eq!(c.volume, 0);
     }
 }

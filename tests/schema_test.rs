@@ -2,11 +2,10 @@ use std::{fs::File, path::Path};
 
 use fugle::{
     errors::{ErrorResponse, FugleError},
-    intraday::{
-        chart::ChartResponse, dealts::DealtsResponse, meta::MetaResponse, quote::QuoteResponse,
-        volumes::VolumesResponse,
+    schema::{
+        CandlesResponse, ChartResponse, DealtsResponse, MetaResponse, QuoteResponse,
+        VolumesResponse,
     },
-    marketdata::candles::CandlesResponse,
 };
 
 #[test]

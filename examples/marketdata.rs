@@ -1,7 +1,4 @@
-use fugle::{
-    errors::FugleError,
-    marketdata::{candles::CandlesResponse, MarketdataBuilder},
-};
+use fugle::{errors::FugleError, http::MarketdataBuilder, schema::CandlesResponse};
 
 fn main() {
     let agent = MarketdataBuilder::default().build();

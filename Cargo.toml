@@ -12,21 +12,30 @@ categories = ["web-programming::http-client", "web-programming::websocket"]
 edition = "2021"
 
 [features]
-default = []
-websocket = ["tungstenite", "log"]
-async-websocket = ["tungstenite", "tokio-tungstenite", "log", "tokio", "futures-util"]
+default = ["query", "websocket"]
+query = ["ureq"]
+async-query = ["reqwest"]
+websocket = ["tungstenite", "log", "serde_json"]
+async-websocket = ["tungstenite", "tokio-tungstenite", "log", "tokio", "futures-util", "serde_json"]
 
 [package.metadata.docs.rs]
-features = ["websocket", "async-websocket"]
+features = ["websocket", "async-websocket", "query", "async-query"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-ureq = { version = "2.4", features = ["json"] }
 time = { version = "0.3", features = ["serde", "parsing"] }
+
+ureq = { version = "2.4", features = ["json"], optional = true }
+serde_json = { version = "1.0", optional = true }
 log = { version = "0.4", optional = true }
 futures-util = { version = "0.3", default-features = false, optional = true }
 tokio = { version = "1", features = ["rt-multi-thread", "sync"], optional = true }
+
+[dependencies.reqwest]
+version = "0.11"
+default-features = false
+features = ["json", "rustls-tls-webpki-roots"]
+optional = true
 
 [dependencies.tungstenite]
 version = "0.17"

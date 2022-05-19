@@ -1,38 +1,16 @@
-use serde::{Deserialize, Serialize};
 use ureq::{OrAnyStatus, Request};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
-    schema::{Info, Result},
+    schema::{QuoteResponse, Result},
 };
 
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct Volume {
-    pub price: f64,
-    pub volume: u64,
-}
-
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct VolumeData {
-    pub info: Info,
-    pub volumes: Vec<Volume>,
-}
-
-#[derive(Default, Debug, Deserialize, Serialize)]
-#[serde(default, rename_all = "camelCase")]
-pub struct VolumesResponse {
-    pub api_version: String,
-    pub data: VolumeData,
-}
-
 /// Associate options when doing the request.
-pub struct VolumesBuilder {
+pub struct QuoteBuilder {
     pub request: Request,
 }
 
-impl VolumesBuilder {
+impl QuoteBuilder {
     /// To see odd lotter or not.
     /// Default value on fugle API is false
     ///
@@ -40,18 +18,18 @@ impl VolumesBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     ///
-    /// agent.volumes("2884")
+    /// agent.quote("2884")
     /// .odd_lot(true)
     /// .call()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn odd_lot(mut self, odd_lot: bool) -> VolumesBuilder {
+    pub fn odd_lot(mut self, odd_lot: bool) -> QuoteBuilder {
         self.request = self.request.query("oddLot", &odd_lot.to_string());
         self
     }
@@ -62,16 +40,16 @@ impl VolumesBuilder {
     ///
     /// ```
     /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::intraday::IntradayBuilder;
+    /// # use fugle::http::IntradayBuilder;
     ///
     /// let agent = IntradayBuilder::new().build();
     ///
-    /// agent.volumes("2884").call()?;
+    /// agent.quote("2884").call()?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub fn call(self) -> Result<VolumesResponse> {
+    pub fn call(self) -> Result<QuoteResponse> {
         match self.request.call().or_any_status() {
             Ok(response) => {
                 if response.status() != 200 {
@@ -92,7 +70,7 @@ mod test {
 
     #[test]
     fn test_call_failed_on_transport() {
-        let it = VolumesBuilder {
+        let it = QuoteBuilder {
             request: AgentBuilder::new().build().get("not-exists-endpoint"),
         };
         assert!(it.call().is_err());

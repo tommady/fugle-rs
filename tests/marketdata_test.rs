@@ -1,4 +1,4 @@
-use fugle::{errors::FugleError, marketdata::MarketdataBuilder};
+use fugle::{errors::FugleError, http::MarketdataBuilder};
 mod util;
 
 #[test]
