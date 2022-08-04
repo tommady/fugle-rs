@@ -62,6 +62,9 @@ pub enum FugleError {
     Tungstenite(tungstenite::Error),
     // error from ureq lib
     Ureq(Box<ureq::Error>),
+    // error from reqwest lib
+    #[cfg(feature = "async-query")]
+    Reqwest(reqwest::Error),
     // error from std io
     StdIO(std::io::Error),
     // from fugle API response code, to specific errors
@@ -86,6 +89,8 @@ impl std::fmt::Display for FugleError {
             #[cfg(any(feature = "websocket", feature = "async-websocket"))]
             FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
             FugleError::Ureq(ref e) => write!(f, "Ureq Lib error: {}", e),
+            #[cfg(feature = "async-query")]
+            FugleError::Reqwest(ref e) => write!(f, "Reqwest Lib error: {}", e),
             FugleError::StdIO(ref e) => write!(f, "std io json Deserialize error: {}", e),
             FugleError::General(ref e) => write!(f, "General purpose error: {}", e),
             FugleError::Unknown(ref e) => write!(f, "Unknown error: {}", e),
@@ -106,6 +111,8 @@ impl std::error::Error for FugleError {
             #[cfg(any(feature = "websocket", feature = "async-websocket"))]
             FugleError::Tungstenite(ref e) => Some(e),
             FugleError::Ureq(ref e) => Some(e),
+            #[cfg(feature = "async-query")]
+            FugleError::Reqwest(ref e) => Some(e),
             FugleError::StdIO(ref e) => Some(e),
             FugleError::General(ref _e) => None,
             FugleError::Unknown(ref _e) => None,
@@ -136,6 +143,14 @@ impl From<ureq::Error> for FugleError {
     #[cfg_attr(coverage, no_coverage)]
     fn from(err: ureq::Error) -> FugleError {
         FugleError::Ureq(Box::new(err))
+    }
+}
+
+#[cfg(feature = "async-query")]
+impl From<reqwest::Error> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
+    fn from(err: reqwest::Error) -> FugleError {
+        FugleError::Reqwest(err)
     }
 }
 

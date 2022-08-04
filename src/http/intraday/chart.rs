@@ -2,8 +2,32 @@ use ureq::{OrAnyStatus, Request};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
+    http::{Query, Request as RequestInterface},
     schema::{ChartResponse, Result},
 };
+
+pub struct ChartRequest<'a> {
+    pub odd_lot: bool,
+    pub symbol_id: &'a str,
+}
+
+impl RequestInterface for ChartRequest<'_> {
+    const REQUEST_URL: &'static str = "https://api.fugle.tw/realtime/v0.3/intraday/chart";
+    type Response = ChartResponse;
+
+    fn queries(&self) -> Vec<Query> {
+        vec![
+            Query {
+                param: "symbolId".to_string(),
+                value: self.symbol_id.to_string(),
+            },
+            Query {
+                param: "oddLot".to_string(),
+                value: self.odd_lot.to_string(),
+            },
+        ]
+    }
+}
 
 /// Associate options when doing the request.
 pub struct ChartBuilder {
