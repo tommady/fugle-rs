@@ -1,5 +1,4 @@
 pub mod intraday;
-pub use intraday::IntradayBuilder;
 
 pub mod marketdata;
 pub use marketdata::MarketdataBuilder;
@@ -11,37 +10,80 @@ use std::time::Duration;
 use ureq::{Agent, AgentBuilder, OrAnyStatus};
 
 #[cfg(feature = "async-query")]
-use reqwest::{Client, ClientBuilder, RequestBuilder as AsyncReq};
+use reqwest::{Client, ClientBuilder};
 
 use crate::{
     errors::{ErrorResponse, FugleError},
     schema::Result,
 };
 
-#[derive(Default)]
-pub struct RequestBuilder<'a> {
+/// Accumulates options towards building an Restful api instance.
+pub struct RestfulBuilder<'a> {
     token: &'a str,
     read_timeout_sec: u64,
 }
 
-impl<'a> RequestBuilder<'a> {
-    pub fn new() -> RequestBuilder<'a> {
-        RequestBuilder {
+impl<'a> Default for RestfulBuilder<'a> {
+    fn default() -> RestfulBuilder<'a> {
+        RestfulBuilder::new()
+    }
+}
+
+impl<'a> RestfulBuilder<'a> {
+    /// Returns a default RestfulBuilder with
+    /// * fugle "demo" token
+    /// * 3 seconds read timeout
+    pub fn new() -> RestfulBuilder<'a> {
+        RestfulBuilder {
             token: "demo",
             read_timeout_sec: 3,
         }
     }
 
-    pub fn token(mut self, token: &'a str) -> RequestBuilder {
+    /// Setup your personal fugle token.
+    ///
+    /// By default the RestfulBuilder using fugle demo token which has limitations on querying,
+    /// please login into below web page
+    /// https://developer.fugle.tw/
+    /// then find your personal token.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::http::RestfulBuilder ;
+    /// let agent = RestfulBuilder ::new()
+    ///     .token("b52153ae36747b17c8bdee801da19542")
+    ///     .build();
+    /// ```
+    pub fn token(mut self, token: &'a str) -> RestfulBuilder {
         self.token = token;
         self
     }
 
-    pub fn read_timeout_sec(mut self, sec: u64) -> RequestBuilder<'a> {
+    /// Setup http read timeout option.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::http::RestfulBuilder ;
+    /// let agent = RestfulBuilder ::new()
+    ///     .read_timeout_sec(10) // set read timeout in 10 seconds
+    ///     .build();
+    /// ```
+    pub fn read_timeout_sec(mut self, sec: u64) -> RestfulBuilder<'a> {
         self.read_timeout_sec = sec;
         self
     }
 
+    /// Create a new Block Request instance.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::http::RestfulBuilder ;
+    /// let agent = RestfulBuilder ::new().build();
+    /// ```
+    #[cfg(feature = "query")]
     pub fn build(&self) -> Result<BlockRequest<'a>> {
         Ok(BlockRequest {
             token: self.token,
@@ -51,6 +93,14 @@ impl<'a> RequestBuilder<'a> {
         })
     }
 
+    /// Create a new Aync Request instance.
+    ///
+    /// # Example:
+    ///
+    /// ```
+    /// # use fugle::http::RestfulBuilder ;
+    /// let agent = RestfulBuilder ::new().build_async();
+    /// ```
     pub fn build_async(&self) -> Result<AsyncRequest<'a>> {
         Ok(AsyncRequest {
             token: self.token,
@@ -133,3 +183,52 @@ impl<'a> AsyncRequest<'a> {
         }
     }
 }
+
+// #[cfg(test)]
+// mod test {
+//     use super::*;
+//     use crate::http::intraday::chart::ChartRequest;
+//     use crate::http::intraday::dealts::DealtsRequest;
+//
+//     #[test]
+//     fn test_block_request() {
+//         let cres = RequestBuilder::new()
+//             .build()
+//             .unwrap()
+//             .call(ChartRequest {
+//                 odd_lot: false,
+//                 symbol_id: "2884",
+//             })
+//             .unwrap();
+//         println!("chart : {:?}", cres);
+//
+//         let mut d = DealtsRequest::default();
+//         d.symbol_id("2884");
+//         let dres = RequestBuilder::new().build().unwrap().call(d).unwrap();
+//         println!("dealts : {:?}", dres);
+//     }
+//
+//     #[tokio::test]
+//     async fn test_async_request() {
+//         let cres = RequestBuilder::new()
+//             .build_async()
+//             .unwrap()
+//             .call(ChartRequest {
+//                 odd_lot: false,
+//                 symbol_id: "2884",
+//             })
+//             .await
+//             .unwrap();
+//         println!("chart : {:?}", cres);
+//
+//         let mut d = DealtsRequest::default();
+//         d.symbol_id("2884");
+//         let dres = RequestBuilder::new()
+//             .build_async()
+//             .unwrap()
+//             .call(d)
+//             .await
+//             .unwrap();
+//         println!("dealts : {:?}", dres);
+//     }
+// }

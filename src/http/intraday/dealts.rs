@@ -1,12 +1,8 @@
-use ureq::{OrAnyStatus, Request};
-
 use crate::{
-    errors::{ErrorResponse, FugleError},
-    http::{Query, Request as RequestInterface},
-    schema::{dealts::DealtsResponse, Result},
+    http::{Query, Request},
+    schema::dealts::DealtsResponse,
 };
 
-#[derive(Default)]
 pub struct DealtsRequest<'a> {
     symbol_id: &'a str,
     odd_lot: bool,
@@ -14,21 +10,44 @@ pub struct DealtsRequest<'a> {
     offset: usize,
 }
 
-impl<'a> DealtsRequest<'a> {
-    pub fn symbol_id(&mut self, symbol_id: &'a str) {
-        self.symbol_id = symbol_id
-    }
-
-    pub fn odd_lot(&mut self, odd_lot: bool) {
-        self.odd_lot = odd_lot
-    }
-
-    pub fn limit(&mut self, limit: usize) {
-        self.limit = limit
+impl Default for DealtsRequest<'_> {
+    fn default() -> Self {
+        DealtsRequest::new()
     }
 }
 
-impl RequestInterface for DealtsRequest<'_> {
+impl<'a> DealtsRequest<'a> {
+    pub fn new() -> Self {
+        DealtsRequest {
+            symbol_id: "2884",
+            odd_lot: false,
+            limit: 0,
+            offset: 0,
+        }
+    }
+
+    pub fn symbol_id(mut self, symbol_id: &'a str) -> Self {
+        self.symbol_id = symbol_id;
+        self
+    }
+
+    pub fn odd_lot(mut self, odd_lot: bool) -> Self {
+        self.odd_lot = odd_lot;
+        self
+    }
+
+    pub fn limit(mut self, limit: usize) -> Self {
+        self.limit = limit;
+        self
+    }
+
+    pub fn offset(mut self, offset: usize) -> Self {
+        self.offset = offset;
+        self
+    }
+}
+
+impl Request for DealtsRequest<'_> {
     const REQUEST_URL: &'static str = "https://api.fugle.tw/realtime/v0.3/intraday/dealts";
     type Response = DealtsResponse;
 
@@ -54,119 +73,119 @@ impl RequestInterface for DealtsRequest<'_> {
     }
 }
 
-/// Associate options when doing the request.
-pub struct DealtsBuilder {
-    pub request: Request,
-}
-
-impl DealtsBuilder {
-    /// Set a limit param while using dealts request.
-    /// Default value on fugle API is 0
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::http::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    /// agent.dealts("2884")
-    /// .limit(99)
-    /// .call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn limit(mut self, limit: usize) -> DealtsBuilder {
-        self.request = self.request.query("limit", &limit.to_string());
-        self
-    }
-
-    /// Set an offset param while using dealts request.
-    /// Default value on fugle API is 50
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::http::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    /// agent.dealts("2884")
-    /// .offset(3)
-    /// .limit(6)
-    /// .call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn offset(mut self, offset: usize) -> DealtsBuilder {
-        self.request = self.request.query("offset", &offset.to_string());
-        self
-    }
-
-    /// To see odd lotter or not.
-    /// Default value on fugle API is false
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::http::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    ///
-    /// agent.dealts("2884")
-    /// .odd_lot(true)
-    /// .call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn odd_lot(mut self, odd_lot: bool) -> DealtsBuilder {
-        self.request = self.request.query("oddLot", &odd_lot.to_string());
-        self
-    }
-
-    /// Send the request.
-    ///
-    /// # Example:
-    ///
-    /// ```
-    /// # fn main() -> fugle::schema::Result<()> {
-    /// # use fugle::http::IntradayBuilder;
-    ///
-    /// let agent = IntradayBuilder::new().build();
-    ///
-    /// agent.dealts("2884").call()?;
-    ///
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn call(self) -> Result<DealtsResponse> {
-        match self.request.call().or_any_status() {
-            Ok(response) => {
-                if response.status() != 200 {
-                    let err: ErrorResponse = response.into_json()?;
-                    return Err(err.into());
-                }
-                Ok(response.into_json()?)
-            }
-            Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
-        }
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use ureq::AgentBuilder;
-
-    #[test]
-    fn test_call_failed_on_transport() {
-        let it = DealtsBuilder {
-            request: AgentBuilder::new().build().get("not-exists-endpoint"),
-        };
-        assert!(it.call().is_err());
-    }
-}
+// /// Associate options when doing the request.
+// pub struct DealtsBuilder {
+//     pub request: Request,
+// }
+//
+// impl DealtsBuilder {
+//     /// Set a limit param while using dealts request.
+//     /// Default value on fugle API is 0
+//     ///
+//     /// # Example:
+//     ///
+//     /// ```
+//     /// # fn main() -> fugle::schema::Result<()> {
+//     /// # use fugle::http::IntradayBuilder;
+//     ///
+//     /// let agent = IntradayBuilder::new().build();
+//     /// agent.dealts("2884")
+//     /// .limit(99)
+//     /// .call()?;
+//     ///
+//     /// # Ok(())
+//     /// # }
+//     /// ```
+//     pub fn limit(mut self, limit: usize) -> DealtsBuilder {
+//         self.request = self.request.query("limit", &limit.to_string());
+//         self
+//     }
+//
+//     /// Set an offset param while using dealts request.
+//     /// Default value on fugle API is 50
+//     ///
+//     /// # Example:
+//     ///
+//     /// ```
+//     /// # fn main() -> fugle::schema::Result<()> {
+//     /// # use fugle::http::IntradayBuilder;
+//     ///
+//     /// let agent = IntradayBuilder::new().build();
+//     /// agent.dealts("2884")
+//     /// .offset(3)
+//     /// .limit(6)
+//     /// .call()?;
+//     ///
+//     /// # Ok(())
+//     /// # }
+//     /// ```
+//     pub fn offset(mut self, offset: usize) -> DealtsBuilder {
+//         self.request = self.request.query("offset", &offset.to_string());
+//         self
+//     }
+//
+//     /// To see odd lotter or not.
+//     /// Default value on fugle API is false
+//     ///
+//     /// # Example:
+//     ///
+//     /// ```
+//     /// # fn main() -> fugle::schema::Result<()> {
+//     /// # use fugle::http::IntradayBuilder;
+//     ///
+//     /// let agent = IntradayBuilder::new().build();
+//     ///
+//     /// agent.dealts("2884")
+//     /// .odd_lot(true)
+//     /// .call()?;
+//     ///
+//     /// # Ok(())
+//     /// # }
+//     /// ```
+//     pub fn odd_lot(mut self, odd_lot: bool) -> DealtsBuilder {
+//         self.request = self.request.query("oddLot", &odd_lot.to_string());
+//         self
+//     }
+//
+//     /// Send the request.
+//     ///
+//     /// # Example:
+//     ///
+//     /// ```
+//     /// # fn main() -> fugle::schema::Result<()> {
+//     /// # use fugle::http::IntradayBuilder;
+//     ///
+//     /// let agent = IntradayBuilder::new().build();
+//     ///
+//     /// agent.dealts("2884").call()?;
+//     ///
+//     /// # Ok(())
+//     /// # }
+//     /// ```
+//     pub fn call(self) -> Result<DealtsResponse> {
+//         match self.request.call().or_any_status() {
+//             Ok(response) => {
+//                 if response.status() != 200 {
+//                     let err: ErrorResponse = response.into_json()?;
+//                     return Err(err.into());
+//                 }
+//                 Ok(response.into_json()?)
+//             }
+//             Err(e) => Err(FugleError::Ureq(Box::new(e.into()))),
+//         }
+//     }
+// }
+//
+// #[cfg(test)]
+// mod test {
+//     use super::*;
+//     use ureq::AgentBuilder;
+//
+//     #[test]
+//     fn test_call_failed_on_transport() {
+//         let it = DealtsBuilder {
+//             request: AgentBuilder::new().build().get("not-exists-endpoint"),
+//         };
+//         assert!(it.call().is_err());
+//     }
+// }
