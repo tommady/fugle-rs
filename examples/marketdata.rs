@@ -1,19 +1,24 @@
-use fugle::{errors::FugleError, http::MarketdataBuilder, schema::CandlesResponse};
+use fugle::{
+    errors::FugleError,
+    http::{marketdata::CandlesRequest, RestfulBuilder},
+    schema::CandlesResponse,
+};
 
 fn main() {
-    let agent = MarketdataBuilder::default().build();
+    let client = RestfulBuilder::default().build().unwrap();
 
-    match agent.candles("2884").call() {
+    // match client.candles("2884").call() {
+    match client.call(CandlesRequest::new().symbol_id("2884")) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match agent
-        .candles("2884")
-        .from("2022-04-21")
-        .to("2022-04-28")
-        .call()
-    {
+    match client.call(
+        CandlesRequest::new()
+            .symbol_id("2884")
+            .from("2022-08-01")
+            .to("2022-08-08"),
+    ) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
@@ -24,7 +29,7 @@ fn main() {
     let mut result = CandlesResponse::default();
 
     'retry_loop: for _ in 0..3 {
-        match agent.candles("2884").call() {
+        match client.call(CandlesRequest::default().symbol_id("2884")) {
             Ok(v) => {
                 result = v;
                 break 'retry_loop;

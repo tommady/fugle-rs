@@ -1,29 +1,36 @@
-use fugle::{errors::FugleError, http::IntradayBuilder, schema::MetaResponse};
+use fugle::{
+    errors::FugleError,
+    http::{
+        intraday::{ChartRequest, DealtsRequest, MetaRequest, QuoteRequest, VolumesRequest},
+        RestfulBuilder,
+    },
+    schema::MetaResponse,
+};
 
 fn main() {
-    let agent = IntradayBuilder::new().build();
+    let client = RestfulBuilder::new().build().unwrap();
 
-    match agent.chart("2884").call() {
+    match client.call(ChartRequest::new().symbol_id("2884")) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match agent.meta("2884").odd_lot(false).call() {
+    match client.call(MetaRequest::new().symbol_id("2884").odd_lot(false)) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match agent.quote("2884").odd_lot(true).call() {
+    match client.call(QuoteRequest::new().symbol_id("2884").odd_lot(true)) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match agent.dealts("2884").limit(10).call() {
+    match client.call(DealtsRequest::new().symbol_id("2884").limit(10)) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match agent.volumes("2884").call() {
+    match client.call(VolumesRequest::new().symbol_id("2884")) {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
@@ -34,7 +41,7 @@ fn main() {
     let mut result = MetaResponse::default();
 
     'retry_loop: for _ in 0..3 {
-        match agent.meta("2884").call() {
+        match client.call(MetaRequest::default().symbol_id("2884")) {
             Ok(v) => {
                 result = v;
                 break 'retry_loop;
