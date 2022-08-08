@@ -1,14 +1,14 @@
-use fugle::{errors::FugleError, http::MarketdataBuilder};
+use fugle::{
+    errors::FugleError,
+    http::{marketdata::CandlesRequest, RestfulBuilder},
+};
 mod util;
 
 #[test]
 fn test_marketdata_candles_pass() {
-    let mk = MarketdataBuilder::default().read_timeout_sec(3).build();
-    let candles = mk
-        .candles("2884")
-        .from("2022-04-21")
-        .to("2022-04-28")
-        .call()
+    let client = RestfulBuilder::default().build().unwrap();
+    let candles = client
+        .call(CandlesRequest::new().from("2022-08-01").to("2022-08-08"))
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
     assert_eq!(candles.typ, "EQUITY");
@@ -20,18 +20,24 @@ fn test_marketdata_candles_pass() {
 // not provided, not like intraday endpoints have more richable error status
 #[test]
 fn test_marketdata_candles_401_failed() {
-    let mk = MarketdataBuilder::new().token("").build();
-    assert_err!(mk.candles("2884").call(), Err(FugleError::Unauthorized));
+    let client = RestfulBuilder::new().token("").build().unwrap();
+    assert_err!(
+        client.call(CandlesRequest::default()),
+        Err(FugleError::Unauthorized)
+    );
 
-    let mk = MarketdataBuilder::new().token("demo").build();
-    assert_err!(mk.candles("").call(), Err(FugleError::Unauthorized));
+    let client = RestfulBuilder::new().build().unwrap();
+    assert_err!(
+        client.call(CandlesRequest::default().symbol_id("")),
+        Err(FugleError::Unauthorized)
+    );
 }
 
 #[test]
 fn test_error_rate_limit_exceeded() {
-    let mk = MarketdataBuilder::new().build();
+    let client = RestfulBuilder::default().build().unwrap();
     for _ in 0..9 {
-        let res = mk.candles("2884").call();
+        let res = client.call(CandlesRequest::new().from("2022-08-01").to("2022-08-08"));
         match res {
             Ok(_) => continue,
             Err(e) => match e {

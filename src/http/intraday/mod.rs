@@ -1,8 +1,8 @@
-pub mod chart;
-pub mod dealts;
-pub mod meta;
-pub mod quote;
-pub mod volumes;
+mod chart;
+mod dealts;
+mod meta;
+mod quote;
+mod volumes;
 
 pub use chart::ChartRequest;
 pub use dealts::DealtsRequest;

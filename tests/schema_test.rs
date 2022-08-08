@@ -276,4 +276,30 @@ fn test_error_response_deserialize() {
         FugleError::ResourceNotFound => {}
         _ => unreachable!(),
     }
+
+    let input_json = r#"{
+      "statusCode": 400,
+      "message": [
+        "from must be a valid ISO 8601 date string",
+        "to must be a valid ISO 8601 date string"
+      ],
+      "error": "Bad Request"
+    }"#;
+    let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
+    let got = FugleError::from(err);
+    match got {
+        FugleError::General(_) => {}
+        _ => unreachable!(),
+    }
+
+    let input_json = r#"{
+      "statusCode": 401,
+      "message": "Unauthorized"
+    }"#;
+    let err: ErrorResponse = serde_json::from_str(input_json).unwrap();
+    let got = FugleError::from(err);
+    match got {
+        FugleError::Unauthorized => {}
+        _ => unreachable!(),
+    }
 }

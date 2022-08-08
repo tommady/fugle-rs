@@ -7,7 +7,7 @@ mod util;
 
 #[test]
 fn test_intraday_chart_pass() {
-    let it = RestfulBuilder::new().read_timeout_sec(3).build().unwrap();
+    let it = RestfulBuilder::new().build().unwrap();
     let chart = it.call(ChartRequest::new()).unwrap();
     assert_eq!(chart.data.info.symbol_id, "2884");
     assert_eq!(chart.data.info.typ, "EQUITY");
@@ -34,7 +34,7 @@ fn test_intraday_chart_401_failed() {
 
 #[test]
 fn test_intraday_quote_pass() {
-    let it = RestfulBuilder::new().read_timeout_sec(3).build().unwrap();
+    let it = RestfulBuilder::new().build().unwrap();
     let quote = it.call(QuoteRequest::new()).unwrap();
     assert_eq!(quote.data.info.symbol_id, "2884");
     assert_eq!(quote.data.info.typ, "EQUITY");
@@ -61,7 +61,7 @@ fn test_intraday_quote_401_failed() {
 
 #[test]
 fn test_intraday_meta_pass() {
-    let it = RestfulBuilder::new().read_timeout_sec(3).build().unwrap();
+    let it = RestfulBuilder::new().build().unwrap();
     let meta = it.call(MetaRequest::new()).unwrap();
     assert_eq!(meta.data.info.symbol_id, "2884");
     assert_eq!(meta.data.info.typ, "EQUITY");
@@ -88,7 +88,7 @@ fn test_intraday_meta_401_failed() {
 
 #[test]
 fn test_intraday_dealts_pass() {
-    let it = RestfulBuilder::new().read_timeout_sec(3).build().unwrap();
+    let it = RestfulBuilder::new().build().unwrap();
     let dealts = it.call(DealtsRequest::new().limit(9).offset(0)).unwrap();
     assert_eq!(dealts.data.info.symbol_id, "2884");
     assert_eq!(dealts.data.info.typ, "EQUITY");
@@ -117,7 +117,7 @@ fn test_intraday_dealts_401_failed() {
 
 #[test]
 fn test_intraday_volumes_pass() {
-    let it = RestfulBuilder::new().read_timeout_sec(3).build().unwrap();
+    let it = RestfulBuilder::new().build().unwrap();
     let volumes = it.call(VolumesRequest::new()).unwrap();
     assert_eq!(volumes.data.info.symbol_id, "2884");
     assert_eq!(volumes.data.info.typ, "EQUITY");

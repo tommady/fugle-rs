@@ -15,7 +15,13 @@ pub enum ErrorResponse {
         api_version: String,
         error: Error,
     },
-    MarketdataError {
+    MarketdataError400 {
+        #[serde(rename = "statusCode")]
+        status_code: i32,
+        message: Vec<String>,
+        error: String,
+    },
+    MarketdataError401 {
         #[serde(rename = "statusCode")]
         status_code: i32,
         message: String,
@@ -33,7 +39,18 @@ impl std::fmt::Display for ErrorResponse {
                     api_version, error.code, error.message,
                 )
             }
-            ErrorResponse::MarketdataError {
+            ErrorResponse::MarketdataError400 {
+                status_code,
+                message,
+                error,
+            } => {
+                write!(
+                    f,
+                    "FugleAPI: {{ code:{}, msg:{:?}, error:{} }}",
+                    status_code, message, error,
+                )
+            }
+            ErrorResponse::MarketdataError401 {
                 status_code,
                 message,
             } => {
@@ -183,7 +200,18 @@ impl From<ErrorResponse> for FugleError {
                 404 => FugleError::ResourceNotFound,
                 _ => FugleError::Unknown(err),
             },
-            ErrorResponse::MarketdataError {
+            ErrorResponse::MarketdataError400 {
+                status_code,
+                message: _,
+                error: _,
+            } => match status_code {
+                400 => FugleError::General(err),
+                401 => FugleError::Unauthorized,
+                403 => FugleError::RateLimitExceeded,
+                404 => FugleError::ResourceNotFound,
+                _ => FugleError::Unknown(err),
+            },
+            ErrorResponse::MarketdataError401 {
                 status_code,
                 message: _,
             } => match status_code {
