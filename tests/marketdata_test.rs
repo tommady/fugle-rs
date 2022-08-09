@@ -6,7 +6,10 @@ mod util;
 
 #[test]
 fn test_marketdata_candles_pass() {
-    let client = RestfulBuilder::default().build().unwrap();
+    let client = RestfulBuilder::default()
+        .read_timeout_sec(3)
+        .build()
+        .unwrap();
     let candles = client
         .call(CandlesRequest::new().from("2022-08-01").to("2022-08-08"))
         .unwrap();
@@ -16,7 +19,10 @@ fn test_marketdata_candles_pass() {
 
 #[tokio::test]
 async fn test_marketdata_async_candles_pass() {
-    let client = RestfulBuilder::default().build_async().unwrap();
+    let client = RestfulBuilder::default()
+        .read_timeout_sec(3)
+        .build_async()
+        .unwrap();
     let candles = client
         .call(CandlesRequest::new().from("2022-08-01").to("2022-08-08"))
         .await
