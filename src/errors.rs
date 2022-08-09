@@ -67,7 +67,6 @@ impl std::error::Error for ErrorResponse {
     }
 }
 
-#[cfg_attr(coverage, no_coverage)]
 #[derive(Debug)]
 pub enum FugleError {
     MpscSendError,
