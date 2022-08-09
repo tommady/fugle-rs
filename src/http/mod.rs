@@ -99,6 +99,7 @@ impl<'a> RestfulBuilder<'a> {
     /// # use fugle::http::RestfulBuilder ;
     /// let client = RestfulBuilder::new().build_async();
     /// ```
+    #[cfg(feature = "async-query")]
     pub fn build_async(&self) -> Result<AsyncRequest<'a>> {
         Ok(AsyncRequest {
             token: self.token,
