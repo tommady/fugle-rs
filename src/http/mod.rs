@@ -49,7 +49,7 @@ impl<'a> RestfulBuilder<'a> {
     ///
     /// ```
     /// # use fugle::http::RestfulBuilder ;
-    /// let agent = RestfulBuilder ::new()
+    /// let client = RestfulBuilder::new()
     ///     .token("b52153ae36747b17c8bdee801da19542")
     ///     .build();
     /// ```
@@ -64,7 +64,7 @@ impl<'a> RestfulBuilder<'a> {
     ///
     /// ```
     /// # use fugle::http::RestfulBuilder ;
-    /// let agent = RestfulBuilder ::new()
+    /// let client = RestfulBuilder::new()
     ///     .read_timeout_sec(10) // set read timeout in 10 seconds
     ///     .build();
     /// ```
@@ -79,7 +79,7 @@ impl<'a> RestfulBuilder<'a> {
     ///
     /// ```
     /// # use fugle::http::RestfulBuilder ;
-    /// let agent = RestfulBuilder ::new().build();
+    /// let client = RestfulBuilder::new().build();
     /// ```
     #[cfg(feature = "query")]
     pub fn build(&self) -> Result<BlockRequest<'a>> {
@@ -97,7 +97,7 @@ impl<'a> RestfulBuilder<'a> {
     ///
     /// ```
     /// # use fugle::http::RestfulBuilder ;
-    /// let agent = RestfulBuilder ::new().build_async();
+    /// let client = RestfulBuilder::new().build_async();
     /// ```
     pub fn build_async(&self) -> Result<AsyncRequest<'a>> {
         Ok(AsyncRequest {
