@@ -20,14 +20,14 @@
 //!
 //! ### [Fugle Chart][fuglechartweb]
 //!
-//! API
+//! Restful API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::http::IntradayBuilder;
-//!                                             
-//! let agent = IntradayBuilder::new().build();
-//! agent.chart("2884").call()?;
-//!                                             
+//! # use fugle::http::{ RestfulBuilder, intraday::ChartRequest };
+//! #
+//! let client = RestfulBuilder::new().build()?;
+//! client.call(ChartRequest::new().symbol_id("2884"))?;
+//! #
 //! # Ok(())
 //! # }
 //! ```
@@ -36,26 +36,26 @@
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
 //! # use fugle::websocket::IntradayBuilder;
-//!                                                            
+//! #
 //! let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
 //!                                                            
 //! let rx = ws.chart()?;
 //! let response = rx.recv()?;
-//!                                                            
+//! #
 //! # Ok(())
 //! # }
 //! ```
 //!
 //! ### [Fugle Quote][fuglequoteweb]
 //!
-//! API
+//! Restful API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::http::IntradayBuilder;
-//!                                             
-//! let agent = IntradayBuilder::new().build();
-//! agent.quote("2884").call()?;
-//!                                             
+//! # use fugle::http::{ RestfulBuilder, intraday::QuoteRequest };
+//! #
+//! let client = RestfulBuilder::new().build()?;
+//! client.call(QuoteRequest::new().symbol_id("2884"))?;
+//! #
 //! # Ok(())
 //! # }
 //! ```
@@ -64,26 +64,26 @@
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
 //! # use fugle::websocket::IntradayBuilder;;
-//!                                                            
+//! #
 //! let mut ws = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
 //!                                                            
 //! let rx = ws.quote()?;
 //! let response = rx.recv()?;
-//!                                                            
+//! #
 //! # Ok(())
 //! # }
 //! ```
 //!
 //! ### [Fugle Meta][fuglemetaweb]
 //!
-//! API
+//! Restful API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::http::IntradayBuilder;
-//!                                             
-//! let agent = IntradayBuilder::new().build();
-//! agent.meta("2884").call()?;
-//!                                             
+//! # use fugle::http::{ RestfulBuilder, intraday::MetaRequest };
+//! #
+//! let client = RestfulBuilder::new().build()?;
+//! client.call(MetaRequest::new().symbol_id("2884"))?;
+//! #
 //! # Ok(())
 //! # }
 //! ```
@@ -92,54 +92,64 @@
 //! ```rust no_run
 //! # fn main() -> fugle::schema::Result<()> {
 //! # use fugle::websocket::IntradayBuilder;;
-//!                                                            
+//! #
 //! let mut lis = IntradayBuilder::new().symbol_id("2884").odd_lot().build();
 //!                                                            
 //! let rx = lis.meta()?;
 //! let response = rx.recv()?;
-//!                                                            
+//! #
 //! # Ok(())
 //! # }
 //! ```
 //!
 //! ### [Fugle Dealts][fugledealtsweb]
 //!
-//! API
+//! Restful API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::http::IntradayBuilder;
-//!                                             
-//! let agent = IntradayBuilder::new().build();
-//! agent.dealts("2884").call()?;
-//!                                             
+//! # use fugle::http::{ RestfulBuilder, intraday::DealtsRequest };
+//! #
+//! let client = RestfulBuilder::new().build()?;
+//! client.call(
+//!     DealtsRequest::new()
+//!     .symbol_id("2884")
+//!     .limit(10)
+//!     .offset(0)
+//! )?;
+//! #
 //! # Ok(())
 //! # }
 //! ```
 //!
 //! ### [Fugle Volumes][fuglevolumesweb]
 //!
-//! API
+//! Restful API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::http::IntradayBuilder;
-//!                                             
-//! let agent = IntradayBuilder::new().build();
-//! agent.volumes("2884").call()?;
-//!                                             
+//! # use fugle::http::{ RestfulBuilder, intraday::VolumesRequest };
+//! #
+//! let client = RestfulBuilder::new().build()?;
+//! client.call(VolumesRequest::new().symbol_id("2884"))?;
+//! #
 //! # Ok(())
 //! # }
 //! ```
 //!
 //! ### [Fugle Candles][fuglecandlesweb]
 //!
-//! API
+//! Restful API
 //! ```rust
 //! # fn main() -> fugle::schema::Result<()> {
-//! # use fugle::http::MarketdataBuilder;
-//!
-//! let agent = MarketdataBuilder::new().build();
-//! agent.candles("2884").call()?;
-//!
+//! # use fugle::http::{ RestfulBuilder, marketdata::CandlesRequest };
+//! #
+//! let client = RestfulBuilder::new().build()?;
+//! client.call(
+//!     CandlesRequest::new()
+//!     .symbol_id("2884")
+//!     .from("2022-08-01")
+//!     .to("2022-08-08")
+//! )?;
+//! #
 //! # Ok(())
 //! # }
 //! ```
