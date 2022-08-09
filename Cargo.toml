@@ -1,6 +1,6 @@
 [package]
 name = "fugle"
-version = "0.3.6"
+version = "0.3.7"
 authors = ["tommady <tommady@users.noreply.github.com>"]
 description = "A Simple, Lightweight, Fast and Safe Fugle Library"
 license = "MIT"
@@ -12,7 +12,7 @@ categories = ["web-programming::http-client", "web-programming::websocket"]
 edition = "2021"
 
 [features]
-default = ["query", "websocket"]
+default = ["query"]
 query = ["ureq"]
 async-query = ["reqwest"]
 websocket = ["tungstenite", "log", "serde_json"]
