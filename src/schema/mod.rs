@@ -1,3 +1,16 @@
+pub mod chart;
+pub use chart::ChartResponse;
+pub mod dealts;
+pub use dealts::DealtsResponse;
+pub mod meta;
+pub use meta::MetaResponse;
+pub mod quote;
+pub use quote::QuoteResponse;
+pub mod volumes;
+pub use volumes::VolumesResponse;
+pub mod candles;
+pub use candles::CandlesResponse;
+
 use serde::{de, Deserialize, Deserializer, Serialize};
 use time::{Date, PrimitiveDateTime};
 

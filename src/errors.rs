@@ -15,7 +15,13 @@ pub enum ErrorResponse {
         api_version: String,
         error: Error,
     },
-    MarketdataError {
+    MarketdataError400 {
+        #[serde(rename = "statusCode")]
+        status_code: i32,
+        message: Vec<String>,
+        error: String,
+    },
+    MarketdataError401 {
         #[serde(rename = "statusCode")]
         status_code: i32,
         message: String,
@@ -33,7 +39,18 @@ impl std::fmt::Display for ErrorResponse {
                     api_version, error.code, error.message,
                 )
             }
-            ErrorResponse::MarketdataError {
+            ErrorResponse::MarketdataError400 {
+                status_code,
+                message,
+                error,
+            } => {
+                write!(
+                    f,
+                    "FugleAPI: {{ code:{}, msg:{:?}, error:{} }}",
+                    status_code, message, error,
+                )
+            }
+            ErrorResponse::MarketdataError401 {
                 status_code,
                 message,
             } => {
@@ -61,6 +78,9 @@ pub enum FugleError {
     Tungstenite(tungstenite::Error),
     // error from ureq lib
     Ureq(Box<ureq::Error>),
+    // error from reqwest lib
+    #[cfg(feature = "async-query")]
+    Reqwest(reqwest::Error),
     // error from std io
     StdIO(std::io::Error),
     // from fugle API response code, to specific errors
@@ -85,6 +105,8 @@ impl std::fmt::Display for FugleError {
             #[cfg(any(feature = "websocket", feature = "async-websocket"))]
             FugleError::Tungstenite(ref e) => write!(f, "Tungstenite Lib error: {}", e),
             FugleError::Ureq(ref e) => write!(f, "Ureq Lib error: {}", e),
+            #[cfg(feature = "async-query")]
+            FugleError::Reqwest(ref e) => write!(f, "Reqwest Lib error: {}", e),
             FugleError::StdIO(ref e) => write!(f, "std io json Deserialize error: {}", e),
             FugleError::General(ref e) => write!(f, "General purpose error: {}", e),
             FugleError::Unknown(ref e) => write!(f, "Unknown error: {}", e),
@@ -105,6 +127,8 @@ impl std::error::Error for FugleError {
             #[cfg(any(feature = "websocket", feature = "async-websocket"))]
             FugleError::Tungstenite(ref e) => Some(e),
             FugleError::Ureq(ref e) => Some(e),
+            #[cfg(feature = "async-query")]
+            FugleError::Reqwest(ref e) => Some(e),
             FugleError::StdIO(ref e) => Some(e),
             FugleError::General(ref _e) => None,
             FugleError::Unknown(ref _e) => None,
@@ -138,6 +162,14 @@ impl From<ureq::Error> for FugleError {
     }
 }
 
+#[cfg(feature = "async-query")]
+impl From<reqwest::Error> for FugleError {
+    #[cfg_attr(coverage, no_coverage)]
+    fn from(err: reqwest::Error) -> FugleError {
+        FugleError::Reqwest(err)
+    }
+}
+
 #[cfg(any(feature = "websocket", feature = "async-websocket"))]
 impl From<tungstenite::Error> for FugleError {
     #[cfg_attr(coverage, no_coverage)]
@@ -167,7 +199,18 @@ impl From<ErrorResponse> for FugleError {
                 404 => FugleError::ResourceNotFound,
                 _ => FugleError::Unknown(err),
             },
-            ErrorResponse::MarketdataError {
+            ErrorResponse::MarketdataError400 {
+                status_code,
+                message: _,
+                error: _,
+            } => match status_code {
+                400 => FugleError::General(err),
+                401 => FugleError::Unauthorized,
+                403 => FugleError::RateLimitExceeded,
+                404 => FugleError::ResourceNotFound,
+                _ => FugleError::Unknown(err),
+            },
+            ErrorResponse::MarketdataError401 {
                 status_code,
                 message: _,
             } => match status_code {

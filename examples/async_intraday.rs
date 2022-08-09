@@ -7,30 +7,40 @@ use fugle::{
     schema::MetaResponse,
 };
 
-fn main() {
-    let client = RestfulBuilder::new().build().unwrap();
+#[tokio::main]
+async fn main() {
+    let client = RestfulBuilder::new().build_async().unwrap();
 
-    match client.call(ChartRequest::new().symbol_id("2884")) {
+    match client.call(ChartRequest::new().symbol_id("2884")).await {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match client.call(MetaRequest::new().symbol_id("2884").odd_lot(false)) {
+    match client
+        .call(MetaRequest::new().symbol_id("2884").odd_lot(false))
+        .await
+    {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match client.call(QuoteRequest::new().symbol_id("2884").odd_lot(true)) {
+    match client
+        .call(QuoteRequest::new().symbol_id("2884").odd_lot(true))
+        .await
+    {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match client.call(DealtsRequest::new().symbol_id("2884").limit(10)) {
+    match client
+        .call(DealtsRequest::new().symbol_id("2884").limit(10))
+        .await
+    {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
 
-    match client.call(VolumesRequest::new().symbol_id("2884")) {
+    match client.call(VolumesRequest::new().symbol_id("2884")).await {
         Ok(v) => println!("{:?}", v),
         Err(e) => println!("{}", e),
     }
@@ -41,7 +51,7 @@ fn main() {
     let mut result = MetaResponse::default();
 
     'retry_loop: for _ in 0..3 {
-        match client.call(MetaRequest::default().symbol_id("2884")) {
+        match client.call(MetaRequest::default().symbol_id("2884")).await {
             Ok(v) => {
                 result = v;
                 break 'retry_loop;
