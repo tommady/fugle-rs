@@ -1,5 +1,7 @@
 use std::{fs::File, path::Path};
 
+use rust_decimal::Decimal;
+
 use fugle::{
     errors::{ErrorResponse, FugleError},
     schema::{
@@ -223,10 +225,10 @@ fn test_candles_response_deserialize() {
     assert_eq!("EQUITY", res.typ);
     assert_eq!("TWSE", res.exchange);
     assert_eq!(6, res.candles.len());
-    assert_eq!(33.4, res.candles[0].open);
-    assert_eq!(33.25, res.candles[1].high);
-    assert_eq!(32.5, res.candles[2].low);
-    assert_eq!(32.45, res.candles[3].close);
+    assert_eq!(Decimal::new(3340, 2), res.candles[0].open);
+    assert_eq!(Decimal::new(3325, 2), res.candles[1].high);
+    assert_eq!(Decimal::new(3250, 2), res.candles[2].low);
+    assert_eq!(Decimal::new(3245, 2), res.candles[3].close);
     assert_eq!(36634330, res.candles[4].volume);
     assert_eq!(2022, res.candles[5].date.year());
     assert_eq!(time::Month::April, res.candles[5].date.month());
