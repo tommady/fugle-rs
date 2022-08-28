@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::schema::Info;
@@ -6,13 +7,13 @@ use crate::schema::Info;
 #[serde(default, rename_all = "camelCase")]
 pub struct Chart {
     #[serde(rename = "o")]
-    pub open: Vec<f64>,
+    pub open: Vec<Decimal>,
     #[serde(rename = "h")]
-    pub high: Vec<f64>,
+    pub high: Vec<Decimal>,
     #[serde(rename = "l")]
-    pub low: Vec<f64>,
+    pub low: Vec<Decimal>,
     #[serde(rename = "c")]
-    pub close: Vec<f64>,
+    pub close: Vec<Decimal>,
     #[serde(rename = "v")]
     pub volume: Vec<u64>,
     #[serde(rename = "t")]

@@ -24,6 +24,7 @@ features = ["websocket", "async-websocket", "query", "async-query"]
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 time = { version = "0.3", features = ["serde", "parsing"] }
+rust_decimal = "1.26"
 
 ureq = { version = "2.4", features = ["json"], optional = true }
 serde_json = { version = "1.0", optional = true }
