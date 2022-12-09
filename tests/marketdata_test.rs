@@ -15,14 +15,14 @@ fn test_marketdata_candles_pass() {
             CandlesRequest::new()
                 .from("2022-08-01")
                 .to("2022-08-08")
-                .add_field(CandleField::Open)
-                .add_field(CandleField::Close)
-                .remove_field(CandleField::Open),
+                .add_field(CandleField::Turnover)
+                .add_field(CandleField::Change)
+                .remove_field(CandleField::Turnover),
         )
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
     assert_eq!(candles.typ, "EQUITY");
-    assert_eq!(candles.candles[0].open, 0.0);
+    assert_eq!(candles.candles[0].turnover, 0);
 }
 
 #[tokio::test]
@@ -36,15 +36,15 @@ async fn test_marketdata_async_candles_pass() {
             CandlesRequest::new()
                 .from("2022-08-01")
                 .to("2022-08-08")
-                .add_field(CandleField::Open)
-                .add_field(CandleField::Close)
-                .remove_field(CandleField::Open),
+                .add_field(CandleField::Turnover)
+                .add_field(CandleField::Change)
+                .remove_field(CandleField::Turnover),
         )
         .await
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
     assert_eq!(candles.typ, "EQUITY");
-    assert_eq!(candles.candles[0].open, 0.0)
+    assert_eq!(candles.candles[0].turnover, 0)
 }
 
 // fugle marketdata candles endpoint will goes into 401 if
