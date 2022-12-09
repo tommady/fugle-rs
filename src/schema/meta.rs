@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::schema::Info;
@@ -8,9 +9,9 @@ pub struct Meta {
     pub market: String,
     pub name_zh_tw: String,
     pub industry_zh_tw: String,
-    pub price_reference: f64,
-    pub price_high_limit: f64,
-    pub price_low_limit: f64,
+    pub price_reference: Decimal,
+    pub price_high_limit: Decimal,
+    pub price_low_limit: Decimal,
     pub can_day_buy_sell: bool,
     pub can_day_sell_buy: bool,
     pub can_short_margin: bool,

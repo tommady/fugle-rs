@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use time::PrimitiveDateTime;
 
@@ -9,7 +10,7 @@ pub struct QuoteTotal {
     #[serde(deserialize_with = "de_primitive_date_time")]
     pub at: PrimitiveDateTime,
     pub transaction: u64,
-    pub trade_value: f64,
+    pub trade_value: Decimal,
     pub trade_volume: u64,
     pub trade_volume_at_bid: u64,
     pub trade_volume_at_ask: u64,
@@ -25,7 +26,7 @@ impl Default for QuoteTotal {
         QuoteTotal {
             at: PrimitiveDateTime::MIN,
             transaction: 0,
-            trade_value: 0.0,
+            trade_value: Decimal::new(0, 2),
             trade_volume: 0,
             trade_volume_at_bid: 0,
             trade_volume_at_ask: 0,
@@ -43,9 +44,9 @@ impl Default for QuoteTotal {
 pub struct QuoteTrial {
     #[serde(deserialize_with = "de_primitive_date_time")]
     pub at: PrimitiveDateTime,
-    pub bid: f64,
-    pub ask: f64,
-    pub price: f64,
+    pub bid: Decimal,
+    pub ask: Decimal,
+    pub price: Decimal,
     pub volume: u64,
 }
 
@@ -53,9 +54,9 @@ impl Default for QuoteTrial {
     fn default() -> QuoteTrial {
         QuoteTrial {
             at: PrimitiveDateTime::MIN,
-            bid: 0.0,
-            ask: 0.0,
-            price: 0.0,
+            bid: Decimal::new(0, 2),
+            ask: Decimal::new(0, 2),
+            price: Decimal::new(0, 2),
             volume: 0,
         }
     }
@@ -66,9 +67,9 @@ impl Default for QuoteTrial {
 pub struct QuoteTrade {
     #[serde(deserialize_with = "de_primitive_date_time")]
     pub at: PrimitiveDateTime,
-    pub bid: f64,
-    pub ask: f64,
-    pub price: f64,
+    pub bid: Decimal,
+    pub ask: Decimal,
+    pub price: Decimal,
     pub volume: u64,
     pub serial: u64,
 }
@@ -77,9 +78,9 @@ impl Default for QuoteTrade {
     fn default() -> QuoteTrade {
         QuoteTrade {
             at: PrimitiveDateTime::MIN,
-            price: 0.0,
-            bid: 0.0,
-            ask: 0.0,
+            price: Decimal::new(0, 2),
+            bid: Decimal::new(0, 2),
+            ask: Decimal::new(0, 2),
             volume: 0,
             serial: 0,
         }
@@ -89,7 +90,7 @@ impl Default for QuoteTrade {
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct QuoteBidAsk {
-    pub price: f64,
+    pub price: Decimal,
     pub volume: u64,
 }
 
@@ -115,7 +116,7 @@ impl Default for QuoteOrder {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct QuotePrice {
-    pub price: f64,
+    pub price: Decimal,
     #[serde(deserialize_with = "de_primitive_date_time")]
     pub at: PrimitiveDateTime,
 }
@@ -124,7 +125,7 @@ impl Default for QuotePrice {
     fn default() -> QuotePrice {
         QuotePrice {
             at: PrimitiveDateTime::MIN,
-            price: 0.0,
+            price: Decimal::new(0, 2),
         }
     }
 }
@@ -148,9 +149,9 @@ pub struct Quote {
     pub price_low: QuotePrice,
     pub price_open: QuotePrice,
     pub price_avg: QuotePrice,
-    pub change: f64,
-    pub change_percent: f64,
-    pub amplitude: f64,
+    pub change: Decimal,
+    pub change_percent: Decimal,
+    pub amplitude: Decimal,
     pub price_limit: u8,
 }
 
@@ -177,7 +178,7 @@ mod test {
         let q = QuoteTotal::default();
         assert_eq!(q.at, PrimitiveDateTime::MIN);
         assert_eq!(q.transaction, 0);
-        assert_eq!(q.trade_value, 0.0);
+        assert_eq!(q.trade_value, Decimal::new(0, 2));
         assert_eq!(q.trade_volume, 0);
         assert_eq!(q.trade_volume_at_bid, 0);
         assert_eq!(q.trade_volume_at_ask, 0);
@@ -192,9 +193,9 @@ mod test {
     fn test_quote_trial_default() {
         let q = QuoteTrial::default();
         assert_eq!(q.at, PrimitiveDateTime::MIN);
-        assert_eq!(q.bid, 0.0);
-        assert_eq!(q.ask, 0.0);
-        assert_eq!(q.price, 0.0);
+        assert_eq!(q.bid, Decimal::new(0, 2));
+        assert_eq!(q.ask, Decimal::new(0, 2));
+        assert_eq!(q.price, Decimal::new(0, 2));
         assert_eq!(q.volume, 0);
     }
 
@@ -202,9 +203,9 @@ mod test {
     fn test_quote_trade_default() {
         let q = QuoteTrade::default();
         assert_eq!(q.at, PrimitiveDateTime::MIN);
-        assert_eq!(q.bid, 0.0);
-        assert_eq!(q.ask, 0.0);
-        assert_eq!(q.price, 0.0);
+        assert_eq!(q.bid, Decimal::new(0, 2));
+        assert_eq!(q.ask, Decimal::new(0, 2));
+        assert_eq!(q.price, Decimal::new(0, 2));
         assert_eq!(q.volume, 0);
         assert_eq!(q.serial, 0);
     }
@@ -221,6 +222,6 @@ mod test {
     fn test_quote_price() {
         let q = QuotePrice::default();
         assert_eq!(q.at, PrimitiveDateTime::MIN);
-        assert_eq!(q.price, 0.0);
+        assert_eq!(q.price, Decimal::new(0, 2));
     }
 }

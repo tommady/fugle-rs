@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::schema::Info;
@@ -5,7 +6,7 @@ use crate::schema::Info;
 #[derive(Default, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct Volume {
-    pub price: f64,
+    pub price: Decimal,
     pub volume: u64,
 }
 
