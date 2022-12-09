@@ -13,6 +13,8 @@ pub struct Candle {
     pub low: f64,
     pub close: f64,
     pub volume: u64,
+    pub turnover: u64,
+    pub change: f64,
 }
 
 impl Default for Candle {
@@ -24,6 +26,8 @@ impl Default for Candle {
             low: 0.0,
             close: 0.0,
             volume: 0,
+            turnover: 0,
+            change: 0.0,
         }
     }
 }
@@ -64,5 +68,7 @@ mod test {
         assert_eq!(c.low, 0.0);
         assert_eq!(c.close, 0.0);
         assert_eq!(c.volume, 0);
+        assert_eq!(c.turnover, 0);
+        assert_eq!(c.change, 0.0);
     }
 }
