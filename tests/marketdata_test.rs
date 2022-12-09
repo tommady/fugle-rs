@@ -1,6 +1,6 @@
 use fugle::{
     errors::FugleError,
-    http::{marketdata::CandlesRequest, RestfulBuilder},
+    http::{marketdata::CandleField, marketdata::CandlesRequest, RestfulBuilder},
 };
 mod util;
 
@@ -11,10 +11,18 @@ fn test_marketdata_candles_pass() {
         .build()
         .unwrap();
     let candles = client
-        .call(CandlesRequest::new().from("2022-08-01").to("2022-08-08"))
+        .call(
+            CandlesRequest::new()
+                .from("2022-08-01")
+                .to("2022-08-08")
+                .add_field(CandleField::Open)
+                .add_field(CandleField::Close)
+                .remove_field(CandleField::Open),
+        )
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
     assert_eq!(candles.typ, "EQUITY");
+    assert_eq!(candles.candles[0].open, 0.0);
 }
 
 #[tokio::test]
@@ -24,11 +32,19 @@ async fn test_marketdata_async_candles_pass() {
         .build_async()
         .unwrap();
     let candles = client
-        .call(CandlesRequest::new().from("2022-08-01").to("2022-08-08"))
+        .call(
+            CandlesRequest::new()
+                .from("2022-08-01")
+                .to("2022-08-08")
+                .add_field(CandleField::Open)
+                .add_field(CandleField::Close)
+                .remove_field(CandleField::Open),
+        )
         .await
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
     assert_eq!(candles.typ, "EQUITY");
+    assert_eq!(candles.candles[0].open, 0.0)
 }
 
 // fugle marketdata candles endpoint will goes into 401 if
