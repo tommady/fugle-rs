@@ -1,7 +1,7 @@
 # fugle-rs
-[![ci status](https://github.com/tommady/fugle-rs/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/tommady/fugle-rs/actions)
+[![ci status](https://github.com/tommady/fugle-rs/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/tommady/fugle-rs/actions)
 [![latest version](https://img.shields.io/crates/v/fugle)](https://crates.io/crates/fugle)
-[![codecov](https://codecov.io/gh/tommady/fugle-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/tommady/fugle-rs)
+[![codecov](https://codecov.io/gh/tommady/fugle-rs/branch/main/graph/badge.svg)](https://codecov.io/gh/tommady/fugle-rs)
 [![docs.rs](https://docs.rs/fugle/badge.svg)](https://docs.rs/fugle)
 ![license](https://img.shields.io/crates/l/fugle)
 ---
