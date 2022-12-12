@@ -3,6 +3,8 @@ use crate::{
     schema::CandlesResponse,
 };
 
+use std::{fmt, slice::Iter};
+
 /// [Endpoint](https://developer.fugle.tw/docs/data/marketdata/candles)
 ///
 /// Fetching history stock information.
@@ -11,7 +13,7 @@ pub struct CandlesRequest<'a> {
     from: &'a str,
     to: &'a str,
     symbol_id: &'a str,
-    fields: [CandleField; 7],
+    fields: u8,
 }
 
 impl Default for CandlesRequest<'_> {
@@ -20,9 +22,7 @@ impl Default for CandlesRequest<'_> {
     }
 }
 
-#[derive(Copy, Clone)]
 pub enum CandleField {
-    NoValue,
     Open,
     High,
     Low,
@@ -32,13 +32,54 @@ pub enum CandleField {
     Change,
 }
 
+impl fmt::Display for CandleField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match *self {
+            CandleField::Open => write!(f, "open"),
+            CandleField::High => write!(f, "high"),
+            CandleField::Low => write!(f, "low"),
+            CandleField::Close => write!(f, "close"),
+            CandleField::Volume => write!(f, "volume"),
+            CandleField::Turnover => write!(f, "turnover"),
+            CandleField::Change => write!(f, "change"),
+        }
+    }
+}
+
+impl CandleField {
+    fn value(&self) -> u8 {
+        match *self {
+            CandleField::Open => 1 << 1,
+            CandleField::High => 1 << 2,
+            CandleField::Low => 1 << 3,
+            CandleField::Close => 1 << 4,
+            CandleField::Volume => 1 << 5,
+            CandleField::Turnover => 1 << 6,
+            CandleField::Change => 1 << 7,
+        }
+    }
+
+    fn iterator() -> Iter<'static, CandleField> {
+        static FIELDS: [CandleField; 7] = [
+            CandleField::Open,
+            CandleField::High,
+            CandleField::Low,
+            CandleField::Close,
+            CandleField::Volume,
+            CandleField::Turnover,
+            CandleField::Change,
+        ];
+        FIELDS.iter()
+    }
+}
+
 impl<'a> CandlesRequest<'a> {
     pub fn new() -> Self {
         CandlesRequest {
             symbol_id: "2884",
             from: "",
             to: "",
-            fields: [CandleField::NoValue; 7],
+            fields: 0,
         }
     }
 
@@ -57,31 +98,14 @@ impl<'a> CandlesRequest<'a> {
         self
     }
 
-    pub fn add_field(mut self, field: CandleField) -> Self {
-        match field {
-            CandleField::Open => self.fields[0] = CandleField::Open,
-            CandleField::High => self.fields[1] = CandleField::High,
-            CandleField::Low => self.fields[2] = CandleField::Low,
-            CandleField::Close => self.fields[3] = CandleField::Close,
-            CandleField::Volume => self.fields[4] = CandleField::Volume,
-            CandleField::Turnover => self.fields[5] = CandleField::Turnover,
-            CandleField::Change => self.fields[6] = CandleField::Change,
-            CandleField::NoValue => {}
-        }
+    pub fn set_field(mut self, field: CandleField) -> Self {
+        self.fields |= field.value();
         self
     }
 
-    pub fn remove_field(mut self, field: CandleField) -> Self {
-        match field {
-            CandleField::Open => self.fields[0] = CandleField::NoValue,
-            CandleField::High => self.fields[1] = CandleField::NoValue,
-            CandleField::Low => self.fields[2] = CandleField::NoValue,
-            CandleField::Close => self.fields[3] = CandleField::NoValue,
-            CandleField::Volume => self.fields[4] = CandleField::NoValue,
-            CandleField::Turnover => self.fields[5] = CandleField::NoValue,
-            CandleField::Change => self.fields[6] = CandleField::NoValue,
-            CandleField::NoValue => {}
-        }
+    pub fn unset_field(mut self, field: CandleField) -> Self {
+        self.fields &= field.value();
+        self.fields ^= field.value();
         self
     }
 }
@@ -109,17 +133,9 @@ impl Request for CandlesRequest<'_> {
             })
         }
         let mut fields = vec![];
-
-        for field in self.fields {
-            match field {
-                CandleField::Open => fields.push("open"),
-                CandleField::High => fields.push("high"),
-                CandleField::Low => fields.push("low"),
-                CandleField::Close => fields.push("close"),
-                CandleField::Volume => fields.push("volume"),
-                CandleField::Turnover => fields.push("turnover"),
-                CandleField::Change => fields.push("change"),
-                CandleField::NoValue => {}
+        for field in CandleField::iterator() {
+            if self.fields & field.value() != 0 {
+                fields.push(field.to_string());
             }
         }
 

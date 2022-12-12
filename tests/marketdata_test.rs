@@ -10,35 +10,25 @@ fn test_marketdata_candles_pass() {
         .read_timeout_sec(3)
         .build()
         .unwrap();
-    // NoValue,
-    // Open,
-    // High,
-    // Low,
-    // Close,
-    // Volume,
-    // Turnover,
-    // Change,
     let candles = client
         .call(
             CandlesRequest::new()
                 .from("2022-08-01")
                 .to("2022-08-08")
-                .add_field(CandleField::NoValue)
-                .add_field(CandleField::Open)
-                .add_field(CandleField::High)
-                .add_field(CandleField::Low)
-                .add_field(CandleField::Close)
-                .add_field(CandleField::Volume)
-                .add_field(CandleField::Turnover)
-                .add_field(CandleField::Change)
-                .remove_field(CandleField::NoValue)
-                .remove_field(CandleField::Open)
-                .remove_field(CandleField::High)
-                .remove_field(CandleField::Low)
-                .remove_field(CandleField::Close)
-                .remove_field(CandleField::Volume)
-                .remove_field(CandleField::Turnover)
-                .remove_field(CandleField::Change),
+                .set_field(CandleField::Open)
+                .set_field(CandleField::High)
+                .set_field(CandleField::Low)
+                .set_field(CandleField::Close)
+                .set_field(CandleField::Volume)
+                .set_field(CandleField::Turnover)
+                .set_field(CandleField::Change)
+                .unset_field(CandleField::Open)
+                .unset_field(CandleField::High)
+                .unset_field(CandleField::Low)
+                .unset_field(CandleField::Close)
+                .unset_field(CandleField::Volume)
+                .unset_field(CandleField::Turnover)
+                .unset_field(CandleField::Change),
         )
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
@@ -57,22 +47,20 @@ async fn test_marketdata_async_candles_pass() {
             CandlesRequest::new()
                 .from("2022-08-01")
                 .to("2022-08-08")
-                .add_field(CandleField::NoValue)
-                .add_field(CandleField::Open)
-                .add_field(CandleField::High)
-                .add_field(CandleField::Low)
-                .add_field(CandleField::Close)
-                .add_field(CandleField::Volume)
-                .add_field(CandleField::Turnover)
-                .add_field(CandleField::Change)
-                .remove_field(CandleField::NoValue)
-                .remove_field(CandleField::Open)
-                .remove_field(CandleField::High)
-                .remove_field(CandleField::Low)
-                .remove_field(CandleField::Close)
-                .remove_field(CandleField::Volume)
-                .remove_field(CandleField::Turnover)
-                .remove_field(CandleField::Change),
+                .set_field(CandleField::Open)
+                .set_field(CandleField::High)
+                .set_field(CandleField::Low)
+                .set_field(CandleField::Close)
+                .set_field(CandleField::Volume)
+                .set_field(CandleField::Turnover)
+                .set_field(CandleField::Change)
+                .unset_field(CandleField::Open)
+                .unset_field(CandleField::High)
+                .unset_field(CandleField::Low)
+                .unset_field(CandleField::Close)
+                .unset_field(CandleField::Volume)
+                .unset_field(CandleField::Turnover)
+                .unset_field(CandleField::Change),
         )
         .await
         .unwrap();
