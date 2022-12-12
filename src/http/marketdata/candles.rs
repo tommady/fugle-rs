@@ -115,11 +115,14 @@ impl Request for CandlesRequest<'_> {
     type Response = CandlesResponse;
 
     fn queries(&self) -> Vec<Query> {
-        let mut ret = vec![Query {
-            param: "symbolId".to_string(),
-            value: self.symbol_id.to_string(),
-        }];
+        let mut ret = Vec::with_capacity(4);
 
+        if !self.symbol_id.is_empty() {
+            ret.push(Query {
+                param: "symbolId".to_string(),
+                value: self.symbol_id.to_string(),
+            })
+        }
         if !self.from.is_empty() {
             ret.push(Query {
                 param: "from".to_string(),
@@ -132,20 +135,19 @@ impl Request for CandlesRequest<'_> {
                 value: self.to.to_string(),
             })
         }
+
         let mut fields = vec![];
         for field in CandleField::iterator() {
             if self.fields & field.value() != 0 {
                 fields.push(field.to_string());
             }
         }
-
         if !fields.is_empty() {
             ret.push(Query {
                 param: "fields".to_string(),
                 value: fields.join(","),
             })
         }
-
         ret
     }
 }
