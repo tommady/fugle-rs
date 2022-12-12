@@ -51,7 +51,7 @@ impl Default for CandlesResponse {
             typ: "".to_string(),
             exchange: "".to_string(),
             market: "".to_string(),
-            candles: vec![],
+            candles: Vec::with_capacity(0),
         }
     }
 }

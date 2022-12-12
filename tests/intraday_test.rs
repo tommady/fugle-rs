@@ -185,12 +185,12 @@ async fn test_intraday_async_meta_401_failed() {
 #[test]
 fn test_intraday_dealts_pass() {
     let it = RestfulBuilder::new().build().unwrap();
-    let dealts = it.call(DealtsRequest::new().limit(9).offset(0)).unwrap();
+    let dealts = it.call(DealtsRequest::new().limit(9).offset(1)).unwrap();
     assert_eq!(dealts.data.info.symbol_id, "2884");
     assert_eq!(dealts.data.info.typ, "EQUITY");
 
     let dealts = it
-        .call(DealtsRequest::default().odd_lot(true).limit(9).offset(0))
+        .call(DealtsRequest::default().odd_lot(true).limit(9).offset(1))
         .unwrap();
     assert_eq!(dealts.data.info.symbol_id, "2884");
     assert_eq!(dealts.data.info.typ, "ODDLOT");
@@ -200,14 +200,14 @@ fn test_intraday_dealts_pass() {
 async fn test_intraday_async_dealts_pass() {
     let it = RestfulBuilder::new().build_async().unwrap();
     let dealts = it
-        .call(DealtsRequest::new().limit(9).offset(0))
+        .call(DealtsRequest::new().limit(9).offset(1))
         .await
         .unwrap();
     assert_eq!(dealts.data.info.symbol_id, "2884");
     assert_eq!(dealts.data.info.typ, "EQUITY");
 
     let dealts = it
-        .call(DealtsRequest::default().odd_lot(true).limit(9).offset(0))
+        .call(DealtsRequest::default().odd_lot(true).limit(9).offset(1))
         .await
         .unwrap();
     assert_eq!(dealts.data.info.symbol_id, "2884");
