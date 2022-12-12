@@ -14,6 +14,8 @@ pub struct Candle {
     pub low: Decimal,
     pub close: Decimal,
     pub volume: u64,
+    pub turnover: u64,
+    pub change: Decimal,
 }
 
 impl Default for Candle {
@@ -25,6 +27,8 @@ impl Default for Candle {
             low: Decimal::new(0, 2),
             close: Decimal::new(0, 2),
             volume: 0,
+            turnover: 0,
+            change: Decimal::new(0, 2),
         }
     }
 }
@@ -65,5 +69,7 @@ mod test {
         assert_eq!(c.low, Decimal::new(0, 2));
         assert_eq!(c.close, Decimal::new(0, 2));
         assert_eq!(c.volume, 0);
+        assert_eq!(c.turnover, 0);
+        assert_eq!(c.change, Decimal::new(0, 2));
     }
 }
