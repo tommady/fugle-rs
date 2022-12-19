@@ -47,15 +47,15 @@ impl fmt::Display for CandleField {
 }
 
 impl CandleField {
-    fn value(&self) -> u8 {
+    const fn value(&self) -> u8 {
         match *self {
-            CandleField::Open => 1 << 1,
-            CandleField::High => 1 << 2,
-            CandleField::Low => 1 << 3,
-            CandleField::Close => 1 << 4,
-            CandleField::Volume => 1 << 5,
-            CandleField::Turnover => 1 << 6,
-            CandleField::Change => 1 << 7,
+            CandleField::Open => 1 << 0,
+            CandleField::High => 1 << 1,
+            CandleField::Low => 1 << 2,
+            CandleField::Close => 1 << 3,
+            CandleField::Volume => 1 << 4,
+            CandleField::Turnover => 1 << 5,
+            CandleField::Change => 1 << 6,
         }
     }
 
