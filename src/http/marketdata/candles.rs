@@ -47,15 +47,15 @@ impl fmt::Display for CandleField {
 }
 
 impl CandleField {
-    fn value(&self) -> u8 {
+    const fn value(&self) -> u8 {
         match *self {
-            CandleField::Open => 1 << 1,
-            CandleField::High => 1 << 2,
-            CandleField::Low => 1 << 3,
-            CandleField::Close => 1 << 4,
-            CandleField::Volume => 1 << 5,
-            CandleField::Turnover => 1 << 6,
-            CandleField::Change => 1 << 7,
+            CandleField::Open => 1 << 0,
+            CandleField::High => 1 << 1,
+            CandleField::Low => 1 << 2,
+            CandleField::Close => 1 << 3,
+            CandleField::Volume => 1 << 4,
+            CandleField::Turnover => 1 << 5,
+            CandleField::Change => 1 << 6,
         }
     }
 
@@ -106,6 +106,18 @@ impl<'a> CandlesRequest<'a> {
     pub fn unset_field(mut self, field: CandleField) -> Self {
         self.fields &= field.value();
         self.fields ^= field.value();
+        self
+    }
+
+    pub fn set_all_fields(mut self) -> Self {
+        for field in CandleField::iterator() {
+            self.fields |= field.value();
+        }
+        self
+    }
+
+    pub fn unset_all_fields(mut self) -> Self {
+        self.fields = 0;
         self
     }
 }
