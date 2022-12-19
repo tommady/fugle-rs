@@ -28,7 +28,9 @@ fn test_marketdata_candles_pass() {
                 .set_field(CandleField::Close)
                 .set_field(CandleField::Volume)
                 .set_field(CandleField::Turnover)
-                .set_field(CandleField::Change),
+                .set_field(CandleField::Change)
+                .unset_all_fields()
+                .set_all_fields(),
         )
         .unwrap();
     assert_eq!(candles.symbol_id, "2884");
@@ -61,7 +63,9 @@ async fn test_marketdata_async_candles_pass() {
                 .set_field(CandleField::Close)
                 .set_field(CandleField::Volume)
                 .set_field(CandleField::Turnover)
-                .set_field(CandleField::Change),
+                .set_field(CandleField::Change)
+                .unset_all_fields()
+                .set_all_fields(),
         )
         .await
         .unwrap();

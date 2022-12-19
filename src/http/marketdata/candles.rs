@@ -108,6 +108,18 @@ impl<'a> CandlesRequest<'a> {
         self.fields ^= field.value();
         self
     }
+
+    pub fn set_all_fields(mut self) -> Self {
+        for field in CandleField::iterator() {
+            self.fields |= field.value();
+        }
+        self
+    }
+
+    pub fn unset_all_fields(mut self) -> Self {
+        self.fields = 0;
+        self
+    }
 }
 
 impl Request for CandlesRequest<'_> {
