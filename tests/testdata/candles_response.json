@@ -1,9 +1,9 @@
 {
-    "symbolId": "2884",
+    "symbol": "2884",
     "type": "EQUITY",
     "exchange": "TWSE",
     "market": "TSE",
-    "candles": [
+    "data": [
         {
             "date": "2022-04-28",
             "open": 33.4,
