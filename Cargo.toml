@@ -51,4 +51,4 @@ optional = true
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "time", "sync"] }
-serial_test = "0.10"
+serial_test = "2.0"
