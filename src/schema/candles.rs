@@ -1,3 +1,4 @@
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use time::Date;
 
@@ -8,22 +9,26 @@ use crate::schema::de_date;
 pub struct Candle {
     #[serde(deserialize_with = "de_date")]
     pub date: Date,
-    pub open: f64,
-    pub high: f64,
-    pub low: f64,
-    pub close: f64,
+    pub open: Decimal,
+    pub high: Decimal,
+    pub low: Decimal,
+    pub close: Decimal,
     pub volume: u64,
+    pub turnover: u64,
+    pub change: Decimal,
 }
 
 impl Default for Candle {
     fn default() -> Candle {
         Candle {
             date: Date::MIN,
-            open: 0.0,
-            high: 0.0,
-            low: 0.0,
-            close: 0.0,
+            open: Decimal::new(0, 2),
+            high: Decimal::new(0, 2),
+            low: Decimal::new(0, 2),
+            close: Decimal::new(0, 2),
             volume: 0,
+            turnover: 0,
+            change: Decimal::new(0, 2),
         }
     }
 }
@@ -47,7 +52,7 @@ impl Default for CandlesResponse {
             typ: "".to_string(),
             exchange: "".to_string(),
             market: "".to_string(),
-            candles: vec![],
+            candles: Vec::with_capacity(0),
         }
     }
 }
@@ -60,10 +65,12 @@ mod test {
     fn test_candle_default() {
         let c = Candle::default();
         assert_eq!(c.date, Date::MIN);
-        assert_eq!(c.open, 0.0);
-        assert_eq!(c.high, 0.0);
-        assert_eq!(c.low, 0.0);
-        assert_eq!(c.close, 0.0);
+        assert_eq!(c.open, Decimal::new(0, 2));
+        assert_eq!(c.high, Decimal::new(0, 2));
+        assert_eq!(c.low, Decimal::new(0, 2));
+        assert_eq!(c.close, Decimal::new(0, 2));
         assert_eq!(c.volume, 0);
+        assert_eq!(c.turnover, 0);
+        assert_eq!(c.change, Decimal::new(0, 2));
     }
 }

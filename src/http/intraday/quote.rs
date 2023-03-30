@@ -42,15 +42,19 @@ impl Request for QuoteRequest<'_> {
     type Response = QuoteResponse;
 
     fn queries(&self) -> Vec<Query> {
-        vec![
-            Query {
+        let mut ret = Vec::with_capacity(2);
+        if !self.symbol_id.is_empty() {
+            ret.push(Query {
                 param: "symbolId".to_string(),
                 value: self.symbol_id.to_string(),
-            },
-            Query {
+            })
+        }
+        if self.odd_lot {
+            ret.push(Query {
                 param: "oddLot".to_string(),
                 value: self.odd_lot.to_string(),
-            },
-        ]
+            })
+        }
+        ret
     }
 }

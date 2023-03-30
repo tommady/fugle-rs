@@ -56,23 +56,31 @@ impl Request for DealtsRequest<'_> {
     type Response = DealtsResponse;
 
     fn queries(&self) -> Vec<Query> {
-        vec![
-            Query {
+        let mut ret = Vec::with_capacity(4);
+        if !self.symbol_id.is_empty() {
+            ret.push(Query {
                 param: "symbolId".to_string(),
                 value: self.symbol_id.to_string(),
-            },
-            Query {
+            })
+        }
+        if self.odd_lot {
+            ret.push(Query {
                 param: "oddLot".to_string(),
                 value: self.odd_lot.to_string(),
-            },
-            Query {
+            })
+        }
+        if self.limit != 0 {
+            ret.push(Query {
                 param: "limit".to_string(),
                 value: self.limit.to_string(),
-            },
-            Query {
+            })
+        }
+        if self.offset != 0 {
+            ret.push(Query {
                 param: "offset".to_string(),
                 value: self.offset.to_string(),
-            },
-        ]
+            })
+        }
+        ret
     }
 }
