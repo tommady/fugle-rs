@@ -36,11 +36,13 @@ impl Default for Candle {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct CandlesResponse {
+    #[serde(rename = "symbol")]
     pub symbol_id: String,
     #[serde(rename = "type")]
     pub typ: String,
     pub exchange: String,
     pub market: String,
+    #[serde(rename = "data")]
     pub candles: Vec<Candle>,
 }
 
