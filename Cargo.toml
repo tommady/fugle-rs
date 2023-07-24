@@ -39,7 +39,7 @@ features = ["json", "rustls-tls-webpki-roots"]
 optional = true
 
 [dependencies.tungstenite]
-version = "0.17"
+version = "0.20"
 default-features = false
 features = ["rustls-tls-webpki-roots"]
 optional = true
